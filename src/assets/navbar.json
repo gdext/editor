@@ -1,0 +1,49 @@
+{
+    "left": [
+        {
+            "title": "File",
+            "options": [
+                [
+                    { "name": "New Level", "id": "new" }
+                ],
+                [
+                    { "name": "Save", "id": "save", "icon": "ic-save.svg" },
+                    { "name": "Save as New", "id": "saveas", "icon": "ic-saveas.svg" },
+                    { "name": "Load", "id": "load" }
+                ],
+                [
+                    { "name": "Export as File", "id": "export", "icon": "ic-export.svg" },
+                    { "name": "Import", "id": "import" },
+                    { "name": "Exit", "id": "exit", "icon": "ic-exit.svg" }
+                ]
+            ]
+        },
+        {
+            "title": "Edit",
+            "options": [
+                [
+                    { "name": "Undo", "id": "undo" },
+                    { "name": "Redo", "id": "redo" }
+                ],
+                [
+                    { "name": "About", "id": "about" }
+                ]
+            ]
+        },
+        {
+            "title": "Settings",
+            "options": [
+                [
+                    { "name": "Level", "id": "settings1" },
+                    { "name": "General", "id": "settings2" },
+                    { "name": "Editor", "id": "settings3" },
+                    { "name": "Flags", "id": "settings4" },
+                    { "name": "Shortcuts", "id": "settings5" }
+                ]
+            ]
+        }
+    ],
+    "right": [ 
+        "save", "saveas", "export", "exit"
+    ]
+}

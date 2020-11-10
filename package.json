@@ -1,0 +1,29 @@
+{
+  "name": "gdext-editor",
+  "version": "0.1.0",
+  "description": "A web-based external Geometry Dash editor",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gdext/editor.git"
+  },
+  "author": "Ucrash",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gdext/editor/issues"
+  },
+  "homepage": "https://github.com/gdext/editor#readme",
+  "devDependencies": {
+    "css-loader": "^5.0.1",
+    "file-loader": "^6.2.0",
+    "style-loader": "^2.0.0",
+    "webpack-cli": "^4.2.0"
+  },
+  "dependencies": {
+    "webpack": "^5.4.0"
+  }
+}
