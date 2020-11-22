@@ -7,7 +7,7 @@ import icDelete from '../assets/ic-delete.svg';
 import icMinimize from '../assets/ic-minimize.svg';
 import ui from './ui';
 import util from './util';
-import gdrenderw from './gdrenderw';
+import buildPreview from './buildPreview';
 
 export default {
     generateNavbar: (navbar) => {
@@ -106,7 +106,6 @@ export default {
         canvas.width = canvasSize.width;
         canvas.height = canvasSize.height;
         canvas.id = "render";
-        gdrenderw.init(ldata);
     },
     generateBottom: (elem) => {
         //tabs selector
@@ -163,6 +162,8 @@ export default {
                 catSelectors.forEach(cs => { cs.classList.remove('sel') });
                 buildCategory.classList.add('sel');
                 buildTitle.innerText = `Build: ${t.name}`;
+                //load objects
+                util.loadObjects(buildContent, t.id, 128);
             }
             let categoryIcon = document.createElement('img');
             import(`../assets/buildtab/${t.icon}.svg`).then(({default: i}) => {
@@ -173,6 +174,9 @@ export default {
             });
             buildCategories.appendChild(buildCategory);
         });
+
+        //load objects
+        util.loadObjects(buildContent, 'blocks', 128);
 
         let tab1 = document.getElementById('tabBuild');
         tab1.appendChild(buildTitle);
