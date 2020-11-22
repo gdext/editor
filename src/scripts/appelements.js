@@ -4,7 +4,10 @@ import logoSrc from '../assets/logo-mono.svg';
 import icBuild from '../assets/ic-build.svg';
 import icEdit from '../assets/ic-edit.svg';
 import icDelete from '../assets/ic-delete.svg';
+import icMinimize from '../assets/ic-minimize.svg';
 import ui from './ui';
+import util from './util';
+import buildPreview from './buildPreview';
 
 export default {
     generateNavbar: (navbar) => {
@@ -89,6 +92,21 @@ export default {
         let autosaveCheckbox = ui.createCheckbox('Autosaving', 'toggleAutosave', false);
         sectionCheckbox.appendChild(autosaveCheckbox);
     },
+    generateMain: (elem, ldata) => {
+        const navbar = document.getElementById('appNavbar');
+        const bottom = document.getElementById('appBottom');
+
+        const canvas = document.createElement('canvas');
+        const canvasSize = util.calcCanvasSize(
+            { width: window.innerWidth, height: window.innerHeight }, 
+            navbar.getBoundingClientRect(), 
+            bottom.getBoundingClientRect()
+        );
+
+        canvas.width = canvasSize.width;
+        canvas.height = canvasSize.height;
+        canvas.id = "render";
+    },
     generateBottom: (elem) => {
         //tabs selector
         let tabs = document.createElement('div');
@@ -144,6 +162,8 @@ export default {
                 catSelectors.forEach(cs => { cs.classList.remove('sel') });
                 buildCategory.classList.add('sel');
                 buildTitle.innerText = `Build: ${t.name}`;
+                //load objects
+                util.loadObjects(buildContent, t.id, 128);
             }
             let categoryIcon = document.createElement('img');
             import(`../assets/buildtab/${t.icon}.svg`).then(({default: i}) => {
@@ -155,10 +175,20 @@ export default {
             buildCategories.appendChild(buildCategory);
         });
 
+        //load objects
+        util.loadObjects(buildContent, 'blocks', 128);
+
         let tab1 = document.getElementById('tabBuild');
         tab1.appendChild(buildTitle);
         tab1.appendChild(buildContent);
         tab1.appendChild(buildCategories);
         document.querySelector('.tab-category-selector').classList.add('sel');
+
+        //minimize/maximize button
+        let minBtn = document.createElement('img');
+        minBtn.src = icMinimize;
+        minBtn.classList.add('bottom-floatbutton');
+        minBtn.onclick = () => elem.classList.toggle('min');
+        elem.appendChild(minBtn);
     }
 }

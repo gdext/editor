@@ -1,0 +1,54 @@
+{
+    "portals": {
+        "ids": [
+            12, 13, 47, 111, 660, 745, 1331, 45, 46, 101, 99, 286, 287, 200, 201, 202, 203, 1334
+        ],
+        "names": [
+            "cube", "ship", "ball", "ufo", "wave", "robot", "spider", "mirror", "nomirror", "mini", "nomini", 
+            "dual", "nodual", "slow", "normal", "fast", "faster", "fastest"
+        ]
+    }, 
+    "triggers": {
+        "ids": [
+            901, 1006, 1007, 1049, 1268, 1346, 1347, 1520,
+            1585, 1595, 1611, 1616, 1612, 1613, 1811, 1812,
+            1814, 1815, 1817, 1818, 1819, 1912, 1913, 1914,
+            1916, 1917, 1931, 31, 32, 33, 34,
+            29, 30, 104, 105, 221, 717, 718, 743, 744, 899, 900, 915,
+            22, 23, 24, 25, 26, 27, 28, 55, 56, 57, 58, 59
+        ],
+        "names": [
+            "move", "pulse", "alpha", "toggle", "spawn", "rotate", "follow", "shake",
+            "animate", "touch", "count", "stop", "hide", "show", "instantcount", "ondeath",
+            "followplayery", "collision", "pickup", "bgfxon", "bgfxoff", "random", "camzoom", "camstatic",
+            "camoffset", "reverse", "end", "startpos", "trailon", "trailoff", "startpos2",
+            "color", "color", "color", "color", "color", "color", "color", "color", "color", "color", "color", "color",
+            "bgfx", "bgfx", "bgfx", "bgfx", "bgfx", "bgfx", "bgfx", "bgfx", "bgfx", "bgfx", "bgfx", "bgfx"
+        ]
+    },
+    "orbs": {
+        "ids": [
+            36, 84, 141, 1022, 1333, 1330, 1704, 1751, 1594
+        ],
+        "names": [
+            "yellow", "blue", "pink", "green", "red", "black", "dash", "dashpink", "trigger"
+        ]
+    },
+    "pads": {
+        "ids": [
+            35, 67, 140, 1332
+        ],
+        "names": [
+            "yellow", "blue", "pink", "red"
+        ]
+    },
+    "pickups": {
+        "ids": [
+            1275, 1587, 1589, 1598, 1614
+        ],
+        "names": [
+            "key", "heart", "flask", "skull", "coin"
+        ]
+    },
+    "text": 914
+}

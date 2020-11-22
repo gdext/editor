@@ -1,0 +1,72 @@
+{
+    "kA2": "gamemode",
+    "kA4": "speed",
+
+    "kA6": "bg",
+    "kA7": "g",
+    "kA18": "font",
+    "kA13": "songoffset",
+
+    "kA3": "mini",
+    "kA8": "dual",
+    "kA9": "startPos",
+    "kA10": "2p",
+    "kA11": "flipgravity",
+    "kA15": "songfadein",
+    "kA16": "songfadeout",
+    "kA17": "line",
+
+    "kS1": "bgr",
+    "kS2": "bgg",
+    "kS3": "bgb",
+
+    "kS4": "gr",
+    "kS5": "gg",
+    "kS6": "gb",
+
+    "kS7": "liner",
+    "kS8": "lineg",
+    "kS9": "linen",
+
+    "kS10": "objr",
+    "kS11": "objg",
+    "kS12": "objb",
+
+    "kS13": "1r",
+    "kS14": "1g",
+    "kS15": "1b",
+
+    "kA5": "1blend",
+
+    "kS16": "bgp",
+    "kS17": "gp",
+    "kS18": "linep",
+    "kS19": "objp",
+    "kS20": "1p",
+
+    "kS29": "bgc",
+    "kS30": "gc",
+    "kS31": "linec",
+    "kS32": "objc",
+    "kS33": "1c",
+    "kS34": "2c",
+    "kS35": "3c",
+    "kS36": "4c",
+    "kS37": "3dlc",
+
+    "kS38": "colors",
+    "colorprops": [
+        null, "r", "g", "b", "pcolor", "blending", "channel",
+        "alpha", null, "copychannel", "copyhsv", null, null, 
+        null, null, null, null, "copyalpha"
+    ],
+    "colorchannels": {
+        "1000": "bg",
+        "1001": "g",
+        "1002": "line",
+        "1003": "3dl",
+        "1004": "obj",
+        "1009": "g2"
+    },
+    "colorhsv": ["h", "s", "v", "smode", "vmode"]
+}

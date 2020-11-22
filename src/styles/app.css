@@ -141,6 +141,7 @@
 .app-element.app-bottom {
     background: #202020;
     display: flex;
+    position: relative;
 }
 
 .bottom-tabs {
@@ -229,4 +230,37 @@
 }
 .tab-category-selector.sel img {
     filter: brightness(10);
+}
+
+.app-bottom.min {
+    height: 40px;
+}
+
+.app-bottom.min .tab-categories {
+    display: none;
+}
+
+.app-bottom.min .tab-content {
+    display: none;
+}
+
+.app-bottom.min .bottom-tabs {
+    display: none;
+}
+
+.bottom-floatbutton{
+    position: absolute;
+    top: 7px;
+    width: 26px;
+    right: 15px;
+    height: 26px;
+    box-sizing: border-box;
+    padding: 8px;
+}
+.bottom-floatbutton:hover{
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+}
+.app-bottom.min .bottom-floatbutton{
+    transform: rotate(180deg);
 }
