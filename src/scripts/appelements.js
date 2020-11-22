@@ -4,7 +4,10 @@ import logoSrc from '../assets/logo-mono.svg';
 import icBuild from '../assets/ic-build.svg';
 import icEdit from '../assets/ic-edit.svg';
 import icDelete from '../assets/ic-delete.svg';
+import icMinimize from '../assets/ic-minimize.svg';
 import ui from './ui';
+import util from './util';
+import gdrenderw from './gdrenderw';
 
 export default {
     generateNavbar: (navbar) => {
@@ -89,6 +92,22 @@ export default {
         let autosaveCheckbox = ui.createCheckbox('Autosaving', 'toggleAutosave', false);
         sectionCheckbox.appendChild(autosaveCheckbox);
     },
+    generateMain: (elem, ldata) => {
+        const navbar = document.getElementById('appNavbar');
+        const bottom = document.getElementById('appBottom');
+
+        const canvas = document.createElement('canvas');
+        const canvasSize = util.calcCanvasSize(
+            { width: window.innerWidth, height: window.innerHeight }, 
+            navbar.getBoundingClientRect(), 
+            bottom.getBoundingClientRect()
+        );
+
+        canvas.width = canvasSize.width;
+        canvas.height = canvasSize.height;
+        canvas.id = "render";
+        gdrenderw.init(ldata);
+    },
     generateBottom: (elem) => {
         //tabs selector
         let tabs = document.createElement('div');
@@ -160,5 +179,12 @@ export default {
         tab1.appendChild(buildContent);
         tab1.appendChild(buildCategories);
         document.querySelector('.tab-category-selector').classList.add('sel');
+
+        //minimize/maximize button
+        let minBtn = document.createElement('img');
+        minBtn.src = icMinimize;
+        minBtn.classList.add('bottom-floatbutton');
+        minBtn.onclick = () => elem.classList.toggle('min');
+        elem.appendChild(minBtn);
     }
 }
