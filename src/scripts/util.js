@@ -6,7 +6,7 @@ export default {
     calcCanvasSize: (ws, ns, bms) => {
         let w = ws.width;
         let h = ws.height - ns.height - bms.height;
-
+        console.log(h);
         return { width: w, height: h }
     },
 
