@@ -122,16 +122,20 @@ export default {
         canvas.onmousedown = (e) => {
             if(e.button == 1) {
                 let coords = renderer.getCoords();
+                let updateInterval = setInterval(() => {
+                    renderer.update(canvas);
+                }, 20);
                 window.onmousemove = (e1) => {
                     coords.x -= e1.movementX / coords.z;
                     coords.y -= e1.movementY / coords.z;
                     renderer.moveTo(coords.x, coords.y, coords.z);
-                    renderer.update(canvas);
                 }
                 function stopMove() {
                     window.onmousemove = null;
                     window.onmouseup = null;
                     window.onmouseout = null;
+                    clearInterval(updateInterval);
+                    updateInterval = null;
                 }
                 window.onmouseup = stopMove;
                 window.onmouseout = stopMove;
