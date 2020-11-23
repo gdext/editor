@@ -34,7 +34,6 @@ export const util = {
         if (success)
             return shader;
     
-        console.log(gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
     },
     createProgram: function(gl, vertexShader, fragmentShader) {
@@ -46,7 +45,6 @@ export const util = {
         if (success)
             return program;
         
-        console.log(gl.getProgramInfoLog(program));
         gl.deleteProgram(program);
     },
     createBuffer: function(gl, values) {
@@ -886,7 +884,6 @@ export function GDRenderer(gl) {
         var size = Math.max(this.width, this.height);
         glMatrix.mat3.scale(model, model, [size, size]);
         gl.uniformMatrix3fv(this.mmUni, false, model);
-        console.log(model);
 
         gl.uniform1f(this.textX, 0);
         gl.uniform1f(this.textY, 0);
@@ -1170,8 +1167,6 @@ export function GDRenderer(gl) {
 
         this.viewM = glMatrix.mat3.create();
         glMatrix.mat3.scale(this.viewM, this.viewM, new Float32Array([this.camera.zoom, this.camera.zoom]));
-
-        console.log(this);
 
         if (this.level)
             for (var i = -4; i < 4; i++)

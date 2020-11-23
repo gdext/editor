@@ -14,6 +14,7 @@
 .app-element.app-main {
     height: 100%;
     flex-shrink: 1;
+    margin-bottom: -5px;
     background: #2b2b2b;
 }
 

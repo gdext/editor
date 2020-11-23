@@ -5,7 +5,6 @@ let image = new Image();
 
 function drawObject(ctx, id) {
     let objs = spritesheet_json.filter((obj) => {return obj.name == id + ".png"});
-    console.log(ctx, image);
     if (objs.length > 0) {
         let obj = objs[0];
 

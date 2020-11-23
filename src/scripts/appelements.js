@@ -7,7 +7,8 @@ import icDelete from '../assets/ic-delete.svg';
 import icMinimize from '../assets/ic-minimize.svg';
 import ui from './ui';
 import util from './util';
-import buildPreview from './buildPreview';
+import renderer from './canvas';
+import levelparse from './levelparse';
 
 export default {
     generateNavbar: (navbar) => {
@@ -92,7 +93,7 @@ export default {
         let autosaveCheckbox = ui.createCheckbox('Autosaving', 'toggleAutosave', false);
         sectionCheckbox.appendChild(autosaveCheckbox);
     },
-    generateMain: (elem, ldata) => {
+    generateMain: (elem) => {
         const navbar = document.getElementById('appNavbar');
         const bottom = document.getElementById('appBottom');
 
@@ -106,6 +107,44 @@ export default {
         canvas.width = canvasSize.width;
         canvas.height = canvasSize.height;
         canvas.id = "render";
+        elem.appendChild(canvas);
+
+        let l = localStorage.getItem('lvlcode');
+        //localStorage.setItem('lvlcode', l);
+
+        renderer.init(canvas, levelparse.code2object(l));
+        renderer.update(canvas);
+        setInterval(() => {
+            renderer.update(canvas);
+        }, 5000);
+
+        //mouse events
+        canvas.onmousedown = (e) => {
+            if(e.button == 1) {
+                let coords = renderer.getCoords();
+                window.onmousemove = (e1) => {
+                    coords.x -= e1.movementX / coords.z;
+                    coords.y -= e1.movementY / coords.z;
+                    renderer.moveTo(coords.x, coords.y, coords.z);
+                    renderer.update(canvas);
+                }
+                function stopMove() {
+                    window.onmousemove = null;
+                    window.onmouseup = null;
+                    window.onmouseout = null;
+                }
+                window.onmouseup = stopMove;
+                window.onmouseout = stopMove;
+            }
+        }
+
+        canvas.onwheel = (e) => {
+            let coords = renderer.getCoords();
+            if(e.deltaY < 0) coords.z *= 1.1;
+            else coords.z /= 1.1;
+            renderer.moveTo(coords.x, coords.y, coords.z);
+            renderer.update(canvas);
+        }  
     },
     generateBottom: (elem) => {
         //tabs selector

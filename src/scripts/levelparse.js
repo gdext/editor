@@ -45,21 +45,37 @@ export default {
             else levelSettingsObj[levelSettingsSplitted[i]] = val;
         }
         //level colors
-        let ci = -1;
-        levelSettingsObj.colors.forEach(c => {
-            ci++;
-            let colorData = {};
-            let colorSplitted = c.split('_');
-            for(let i = 0; i < colorSplitted.length; i+=2){
-                let val = colorSplitted[i+1];
-                let key = settingids.colorprops[colorSplitted[i]];
-                if(key) colorData[key] = val;
-                else colorData[colorSplitted[i]] = val;
-            }
-            if(settingids.colorchannels[colorData.channel]) colorData.channelInfo = settingids.colorchannels[colorData.channel];
-            levelSettingsObj.colors[ci] = colorData;
-        });
-        levelSettingsObj.colors = levelSettingsObj.colors.slice(0, -1);
+        if(levelSettingsObj.colors) {
+            let ci = -1;
+            levelSettingsObj.colors.forEach(c => {
+                ci++;
+                let colorData = {};
+                let colorSplitted = c.split('_');
+                for(let i = 0; i < colorSplitted.length; i+=2){
+                    let val = colorSplitted[i+1];
+                    let key = settingids.colorprops[colorSplitted[i]];
+                    if(key) colorData[key] = val;
+                    else colorData[colorSplitted[i]] = val;
+                }
+                if(settingids.colorchannels[colorData.channel]) colorData.channelInfo = settingids.colorchannels[colorData.channel];
+                levelSettingsObj.colors[ci] = colorData;
+            });
+            levelSettingsObj.colors = levelSettingsObj.colors.slice(0, -1);
+        }else {
+            //old color system
+            levelSettingsObj.colors = [];
+            let colorz = {};
+            Object.keys(levelSettingsObj).forEach(k => {
+                let v = levelSettingsObj[k];
+                if(Object.values(settingids.colorchannels).includes(k.slice(0, -1))) {
+                    let k2 = Object.keys(settingids.colorchannels)[Object.values(settingids.colorchannels).indexOf(k.slice(0, -1))];
+                    if(!colorz[k.slice(0, -1)]) colorz[k.slice(0, -1)] = {};
+                    colorz[k.slice(0, -1)][k.slice(-1)] = v;
+                    if(k2) colorz[k.slice(0, -1)].channel = k2;
+                }
+            });
+            levelSettingsObj.colors = Object.values(colorz);
+        }
         return { info: levelSettingsObj, data: levelObjects }
     },
     object2code: (obj) => {
