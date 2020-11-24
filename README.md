@@ -19,16 +19,16 @@ To run GDExt locally, navigate into the root directory, after you clone the repo
 npm install
 ```
 
-After all the modules are installed, run:
+After all the modules are installed, run the command below to generate the web page:
 ```
 npm run build
 ```
-to generate the web page. And finally, run a local http server with:
+And finally, run a local http server with:
 ```
 npx http-server -p 8000 -c -1
 ```
 
-When all of the steps above are complete, you should then be able to run GDExt by opening `localhost:8000/dist` in your web browser.
+When all of the steps above are complete, you should be able to run GDExt by opening `localhost:8000/dist` in your web browser.
 
 ## Contribute
 GDExt is still far, far, FAR from finished, so if you want to contribute and help, feel free to do so!
