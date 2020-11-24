@@ -14,16 +14,11 @@ After you've cloned the repository, type `npm install` to install all the module
 * `/src/index.js` is the entry script
 
 ## Running Locally (via web browser)
-To run GDExt locally, navigate into the root directory, after you clone the repo. Open command prompt there and run:
-```
-npm install
-```
-
-After all the modules are installed, run the command below to generate the web page:
+To run GDExt locally, open command prompt in the root directory and run the command below to generate the web page:
 ```
 npm run build
 ```
-And finally, run a local http server with:
+After that, run a local http server with:
 ```
 npx http-server -p 8000 -c -1
 ```
