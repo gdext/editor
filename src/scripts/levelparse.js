@@ -18,6 +18,9 @@ export default {
             types.forEach(t => {
                 if(objects[t].ids.includes(parseInt(data.id))){
                     data.type = t.slice(0, -1);
+                    if(t == 'triggers' && Object.keys(settingids.colortriggers).includes(data.id)) {
+                        data.color = settingids.colortriggers[data.id];
+                    }
                     data.info = objects[t].names[objects[t].ids.indexOf(parseInt(data.id))];
                 }
             });
