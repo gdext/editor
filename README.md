@@ -14,25 +14,16 @@ After you've cloned the repository, type `npm install` to install all the module
 * `/src/index.js` is the entry script
 
 ## Running Locally (via web browser)
-To run GDExt locally, create new folder named `/dist` in the root directory. Navigate into it and create an HTML file with the script with src attribute set to `bundle.js`, something like that:
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GDExt</title>
-</head>
-<body>
-    <script src="bundle.js"></script>
-</body>
-</html>
-```
-After that, navigate back to the root directory and run:
+To run GDExt locally, open command prompt in the root directory and run the command below to generate the web page:
 ```
 npm run build
 ```
-You should then be able to run GDExt by opening `/dist/index.js` in your web browser.
+After that, run a local http server with:
+```
+npx http-server -p 8000 -c -1
+```
+
+When all of the steps above are complete, you should be able to run GDExt by opening `localhost:8000/dist` in your web browser.
 
 ## Contribute
 GDExt is still far, far, FAR from finished, so if you want to contribute and help, feel free to do so!
