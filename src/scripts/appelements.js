@@ -98,7 +98,7 @@ export default {
         const bottom = document.getElementById('appBottom');
 
         const canvas = document.createElement('canvas');
-        const canvasSize = util.calcCanvasSize(
+        let canvasSize = util.calcCanvasSize(
             { width: window.innerWidth, height: window.innerHeight }, 
             navbar.getBoundingClientRect(), 
             bottom.getBoundingClientRect()
@@ -136,11 +136,27 @@ export default {
                     window.onmouseout = null;
                     clearInterval(updateInterval);
                     updateInterval = null;
+                    renderer.update(canvas);
                 }
                 window.onmouseup = stopMove;
                 window.onmouseout = stopMove;
             }
         }
+
+        //on resize
+        function resizeCanvas() {
+            canvasSize = util.calcCanvasSize(
+                { width: window.innerWidth, height: window.innerHeight }, 
+                navbar.getBoundingClientRect(), 
+                bottom.getBoundingClientRect()
+            );
+            canvas.width = canvasSize.width;
+            canvas.height = canvasSize.height;
+            renderer.update(canvas);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('resizeCanvas', resizeCanvas);
 
         canvas.onwheel = (e) => {
             let coords = renderer.getCoords();
@@ -228,10 +244,14 @@ export default {
         document.querySelector('.tab-category-selector').classList.add('sel');
 
         //minimize/maximize button
+        const resizeEvent = new Event('resizeCanvas');
         let minBtn = document.createElement('img');
         minBtn.src = icMinimize;
         minBtn.classList.add('bottom-floatbutton');
-        minBtn.onclick = () => elem.classList.toggle('min');
+        minBtn.onclick = () => {
+            elem.classList.toggle('min');
+            window.dispatchEvent(resizeEvent);
+        }
         elem.appendChild(minBtn);
     }
 }
