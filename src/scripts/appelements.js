@@ -205,6 +205,13 @@ export default {
         if(firstTabSel) firstTabSel.classList.add('sel');
 
         //build tab categories
+        const buildContentBlocks = document.createElement('div');
+        buildContentBlocks.classList.add('tab-content-blocks');
+        const buildContentNext = document.createElement('div');
+        buildContentNext.classList.add('tab-content-button');
+        const buildContentPrevious = document.createElement('div');
+        buildContentPrevious.classList.add('tab-content-button');
+
         let buildTitle = document.createElement('h4');
         buildTitle.innerText = 'Build';
         let buildContent = document.createElement('div');
@@ -222,7 +229,7 @@ export default {
                 buildCategory.classList.add('sel');
                 buildTitle.innerText = `Build: ${t.name}`;
                 //load objects
-                util.loadObjects(buildContent, t.id, 128);
+                util.loadObjects(buildContentBlocks, t.id, 77);
             }
             let categoryIcon = document.createElement('img');
             import(`../assets/buildtab/${t.icon}.svg`).then(({default: i}) => {
@@ -235,7 +242,12 @@ export default {
         });
 
         //load objects
-        util.loadObjects(buildContent, 'blocks', 128);
+
+        buildContent.appendChild(buildContentPrevious);
+        buildContent.appendChild(buildContentBlocks);
+        buildContent.appendChild(buildContentNext);
+
+        util.loadObjects(buildContentBlocks, 'blocks', 77);
 
         let tab1 = document.getElementById('tabBuild');
         tab1.appendChild(buildTitle);

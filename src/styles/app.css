@@ -183,6 +183,17 @@
     height: 100%;
 }
 
+.tab-content-button {
+    width: 25px;
+    flex-shrink: 0;
+}
+
+.tab-content-blocks canvas {
+    margin-right: 5px;
+    padding: 5px;
+    border-radius: 4px;
+}
+
 .bottom-tab {
     display: none;
     height: 100%;
@@ -204,6 +215,8 @@
 
 .bottom-tab .tab-content {
     height: 100%;
+    padding: 0 15px;
+    display: flex;
 }
 
 .bottom-tab .tab-categories {
