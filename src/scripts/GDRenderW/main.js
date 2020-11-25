@@ -1,4 +1,5 @@
 import * as glMatrix from "./matrixgl/index"
+import monitor from "./monitor"
 
 import spritesheet from "./spritesheet.png"
 
@@ -71,6 +72,47 @@ export const util = {
         renderer.gl.uniform1f(renderer.textW, (tex.w-1.2)/renderer.mainT.width);
         renderer.gl.uniform1f(renderer.textH, (tex.h-1.2)/renderer.mainT.height);
     },
+    setModelMatrix: function(renderer, x, y, w, h, rot) {
+        let model = glMatrix.mat3.create();
+
+        glMatrix.mat3.translate(model, model, [x, y]);
+
+        if (rot)
+            glMatrix.mat3.rotate(model, model, rot * Math.PI / 180);
+
+        if (!h)
+            glMatrix.mat3.scale(model, model, [w, w]);
+        else
+            glMatrix.mat3.scale(model, model, [w, h]);
+        
+        renderer.gl.uniformMatrix3fv(renderer.mmUni, false, model);
+    },
+    setCamera: function(renderer, x, y, zoom) {
+        if (x == undefined) {
+            x = -renderer.camera.x;
+            y = renderer.camera.y;
+            zoom = renderer.camera.zoom;
+        }
+
+        let gl = renderer.gl;
+        
+        gl.uniform1f(renderer.cxUni, x);
+        gl.uniform1f(renderer.cyUni, y);
+
+        let matrix = glMatrix.mat3.create();
+        if (zoom)
+            glMatrix.mat3.scale(matrix, matrix, [zoom, zoom]);
+        else
+            glMatrix.mat3.scale(matrix, matrix, [1, 1]);
+        
+        gl.uniformMatrix3fv(renderer.vmUni, false, matrix);
+    },
+    setProjection: function(renderer) {
+        let matrix = glMatrix.mat3.create();
+        glMatrix.mat3.scale(matrix, matrix, [2/renderer.width, 2/renderer.height]);
+
+        renderer.gl.uniformMatrix3fv(renderer.pmUni, false, matrix);
+    },
     getSpeedPortal: function(obj) {
         if (obj.id == 200)
             return 0;
@@ -85,33 +127,33 @@ export const util = {
         return null;
     },
     ups: {
-        0: 258,
-        1: 312,
-        2: 388.8,
-        3: 468,
-        4: 578.1
+        [0]: 258,
+        [1]: 312,
+        [2]: 388.8,
+        [3]: 468,
+        [4]: 578.1
     },
-    xToSec: function(level, x) {
+    xToSec: function(level, x, lol) {
         var resSP = null;
         var lspd = null;
         if (level.format == "GDRenderW")
             lspd = (level.keys.speed === undefined) ? 1 : (level.keys.speed + 1);
         if (level.format == "GDExt")
-            lspd = (level.info.speed === undefined) ? 1 : (level.info.speed + 1);
+            lspd = parseInt((level.info.speed === undefined) ? 1 : (level.info.speed + 1));
         for (var sp of level.listSPs) {
-            if (sp.x >= x)
+            if (parseFloat(sp.x) >= parseFloat(x))
                 break;
             resSP = sp;
         }
         if (resSP != null) {
             var speed = null;
             speed = this.getSpeedPortal(resSP);
-            return resSP.secx + (x - resSP.x) / this.ups[speed];
+            return resSP.secx + (x - resSP.x) / parseFloat(this.ups[speed]);
         } else
-            return x / this.ups[lspd];
+            return parseFloat(x) / parseFloat(this.ups[lspd]);
     },
     longToShortCol(col) {
-        return {r: col.red, b: col.blue, g: col.green};
+        return {r: parseFloat(col.red), b: parseFloat(col.blue), g: parseFloat(col.green)};
     },
     xToCOL: function(level, x, col) {
         var resCOL = null;
@@ -123,10 +165,10 @@ export const util = {
             }
         }
         if (resCOL != null) {
-            var delta = this.xToSec(level, x) - this.xToSec(level, resCOL.x);
-            if (delta < resCOL.duration)
+            var delta = this.xToSec(level, x) - this.xToSec(level, resCOL.x, true);
+            if (delta < parseFloat(resCOL.duration)) {
                 return this.blendColor(resCOL.curCol, this.longToShortCol(resCOL), delta / resCOL.duration);
-            else
+            } else
                 return this.longToShortCol(resCOL);
         } else {
             if (level.format == "GDRenderW")
@@ -178,12 +220,12 @@ export const util = {
 
         var lastCOL = {x: -200000, red: 255, blue: 255, green: 255, duration: 0};
         var curCol  = {r: 255, g: 255, b: 255};
-        if (level.format == "GDRenderW")
+        if (level.format == "GDRenderW") {
             if (level.keys.colors[color] != undefined) {
                 lastCOL = {x: -200000, red: level.keys.colors[color].red, blue: level.keys.colors[color].blue, green: level.keys.colors[color].green, duration: 0};
                 curCol = {r: level.keys.colors[color].red, b: level.keys.colors[color].blue, g: level.keys.colors[color].green};
             }
-        else if (level.format == "GDExt") {
+        } else if (level.format == "GDExt") {
             var baseColor = level.info.colors.filter((f) => {return f.channel == color;});
             if (baseColor.length > 0) {
                 baseColor = baseColor[0];
@@ -666,9 +708,13 @@ varying vec2 o_texcoord;
 uniform sampler2D a_sampler;
 
 uniform vec4 a_tint;
+uniform int  render_line;
 
 void main(void) {
-    gl_FragColor = texture2D(a_sampler, o_texcoord) * a_tint;
+    if (render_line == 1)
+        gl_FragColor = a_tint;
+    else
+        gl_FragColor = texture2D(a_sampler, o_texcoord) * a_tint;
 }`;
 
 function Texture(gl, url) {
@@ -777,6 +823,7 @@ export function GDRenderer(gl) {
             this.colors = {};
         },
         getColor: function(renderer, color) {
+            monitor.startCategory("Color calculation");
             if (color == 1010)
                 return {r: 1, g: 1, b: 1, a: 1};
             if (this.colors[color])
@@ -784,6 +831,7 @@ export function GDRenderer(gl) {
 
             this.colors[color] = util.toOne(util.xToCOL(renderer.level, renderer.camera.x, color));
             this.colors[color].a = 1;
+            monitor.endCategory("Color calculation");
             return this.colors[color];
         }
     }
@@ -877,13 +925,10 @@ export function GDRenderer(gl) {
 
         var gl = this.gl;
 
-        gl.uniform1f(this.cxUni, 0);
-        gl.uniform1f(this.cyUni, 0);
+        util.setCamera(this, 0, 0);
         
-        var model = glMatrix.mat3.create();
         var size = Math.max(this.width, this.height);
-        glMatrix.mat3.scale(model, model, [size, size]);
-        gl.uniformMatrix3fv(this.mmUni, false, model);
+        util.setModelMatrix(this, 0, 0, size);
 
         gl.uniform1f(this.textX, 0);
         gl.uniform1f(this.textY, 0);
@@ -897,6 +942,38 @@ export function GDRenderer(gl) {
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         
         return true;
+    };
+
+    this.renderLine = (x, vertical, tint = {r: 1, g: 1, b: 1, a: 1}, width = 1, toCamera = false) => {
+        let gl = this.gl;
+
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 1);
+        
+        if (!toCamera)
+            util.setCamera(this, 0, 0);
+
+        if (!vertical) {
+            if (!toCamera)
+                util.setModelMatrix(this, 0, -this.height/2 + x, this.width, width);
+            else {
+                util.setCamera(this, 0, this.camera.y, this.camera.zoom);
+                util.setModelMatrix(this, 0, x, this.width / this.camera.zoom, width / this.camera.zoom);
+            }
+        } else {
+            if (!toCamera)
+                util.setModelMatrix(this, -this.width/2 + x, 0, width, this.height);
+            else {
+                util.setCamera(this, -this.camera.x, 0, this.camera.zoom);
+                util.setModelMatrix(this, x, 0, width / this.camera.zoom, this.height / this.camera.zoom);
+            }
+        }
+        gl.uniform4fv(gl.getUniformLocation(this.gProg, "a_tint"), new Float32Array([tint.r, tint.g, tint.b, tint.a]));
+
+        util.enableTexture(gl, this.mainT.texture, this.spUni);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 0);
     };
 
     this.renderTexture = (tex, x, y, rot, xflip, yflip, tint = {r: 1, g: 1, b: 1, a: 1}) => {
@@ -921,18 +998,15 @@ export function GDRenderer(gl) {
         var sx = tex.w/62*30 * (xflip ? -1 : 1);
         var sy = tex.h/62*30 * (yflip ? -1 : 1);
 
-        var model = glMatrix.mat3.create();
-        glMatrix.mat3.translate(model, model, [x, y]);
-        glMatrix.mat3.rotate(model, model, rot * Math.PI / 180);
-        glMatrix.mat3.scale(model, model, [sx, sy]);
+        util.setModelMatrix(this, x, y, sx, sy, rot);
 
-        gl.uniformMatrix3fv(this.mmUni, false, model);
-        var tinted = glMatrix.vec4.create();
         gl.uniform4fv(gl.getUniformLocation(this.gProg, "a_tint"), new Float32Array([tint.r, tint.g, tint.b, tint.a]));
 
         util.enableTexture(gl, this.mainT.texture, this.spUni);
         
+        monitor.startCategory("WebGL rendering");
         gl.drawArrays(gl.TRIANGLES, 0, 6);
+        monitor.endCategory("WebGL rendering");
     }
 
     this.renderObject = (obj) => {
@@ -955,17 +1029,22 @@ export function GDRenderer(gl) {
         if (!def)
             return;
 
+        var maincol = this.cache.getColor(this, mainc);
+        var seccol = this.cache.getColor(this, secc);
+
+        monitor.startCategory("Object rendering");
         if (def.texture_i)
             this.renderTexture(def.texture_i, obj.x, obj.y, rot, xflip, yflip);
         if (def.texture_l)
-            this.renderTexture(def.texture_l, obj.x, obj.y, rot, xflip, yflip, this.cache.getColor(this, mainc));
+            this.renderTexture(def.texture_l, obj.x, obj.y, rot, xflip, yflip, maincol);
         if (def.texture_b)
-            this.renderTexture(def.texture_b, obj.x, obj.y, rot, xflip, yflip, this.cache.getColor(this, secc));
+            this.renderTexture(def.texture_b, obj.x, obj.y, rot, xflip, yflip, seccol);
         if (def.texture_a)
             if (def.texture_l)
-                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, this.cache.getColor(this, secc));
+                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, seccol);
             else
-                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, this.cache.getColor(this, mainc));
+                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, maincol);
+        monitor.endCategory("Object rendering");
     }
 
     this.loadGDExtLevel = (level) => {
@@ -1114,41 +1193,37 @@ export function GDRenderer(gl) {
         this.level.zlayers = zlayers;
     }
 
-    this.renderLevel = (width, height) => {
-        if (!this.level)
-            return;
-        var gl = this.gl
+    this.prepareRender = (width, height) => {
+        var gl = this.gl;
         this.cache.clear();
 
-        this.width = width;
+        this.width  = width;
         this.height = height;
-
-        var bgcol = this.cache.getColor(this, 1000);
 
         gl.useProgram(this.gProg);
 
         util.enableBuffer(gl, this.pBuff, this.pAttr, 2);
         util.enableBuffer(gl, this.tBuff, this.tAttr, 2);
 
-        this.viewM = glMatrix.mat3.create();
-        glMatrix.mat3.scale(this.viewM, this.viewM, [1, 1]);
+        util.setProjection(this);
+    }
 
-        this.projM = glMatrix.mat3.create();
-        glMatrix.mat3.scale(this.projM, this.projM, [2/width, 2/height]);
-
-        gl.uniformMatrix3fv(this.pmUni, false, this.projM);
-        gl.uniformMatrix3fv(this.vmUni, false, this.viewM);
+    this.renderLevel = (width, height, options = {}) => {
+        if (!this.level)
+            return;
+        monitor.startFrame();
+        var gl = this.gl;
         
-        gl.uniform1f(this.cxUni, 0);
-        gl.uniform1f(this.cyUni, 0);
+        this.prepareRender(width, height);
 
-        this.viewM = glMatrix.mat3.create();
-        glMatrix.mat3.scale(this.viewM, this.viewM, [this.camera.zoom, this.camera.zoom]);
+        monitor.startCategory("Background rendering");
 
-        gl.uniformMatrix3fv(this.pmUni, false, this.projM);
-        gl.uniformMatrix3fv(this.vmUni, false, this.viewM);
+        var bgcol = this.cache.getColor(this, 1000);
 
         gl.viewport(0, 0, this.width, this.height);
+
+        this.viewM = glMatrix.mat3.create();
+        gl.uniformMatrix3fv(this.vmUni, false, this.viewM);
 
         if (this.level.format == "GDRenderW")
             if (!this.renderBG(this.level.keys.background === undefined ? 1 : this.level.keys.background, bgcol)) {
@@ -1156,22 +1231,44 @@ export function GDRenderer(gl) {
                 gl.clear(gl.COLOR_BUFFER_BIT);
             }
         if (this.level.format == "GDExt") {
-            if (!this.renderBG(this.level.info.bg === undefined ? 1 : this.level.info.bg, bgcol)) {
+            if (!this.renderBG(this.level.info.bg ? Math.max( 1, this.level.info.bg ) : 1 , bgcol)) {
                 gl.clearColor(bgcol.r, bgcol.g, bgcol.b, 1);
                 gl.clear(gl.COLOR_BUFFER_BIT);
             }
         }
 
-        gl.uniform1f(this.cxUni, -this.camera.x);
-        gl.uniform1f(this.cyUni, this.camera.y);
+        monitor.endCategory("Background rendering");
 
-        this.viewM = glMatrix.mat3.create();
-        glMatrix.mat3.scale(this.viewM, this.viewM, new Float32Array([this.camera.zoom, this.camera.zoom]));
+        if (options.grid) {
+            let cw = this.width / this.camera.zoom;
+            let ch = this.height / this.camera.zoom;
+
+            let x1 = this.camera.x - cw / 2;
+            let y1 = -this.camera.y - ch / 2;
+
+            let x2 = this.camera.x + cw / 2;
+            let y2 = -this.camera.y + ch / 2;
+
+            const BLACK = {r: 0, g: 0, b: 0, a: 1};
+            const BLOCK = 30;
+
+            for (let x = Math.floor(x1/BLOCK) * BLOCK; x <= Math.floor(x2/BLOCK) * BLOCK; x+=BLOCK)
+                this.renderLine(x, true, BLACK, 0.7, true);
+            for (let y = Math.floor(y1/BLOCK) * BLOCK; y <= Math.floor(y2/BLOCK) * BLOCK; y+=BLOCK)
+                this.renderLine(y, false, BLACK, 0.7, true);
+
+            this.renderLine(0, false, {r: 1, g: 1, b: 1, a: 1},   1.5, true);
+            this.renderLine(0, true, {r: 0, g: 0.6, b: 0, a: 1}, 1.5, true);
+        }
+
+        util.setCamera(this);
 
         if (this.level)
             for (var i = -4; i < 4; i++)
                 if (i != 0)
                     for (var obj of this.level.zlayers[i])
                         this.renderObject(obj);
+    
+        monitor.endFrame(false);
     };
 }
