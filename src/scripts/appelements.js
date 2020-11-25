@@ -98,7 +98,7 @@ export default {
         const bottom = document.getElementById('appBottom');
 
         const canvas = document.createElement('canvas');
-        const canvasSize = util.calcCanvasSize(
+        let canvasSize = util.calcCanvasSize(
             { width: window.innerWidth, height: window.innerHeight }, 
             navbar.getBoundingClientRect(), 
             bottom.getBoundingClientRect()
@@ -136,11 +136,27 @@ export default {
                     window.onmouseout = null;
                     clearInterval(updateInterval);
                     updateInterval = null;
+                    renderer.update(canvas);
                 }
                 window.onmouseup = stopMove;
                 window.onmouseout = stopMove;
             }
         }
+
+        //on resize
+        function resizeCanvas() {
+            canvasSize = util.calcCanvasSize(
+                { width: window.innerWidth, height: window.innerHeight }, 
+                navbar.getBoundingClientRect(), 
+                bottom.getBoundingClientRect()
+            );
+            canvas.width = canvasSize.width;
+            canvas.height = canvasSize.height;
+            renderer.update(canvas);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('resizeCanvas', resizeCanvas);
 
         canvas.onwheel = (e) => {
             let coords = renderer.getCoords();
@@ -189,6 +205,13 @@ export default {
         if(firstTabSel) firstTabSel.classList.add('sel');
 
         //build tab categories
+        const buildContentBlocks = document.createElement('div');
+        buildContentBlocks.classList.add('tab-content-blocks');
+        const buildContentNext = document.createElement('div');
+        buildContentNext.classList.add('tab-content-button');
+        const buildContentPrevious = document.createElement('div');
+        buildContentPrevious.classList.add('tab-content-button');
+
         let buildTitle = document.createElement('h4');
         buildTitle.innerText = 'Build';
         let buildContent = document.createElement('div');
@@ -206,7 +229,7 @@ export default {
                 buildCategory.classList.add('sel');
                 buildTitle.innerText = `Build: ${t.name}`;
                 //load objects
-                util.loadObjects(buildContent, t.id, 128);
+                util.loadObjects(buildContentBlocks, t.id, 77);
             }
             let categoryIcon = document.createElement('img');
             import(`../assets/buildtab/${t.icon}.svg`).then(({default: i}) => {
@@ -219,7 +242,12 @@ export default {
         });
 
         //load objects
-        util.loadObjects(buildContent, 'blocks', 128);
+
+        buildContent.appendChild(buildContentPrevious);
+        buildContent.appendChild(buildContentBlocks);
+        buildContent.appendChild(buildContentNext);
+
+        util.loadObjects(buildContentBlocks, 'blocks', 77);
 
         let tab1 = document.getElementById('tabBuild');
         tab1.appendChild(buildTitle);
@@ -228,10 +256,14 @@ export default {
         document.querySelector('.tab-category-selector').classList.add('sel');
 
         //minimize/maximize button
+        const resizeEvent = new Event('resizeCanvas');
         let minBtn = document.createElement('img');
         minBtn.src = icMinimize;
         minBtn.classList.add('bottom-floatbutton');
-        minBtn.onclick = () => elem.classList.toggle('min');
+        minBtn.onclick = () => {
+            elem.classList.toggle('min');
+            window.dispatchEvent(resizeEvent);
+        }
         elem.appendChild(minBtn);
     }
 }
