@@ -186,6 +186,24 @@
 .tab-content-button {
     width: 25px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+}
+.tab-content-button:first-child{
+    transform: scaleX(-1.0);
+}
+.tab-content-button::before {
+    content: '';
+    height: 15px;
+    width: 15px;
+    background-image: url('../assets/ic-next.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.tab-content-button.lock {
+    opacity: 0.5;
 }
 
 .tab-content-blocks canvas {
@@ -217,6 +235,7 @@
     height: 100%;
     padding: 0 15px;
     display: flex;
+    justify-content: space-between;
 }
 
 .bottom-tab .tab-categories {

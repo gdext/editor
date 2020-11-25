@@ -212,6 +212,9 @@ export default {
         const buildContentPrevious = document.createElement('div');
         buildContentPrevious.classList.add('tab-content-button');
 
+        let lastCategory = 'blocks';
+        let page = 0;
+
         let buildTitle = document.createElement('h4');
         buildTitle.innerText = 'Build';
         let buildContent = document.createElement('div');
@@ -229,7 +232,9 @@ export default {
                 buildCategory.classList.add('sel');
                 buildTitle.innerText = `Build: ${t.name}`;
                 //load objects
-                util.loadObjects(buildContentBlocks, t.id, 77);
+                page = 0;
+                loadObjs(t.id, page);
+                lastCategory = t.id;
             }
             let categoryIcon = document.createElement('img');
             import(`../assets/buildtab/${t.icon}.svg`).then(({default: i}) => {
@@ -247,13 +252,45 @@ export default {
         buildContent.appendChild(buildContentBlocks);
         buildContent.appendChild(buildContentNext);
 
-        util.loadObjects(buildContentBlocks, 'blocks', 77);
+        function loadObjs(category, page) {
+            buildContentBlocks.style.width = "";
+            let ow = util.calcBuildObjectsAmount(buildContent);
+            let l = Math.ceil(buildtabData.tabscontent[category].length / ow.amount);
+
+            buildContentPrevious.classList.remove('lock');
+            buildContentNext.classList.remove('lock');
+            if(page == 0) buildContentPrevious.classList.add('lock');
+            if(page >= l) buildContentNext.classList.add('lock');
+            if(page > l) { 
+                page = l;
+                return 'h';
+            }
+
+            util.loadObjects(buildContentBlocks, category, ow.amount*page+page, ow.amount*(page+1));
+            buildContentBlocks.style.width = ow.parentw;
+        }
 
         let tab1 = document.getElementById('tabBuild');
         tab1.appendChild(buildTitle);
         tab1.appendChild(buildContent);
         tab1.appendChild(buildCategories);
         document.querySelector('.tab-category-selector').classList.add('sel');
+
+        loadObjs('blocks', page);
+        window.addEventListener('resize', () => {
+            loadObjs(lastCategory, page);
+        });
+        buildContentNext.onclick = () => {
+            page++;
+            let h = loadObjs(lastCategory, page);
+            if(h == 'h') page--;
+        }
+        buildContentPrevious.onclick = () => {
+            if(page > 0) {
+                page--;
+                loadObjs(lastCategory, page);
+            }
+        }
 
         //minimize/maximize button
         const resizeEvent = new Event('resizeCanvas');

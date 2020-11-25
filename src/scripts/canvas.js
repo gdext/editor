@@ -10,7 +10,6 @@ export default {
         renderer = new GDRenderer(gl);
         cvs = canvas;
         renderer.loadGDExtLevel(lvl);
-        console.log(cvs.width, cvs.height)
         renderer.renderLevel(cvs.width, cvs.height, options);
     },
     update: (canvas) => {

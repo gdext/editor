@@ -10,16 +10,26 @@ export default {
         return { width: w, height: h }
     },
 
-    loadObjects: (elem, category, amount) => {
+    loadObjects: (elem, category, start, end) => {
         elem.innerHTML = "";
-        if(!elem || !buildtabData.tabscontent[category] || !parseInt(amount)) return;
+        if(!elem || !buildtabData.tabscontent[category]) return;
         let bti = -1;
         buildtabData.tabscontent[category].forEach(o => {
             bti++;
-            if(bti > amount || bti > buildtabData.tabscontent[category].length) return;
+            if(bti > end || bti < start || bti > buildtabData.tabscontent[category].length) return;
             let obj = buildPreview.createPreview(o);
             elem.appendChild(obj);
         });
+    },
+
+    calcBuildObjectsAmount: (bottom) => {
+        let width = bottom.getBoundingClientRect().width;
+        width -= 80; //to compensate for left/right arrows and paddings
+        let objw = 45;
+        return {
+            amount: Math.floor(width/objw) * 3 - 1,
+            parentw: Math.floor(width/objw)*45 + 'px'
+        };
     }
 
 }
