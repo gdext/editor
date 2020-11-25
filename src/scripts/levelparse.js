@@ -10,7 +10,9 @@ export default {
             let data = {};
             let objSplitted = obj.split(',');
             for(let i = 0; i < objSplitted.length; i+=2){
-                let val = (propids[objSplitted[i]] == 'groups') ? objSplitted[i+1].split('.') : ((propids[objSplitted[i]] == 'copiedHSV') ? objSplitted[i+1].split('a') : objSplitted[i+1]);
+                let val = objSplitted[i+1];
+                if (propids[objSplitted[i]] == 'groups') val = objSplitted[i+1].split('.') 
+                else if (propids[objSplitted[i]] == 'copiedHSV' || propids[objSplitted[i]] == 'hsv1' || propids[objSplitted[i]] == 'hsv2') val = objSplitted[i+1].split('a');
                 data[propids[objSplitted[i]] || objSplitted[i]] = val;
             }
             //check if trigger, portal, orb, pad or pickup
