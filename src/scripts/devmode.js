@@ -18,7 +18,7 @@ export default {
                 });
         }
 
-        window.onkeypress = (e) => {
+        window.addEventListener('devmode', e => {
             console.log(e.keyCode);
             if(e.keyCode == 113) {
                 let devprompt = prompt('Dev Mode Prompt. Enter Command:');
@@ -52,6 +52,6 @@ import from id - load level using it's id`);
                         break;
                 }
             }
-        }
+        });
     }
 }
