@@ -113,6 +113,10 @@ export const util = {
 
         renderer.gl.uniformMatrix3fv(renderer.pmUni, false, matrix);
     },
+    setTint: function(renderer, tint) {
+        let uniform = renderer.gl.getUniformLocation(renderer.gProg, "a_tint")
+        renderer.gl.uniform4fv(uniform, new Float32Array([tint.r, tint.g, tint.b, tint.a]));
+    },
     getSpeedPortal: function(obj) {
         if (obj.id == 200)
             return 0;
@@ -133,7 +137,7 @@ export const util = {
         [3]: 468,
         [4]: 578.1
     },
-    xToSec: function(level, x, lol) {
+    xToSec: function(level, x) {
         var resSP = null;
         var lspd = null;
         if (level.format == "GDRenderW")
@@ -165,7 +169,7 @@ export const util = {
             }
         }
         if (resCOL != null) {
-            var delta = this.xToSec(level, x) - this.xToSec(level, resCOL.x, true);
+            var delta = this.xToSec(level, x, true) - this.xToSec(level, resCOL.x);
             if (delta < parseFloat(resCOL.duration)) {
                 return this.blendColor(resCOL.curCol, this.longToShortCol(resCOL), delta / resCOL.duration);
             } else
@@ -213,7 +217,7 @@ export const util = {
             }
         else if (level.format == "GDExt")
             for (const obj of level.data)
-                if (obj.type == "trigger" && obj.info == "color" && obj.color == "" + color)
+                if (obj.type == "trigger" && obj.info == "color" && (obj.color == "" + color || (color == 1 && !obj.color)))
                     listCOLs.push(obj);
 
         listCOLs.sort((a, b) => a.x - b.x);
@@ -935,7 +939,7 @@ export function GDRenderer(gl) {
         gl.uniform1f(this.textW, 1);
         gl.uniform1f(this.textH, 1);
         
-        gl.uniform4fv(gl.getUniformLocation(this.gProg, "a_tint"), new Float32Array([tint.r, tint.g, tint.b, tint.a]));
+        util.setTint(this, tint);
         
         util.enableTexture(gl, tex.texture, this.spUni);
 
@@ -967,9 +971,7 @@ export function GDRenderer(gl) {
                 util.setModelMatrix(this, x, 0, width / this.camera.zoom, this.height / this.camera.zoom);
             }
         }
-        gl.uniform4fv(gl.getUniformLocation(this.gProg, "a_tint"), new Float32Array([tint.r, tint.g, tint.b, tint.a]));
-
-        util.enableTexture(gl, this.mainT.texture, this.spUni);
+        util.setTint(this, tint);
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -1000,7 +1002,7 @@ export function GDRenderer(gl) {
 
         util.setModelMatrix(this, x, y, sx, sy, rot);
 
-        gl.uniform4fv(gl.getUniformLocation(this.gProg, "a_tint"), new Float32Array([tint.r, tint.g, tint.b, tint.a]));
+        util.setTint(this, tint);
 
         util.enableTexture(gl, this.mainT.texture, this.spUni);
         
@@ -1051,16 +1053,16 @@ export function GDRenderer(gl) {
         this.level = level;
         this.level.format = "GDExt";
 
-        var listSPs = [];
+        let listSPs = [];
         for (const obj of this.level.data) {
             if (util.getSpeedPortal(obj))
                 listSPs.push(obj);
         }
         listSPs.sort((a, b) => a.x - b.x);
 
-        var lastSP = 0;
-        var currSP = (this.level.info.speed === undefined) ? 1 : this.level.info.speed + 1;
-        var secPas = 0;
+        let lastSP = 0;
+        let currSP = parseInt((this.level.info.speed === undefined) ? 1 : this.level.info.speed + 1);
+        let secPas = 0;
 
         for (const obj of listSPs) {
             var delta = obj.x - lastSP;
@@ -1104,18 +1106,31 @@ export function GDRenderer(gl) {
 
         var zlayers = {};
 
-        for (var i = -4; i < 4; i++) {
-            if (i != 0) {
-                zlayers[i] = [];
-                for (var obj of this.level.data)
-                    if (obj.z == i)
-                        zlayers[i].push(obj);
+        var lchunks = {};
 
-                zlayers[i].sort((a, b) => (a.zlayer < b.zlayer) ? -1 : 1);
-            }
+        for (var obj of this.level.data) {
+            let chunk = lchunks[Math.floor(obj.x / 992)];
+            if (!chunk)
+                chunk = {};
+
+            if (!chunk[obj.z])
+                chunk[obj.z] = [];
+
+            chunk[obj.z].push(obj);
+            lchunks[Math.floor(obj.x / 992)] = chunk;
         }
 
-        this.level.zlayers = zlayers;
+        for (var chunk in lchunks)
+            if (lchunks.hasOwnProperty(chunk))
+                for (var zid in lchunks[chunk])
+                    if (lchunks[chunk].hasOwnProperty(zid)) {
+                        var zlayer = lchunks[chunk][zid];
+                        zlayer.sort((a, b) => (a.zorder < b.zorder) ? -1 : 1);
+                        lchunks[chunk][zid] = zlayer;
+                    }
+
+
+        this.level.lchunks = lchunks;
     }
 
     this.loadGDRLevel = (level) => {
@@ -1178,7 +1193,7 @@ export function GDRenderer(gl) {
         }
 
         var zlayers = {};
-
+        
         for (var i = -4; i < 4; i++) {
             if (i != 0) {
                 zlayers[i] = [];
@@ -1213,7 +1228,7 @@ export function GDRenderer(gl) {
             return;
         monitor.startFrame();
         var gl = this.gl;
-        
+
         this.prepareRender(width, height);
 
         monitor.startCategory("Background rendering");
@@ -1261,14 +1276,31 @@ export function GDRenderer(gl) {
             this.renderLine(0, true, {r: 0, g: 0.6, b: 0, a: 1}, 1.5, true);
         }
 
+        //console.log(this);
+
         util.setCamera(this);
 
-        if (this.level)
-            for (var i = -4; i < 4; i++)
-                if (i != 0)
-                    for (var obj of this.level.zlayers[i])
-                        this.renderObject(obj);
-    
-        monitor.endFrame(false);
+        //if (this.level == "GDExt") {
+            let camB = Math.floor( (this.camera.x - this.width / this.camera.zoom - 150) / 992);
+            let camE = Math.floor( (this.camera.x + this.width / this.camera.zoom + 150) / 992);
+
+            for (let c = camB; c <= camE; c++)
+                if (this.level.lchunks[c]) {
+                    let chunk = this.level.lchunks[c];
+                    for (let i = -4; i <= 3; i++)
+                        if (i != 0 && chunk[i]) {
+                            for (let obj of chunk[i])
+                                this.renderObject(obj);
+                        }
+                }
+        /*} else {
+            if (this.level)
+                for (var i = -4; i < 4; i++)
+                    if (i != 0)
+                        for (var obj of this.level.zlayers[i])
+                            this.renderObject(obj);
+        }*/
+
+        monitor.endFrame(true);
     };
 }
