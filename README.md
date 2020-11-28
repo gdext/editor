@@ -6,6 +6,8 @@
 **Welcome to GDExt's repo! :)**
 This is an external Geometry Dash editor built using electron and webpack. This repo contains the code for the editor's page itself. However, it doesn't include the `/dist` directory and any of the code related to electron.
 
+![GDExt](https://i.imgur.com/YRC7zHz.png)
+
 ## Getting Started
 After you've cloned the repository, type `npm install` to install all the modules. All the code is located in the `/src` directory. Here's more info:
 * `/src/assets` contains all the assets, excluding scripts and styles
