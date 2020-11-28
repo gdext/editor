@@ -1,0 +1,44 @@
+[
+    {
+        "keys": [ 16, 17, 73 ],
+        "type": "event",
+        "eventName": "electronApi",
+        "eventInfo": "openDevTools"
+    },
+    {
+        "keys": [ 122 ],
+        "type": "event",
+        "eventName": "electronApi",
+        "eventInfo": "toggleFullscreen"
+    },
+    {
+        "keys": [ 13, 18 ],
+        "type": "event",
+        "eventName": "electronApi",
+        "eventInfo": "toggleFullscreen"
+    },
+    {
+        "keys": [ 16, 17, 81 ],
+        "type": "event",
+        "eventName": "devmode",
+        "eventInfo": "prompt"
+    },
+    {
+        "keys": [ 116 ],
+        "type": "event",
+        "eventName": "electronApi",
+        "eventInfo": "reload"
+    },
+    {
+        "keys": [ 17, 82 ],
+        "type": "event",
+        "eventName": "electronApi",
+        "eventInfo": "reload"
+    },
+    {
+        "keys": [ 17, 81 ],
+        "type": "event",
+        "eventName": "electronApi",
+        "eventInfo": "quit"
+    }
+]
