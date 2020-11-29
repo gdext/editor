@@ -34,6 +34,13 @@ export default {
         prefData[cname] = cat;
         return cat;
     },
+    getTime: function(catn) {
+        let cat = prefData[catn];
+        if (!cat)
+            return;
+
+        return cat.time;
+    },
     endFrame: function(log) {
         if (log) {
             let total_time = window.performance.now() - prefData._total_;

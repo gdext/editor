@@ -78,13 +78,13 @@ export const util = {
         glMatrix.mat3.translate(model, model, [x, y]);
 
         if (rot)
-            glMatrix.mat3.rotate(model, model, rot * Math.PI / 180);
+            glMatrix.mat3.rotate(model, model, (-rot) * Math.PI / 180);
 
         if (!h)
             glMatrix.mat3.scale(model, model, [w, w]);
         else
             glMatrix.mat3.scale(model, model, [w, h]);
-        
+
         renderer.gl.uniformMatrix3fv(renderer.mmUni, false, model);
     },
     setCamera: function(renderer, x, y, zoom) {
@@ -823,8 +823,12 @@ export function GDRenderer(gl) {
     this.cache = {
         colors: {},
         parent: null,
+        camX1: null,
+        camX2: null,
+        objCount: 0,
         clear: function() {
             this.colors = {};
+            this.objCount = 0;
         },
         getColor: function(renderer, color) {
             monitor.startCategory("Color calculation");
@@ -981,55 +985,49 @@ export function GDRenderer(gl) {
     this.renderTexture = (tex, x, y, rot, xflip, yflip, tint = {r: 1, g: 1, b: 1, a: 1}) => {
         if (tex == undefined)
             return;
-        if (!this.mainT.loaded)
-            return;
-        
-        var rx = (x - this.camera.x) * this.camera.zoom;
-        var ry = (y + this.camera.y) * this.camera.zoom;
 
         var gl = this.gl;
 
-        if (!(rx+tex.w/2+60 > -(this.width/2) && rx-tex.w/2-60 <= this.width/2))
-            return;
-        if (this.level.format == "GDRenderW")
-            if (!(ry+tex.h/2+60 > -(this.height/2) && ry-tex.h/2-60 <= this.height/2))
-                return;
-
         util.setTexture(this, tex);
 
-        var sx = tex.w/62*30 * (xflip ? -1 : 1);
-        var sy = tex.h/62*30 * (yflip ? -1 : 1);
+        var sx = tex.w * 0.48387096774 * xflip;
+        var sy = tex.h * 0.48387096774 * yflip;
 
-        util.setModelMatrix(this, x, y, sx, sy, rot);
+        util.setModelMatrix(this, x, y, sx, sy, rot, true);
 
         util.setTint(this, tint);
 
-        util.enableTexture(gl, this.mainT.texture, this.spUni);
-        
+        //monitor.endCategory("Object rendering");
         monitor.startCategory("WebGL rendering");
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         monitor.endCategory("WebGL rendering");
+        //monitor.startCategory("Object rendering");
     }
 
     this.renderObject = (obj) => {
-        if (this.level.format == "GDRenderW") {
-            var rot = (obj.rot === undefined) ? 0 : -obj.rot;
-            var xflip = (obj.flip_hor === undefined) ? false : obj.flip_hor;
-            var yflip = (obj.flip_ver === undefined) ? false : obj.flip_ver;
-            var mainc = obj.maincolor;
-            var secc  = obj.seccolor;
-        } else if (this.level.format == "GDExt") {
-            var rot = (obj.r === undefined) ? 0 : -obj.r;
-            var xflip = (obj.flipx === undefined) ? false : obj.flipx;
-            var yflip = (obj.flipy === undefined) ? false : obj.flipy;
-            var mainc = obj.baseCol;
-            var secc  = obj.decorCol;
-        }
-
         var def = this.objectDefs[obj.id];
 
         if (!def)
             return;
+
+        if (obj.x > this.cache.camX2 || obj.x < this.cache.camX1)
+            return;
+
+        if (this.level.format == "GDRenderW") {
+            var rot = obj.rot;
+            var xflip = (obj.flip_hor === undefined) ? 1 : (obj.flip_hor ? -1 : 1);
+            var yflip = (obj.flip_ver === undefined) ? 1 : (obj.flip_ver ? -1 : 1);
+            var mainc = obj.maincolor;
+            var secc  = obj.seccolor;
+        } else if (this.level.format == "GDExt") {
+            var rot = obj.r;
+            var xflip = (obj.flipx === undefined) ? 1 : (obj.flipx ? -1 : 1);
+            var yflip = (obj.flipy === undefined) ? 1 : (obj.flipy ? -1 : 1);
+            var mainc = obj.baseCol;
+            var secc  = obj.decorCol;
+        }
+
+        this.cache.objCount++;
 
         var maincol = this.cache.getColor(this, mainc);
         var seccol = this.cache.getColor(this, secc);
@@ -1224,6 +1222,7 @@ export function GDRenderer(gl) {
     }
 
     this.renderLevel = (width, height, options = {}) => {
+        let startTime = window.performance.now();
         if (!this.level)
             return;
         monitor.startFrame();
@@ -1254,6 +1253,7 @@ export function GDRenderer(gl) {
 
         monitor.endCategory("Background rendering");
 
+        monitor.startCategory("Grid rendering");
         if (options.grid) {
             let cw = this.width / this.camera.zoom;
             let ch = this.height / this.camera.zoom;
@@ -1275,32 +1275,40 @@ export function GDRenderer(gl) {
             this.renderLine(0, false, {r: 1, g: 1, b: 1, a: 1},   1.5, true);
             this.renderLine(0, true, {r: 0, g: 0.6, b: 0, a: 1}, 1.5, true);
         }
+        monitor.endCategory("Grid rendering");
+
+        if (!this.mainT.loaded) {
+            monitor.endFrame(false);
+            return;
+        }
+
+        this.cache.camX1 = this.camera.x - this.width / this.camera.zoom / 2 - 60;
+        this.cache.camX2 = this.camera.x + this.width / this.camera.zoom / 2 + 60;
 
         //console.log(this);
 
         util.setCamera(this);
+        util.enableTexture(gl, this.mainT.texture, this.spUni);
 
-        //if (this.level == "GDExt") {
-            let camB = Math.floor( (this.camera.x - this.width / this.camera.zoom - 150) / 992);
-            let camE = Math.floor( (this.camera.x + this.width / this.camera.zoom + 150) / 992);
+        let camB = Math.floor( this.cache.camX1 / 992 );
+        let camE = Math.floor( this.cache.camX2 / 992 );
 
-            for (let c = camB; c <= camE; c++)
-                if (this.level.lchunks[c]) {
-                    let chunk = this.level.lchunks[c];
-                    for (let i = -4; i <= 3; i++)
-                        if (i != 0 && chunk[i]) {
-                            for (let obj of chunk[i])
-                                this.renderObject(obj);
-                        }
-                }
-        /*} else {
-            if (this.level)
-                for (var i = -4; i < 4; i++)
-                    if (i != 0)
-                        for (var obj of this.level.zlayers[i])
+        for (let c = camB; c <= camE; c++)
+            if (this.level.lchunks[c]) {
+                let chunk = this.level.lchunks[c];
+                for (let i = -4; i <= 3; i++)
+                    if (i != 0 && chunk[i]) {
+                        for (let obj of chunk[i])
                             this.renderObject(obj);
-        }*/
+                    }
+            }
 
-        monitor.endFrame(true);
+        var frameTime = window.performance.now() - startTime;
+
+        //console.log((1000 / frameTime) + " FPS");
+
+        monitor.endFrame(false);
+        //console.log(monitor.getTime("Object rendering") / this.cache.objCount + "ms per object");
+        //console.log(this.cache.objCount);
     };
 }
