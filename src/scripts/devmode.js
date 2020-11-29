@@ -5,7 +5,20 @@ const Buffer = require('buffer/').Buffer;
 export default {
     init: () => {
         console.log('Dev mode activated!');
-        window.onkeypress = (e) => {
+        //instantly load level by id
+        if(localStorage.getItem('lvlid')) {
+            fetch(`https://gdbrowser.com/api/level/${localStorage.getItem('lvlid')}?download`)
+                .then(r => r.json())
+                .then(data => {
+                    let datDecoded = Buffer.from(data.data, 'base64');
+                    let datUnzip = new TextDecoder("utf-8").decode(pako.ungzip(datDecoded));
+                    localStorage.setItem('lvlcode', datUnzip);
+                    localStorage.removeItem('lvlid');
+                    window.location.reload();
+                });
+        }
+
+        window.addEventListener('devmode', e => {
             console.log(e.keyCode);
             if(e.keyCode == 113) {
                 let devprompt = prompt('Dev Mode Prompt. Enter Command:');
@@ -39,6 +52,6 @@ import from id - load level using it's id`);
                         break;
                 }
             }
-        }
+        });
     }
 }
