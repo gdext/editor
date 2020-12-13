@@ -140,6 +140,23 @@ export const util = {
     xToSec: function(level, x) {
         var resSP = null;
         var lspd = null;
+        lspd = parseInt((level.info.speed === undefined) ? 1 : (level.info.speed + 1));
+        for (var i of level.sps) {
+            let sp = level.data[i];
+            if (parseFloat(sp.x) >= parseFloat(x))
+                break;
+            resSP = sp;
+        }
+        if (resSP != null) {
+            var speed = null;
+            speed = this.getSpeedPortal(resSP);
+            return resSP.secx + (x - resSP.x) / parseFloat(this.ups[speed]);
+        } else
+            return parseFloat(x) / parseFloat(this.ups[lspd]);
+    },
+    xToSecBC: function(level, x) {
+        var resSP = null;
+        var lspd = null;
         if (level.format == "GDRenderW")
             lspd = (level.keys.speed === undefined) ? 1 : (level.keys.speed + 1);
         if (level.format == "GDExt")
@@ -160,6 +177,32 @@ export const util = {
         return {r: parseFloat(col.red), b: parseFloat(col.blue), g: parseFloat(col.green)};
     },
     xToCOL: function(level, x, col) {
+        var resCOL = null;
+        if (level.cts[col] != undefined) {
+            for (let i of level.cts[col]) {
+                let colo = level.data[i];
+                if (colo.x >= x)
+                    break;
+                resCOL = colo;
+            }
+        }
+        if (resCOL != null) {
+            var delta = this.xToSec(level, x, true) - this.xToSec(level, resCOL.x);
+            if (delta < parseFloat(resCOL.duration)) {
+                return this.blendColor(resCOL.curCol, this.longToShortCol(resCOL), delta / resCOL.duration);
+            } else
+                return this.longToShortCol(resCOL);
+        } else {
+            var baseColor = level.info.colors.filter((f) => {return f.channel == col;});
+            if (baseColor.length > 0) {
+                baseColor = baseColor[0];
+
+                return {r: baseColor.r, b: baseColor.b, g: baseColor.g};
+            } else
+                return {r: 255, b: 255, g: 255}
+        }
+    },
+    xToCOLBC: function(level, x, col) {
         var resCOL = null;
         if (level.listCOLs[col] != undefined) {
             for (var colo of level.listCOLs[col]) {
@@ -1047,6 +1090,12 @@ export function GDRenderer(gl) {
         monitor.endCategory("Object rendering");
     }
 
+    this.screenToLevelPos = (x, y) => {
+        let cX = (x - this.width / 2) / this.camera.zoom;
+        let cY = (y - this.height / 2) / this.camera.zoom;
+        return {x: this.camera.x + cX, y: -this.camera.y - cY}
+    }
+
     this.loadGDExtLevel = (level) => {
         this.level = level;
         this.level.format = "GDExt";
@@ -1221,10 +1270,13 @@ export function GDRenderer(gl) {
         util.setProjection(this);
     }
 
-    this.renderLevel = (width, height, options = {}) => {
+    this.renderLevel = (level, width, height, options = {}) => {
         let startTime = window.performance.now();
-        if (!this.level)
+        if (!level.level)
             return;
+
+        this.level = level.level;
+
         monitor.startFrame();
         var gl = this.gl;
 
@@ -1299,7 +1351,7 @@ export function GDRenderer(gl) {
                 for (let i = -4; i <= 3; i++)
                     if (i != 0 && chunk[i]) {
                         for (let obj of chunk[i])
-                            this.renderObject(obj);
+                            this.renderObject(this.level.data[obj]);
                     }
             }
 
