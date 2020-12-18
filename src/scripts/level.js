@@ -1,9 +1,18 @@
 import { util } from "./GDRenderW/main"
 
+function getChunk(x) {
+    return Math.floor(x / 992);
+}
+
 export function EditorLevel(renderer, level) {
     this.level = level;
     this.level.format = "GDExt";
     this.renderer = renderer;
+
+    this.orderSortLog    = [];
+    this.reloadColorTrgs = [];
+    this.reloadSpeeds    = false;
+    this.reloadCTriggers = false;
 
     this.getObject = function(i) {
         return this.level.data[i];
@@ -80,6 +89,173 @@ export function EditorLevel(renderer, level) {
         this.level.cts[color] = listCOLs;
     }
 
+    this.removeObjectZList = function(key, chunkn, layern) {
+        let chunk = this.level.lchunks[chunkn];
+
+        if (chunk) {
+            let layer = chunk[layern];
+            if (layer) {
+                let o = layer.indexOf(key);
+                if (o != -1)
+                    layer.splice(o, 1);
+            }
+        }
+    }
+
+    this.addZSort = function(chunk, layer) {
+        for (let sort of this.orderSortLog)
+            if (sort.c == chunk && sort.l == layer)
+                return;
+        this.orderSortLog.push({c: chunk, l: layer});
+    }
+
+    this.moveObjectZList = function(key, obj, chunk, layer) {
+        if (getChunk(obj.x) != chunk || obj.z != layer) {
+            this.removeObjectZList(key, getChunk(obj.x), obj.z);
+
+            let chk = this.level.lchunks[chunk];
+
+            if (!chk) {
+                this.level.lchunks[chunk] = {};
+                chk = {};
+            }
+
+            let lay = chk[layer];
+
+            if (!lay)
+                lay = [];
+
+            lay.push(key);
+            this.level.lchunks[chunk][layer] = lay;
+
+            this.addZSort(chunk, layer);
+        }
+    }
+
+    this.addColorT = function(color) {
+        if (this.reloadColorTrgs.indexOf(color) != -1) {
+            this.reloadColorTrgs.push(color);
+        }
+    }
+
+    this.sortZLayer = function(chunk, layer) {
+        this.level.lchunks[chunk][layer].sort((a, b) => (this.getObject(a).zorder < this.getObject(b).zorder) ? -1 : 1);
+    }
+
+    this.editObject = function(key, props) {
+        let obj = this.getObject(key);
+
+        let zprp = obj.z;
+        let xprp = obj.x;
+
+        if (props.z)
+            zprp = props.z;
+        if (props.x)
+            xprp = props.x;
+
+        this.moveObjectZList(key, obj, getChunk(xprp), zprp);
+
+        if (obj.type == "trigger" && obj.info == "color") {
+            if (!props.color) {
+                if (obj.color != props.color) {
+                    this.addColorT(obj.color);
+                    this.addColorT(props.color);
+                }
+            } else
+                this.addColorT(obj.color);
+        }
+        if (util.getSpeedPortal(obj))
+            this.reloadSpeeds = true;
+
+        for (var prop in props) {
+            if (Object.prototype.hasOwnProperty.call(props, prop)) {
+                this.level.data[key][prop] = props[prop];
+            }
+        }
+    }
+
+    this.confirmEdit = function() {
+        for (let srt of this.orderSortLog) {
+            this.sortZLayer(srt.c, srt.l);
+        }
+
+        if (this.reloadSpeeds) {
+            this.reloadSpeedPortals();
+            for (let i = 0; i < 1010; i++)
+                this.loadCTriggers(i);
+        } else if (this.reloadCTriggers) {
+            this.loadCTriggers(i);
+        } else if (this.reloadColorTrgs.length != 0) {
+            for (let cl of this.reloadColorTrgs)
+                this.loadCTriggers(ct);
+        }
+        
+        this.orderSortLog = [];
+        this.reloadColorTrgs = [];
+    }
+
+    this.isInObject = function(key, x, y) {
+        let obj = this.getObject(key);
+        let def = renderer.objectDefs[obj.id];
+
+        if (!def)
+            return;
+
+        let texture;
+
+        if (def.texture_i)
+            texture = def.texture_i;
+        else if (def.texture_a)
+            texture = def.texture_a;
+        else if (def.texture_b)
+            texture = def.texture_b;
+        else if (def.texture_l)
+            texture = def.texture_l;
+
+        if (!texture)
+            return;
+
+        let width =  texture.w / 62 * 30;
+        let height = texture.h / 62 * 30;
+
+        let left  = parseFloat(obj.x) - width/2;
+        let right = parseFloat(obj.x) + width/2;
+        let top   = parseFloat(obj.y) + height/2;
+        let bot   = parseFloat(obj.y) - height/2;
+
+        let bool = (x >= left && x <= right && y <= top && y >= bot);
+
+        return bool;
+    }
+
+    this.getObjectsAt = function(x, y) {
+        let currChunk = getChunk(x);
+        let extChunk;
+
+        let objs = [];
+
+        if (currChunk * 992 + 496 > x)
+            extChunk = getChunk(x) - 1;
+        else
+            extChunk = getChunk(x) + 1;
+
+        if (this.level.lchunks[currChunk])
+            for (let i = -4; i < 5; i++)
+                if (i != 0 && this.level.lchunks[currChunk][i])
+                    for (let key of this.level.lchunks[currChunk][i])
+                        if (this.isInObject(key, x, y))
+                            objs.push(key);
+
+        if (this.level.lchunks[extChunk])
+            for (let i = -4; i < 5; i++)
+                if (i != 0 && this.level.lchunks[extChunk][i])
+                    for (let key of this.level.lchunks[extChunk][i])
+                        if (this.isInObject(key, x, y))
+                            objs.push(key);
+
+        return objs;
+    }
+
     this.addObject = function(obj) {
         let key = this.level.data.findIndex(Object.is.bind(null, undefined));
 
@@ -88,22 +264,18 @@ export function EditorLevel(renderer, level) {
         else
             key = this.level.data.push(obj) - 1;
 
-        console.log("A");
+        let chunk = this.level.lchunks[getChunk(obj.x)];
 
-        let chunk = this.level.lchunks[Math.floor(obj.x / 992)];
-
-        if (!chunk)
-            this.level.lchunks[Math.floor(obj.x / 992)] = {};
+        if (!chunk) {
+            this.level.lchunks[getChunk(obj.x)] = {};
+            chunk = {};
+        }
 
         let layer = chunk[obj.z];
 
-        console.log("B");
-
         if (layer) {
             layer.push(key);
-            layer.sort((a, b) => (this.getObject(a).zorder < this.getObject(b).zorder) ? -1 : 1);
-
-            this.level.lchunks[Math.floor(obj.x / 992)][obj.z] = layer;
+            this.addZSort(getChunk(obj.x), obj.z);
         } else
             this.level.lchunks[Math.floor(obj.x / 992)][obj.z] = [key];
     }
@@ -118,13 +290,13 @@ export function EditorLevel(renderer, level) {
         return ret;
     }
 
-    console.log(renderer);
-
     this.removeObject = function(i) {
         let obj = this.level.data[i];
         delete this.level.data[i];
 
-        let chunk = this.level.lchunks[Math.floor(obj.x / 992)];
+        if (!obj)
+            return;
+        let chunk = this.level.lchunks[getChunk(obj.x)];
 
         if (chunk) {
             let layer = chunk[obj.z];
@@ -139,7 +311,7 @@ export function EditorLevel(renderer, level) {
             this.loadCTriggers(parseInt(obj.color));
 
         if (util.getSpeedPortal(obj))
-            this.reloadSpeedPortals();
+            this.reloadSpeeds = true;
     }
 
     this.reloadSpeedPortals();
@@ -200,6 +372,4 @@ export function EditorLevel(renderer, level) {
                 }
 
     this.level.lchunks = lchunks;
-
-    console.log(this);
 }
