@@ -3,19 +3,17 @@ import {EditorLevel} from './level';
 let gl, renderer, cvs, options, level;
 
 export default {
-    init: (canvas, lvl) => {
+    init: (canvas) => {
         options = {
             grid: true
         };
         gl = canvas.getContext("webgl");
         renderer = new GDRenderer(gl);
         cvs = canvas;
-        renderer.loadGDExtLevel(lvl);
-        renderer.renderLevel(cvs.width, cvs.height, options);
     },
     update: (canvas) => {
         if(!canvas) return;
-        renderer.renderLevel(canvas.width, canvas.height, options);
+        renderer.renderLevel(level, canvas.width, canvas.height, options);
     },
     moveTo: (x, y, z) => {
         renderer.camera.x = x;

@@ -112,7 +112,8 @@ export default {
         let l = localStorage.getItem('lvlcode');
         //localStorage.setItem('lvlcode', l);
 
-        renderer.init(canvas, levelparse.code2object(l));
+        renderer.init(canvas);
+        renderer.initLevel(levelparse.code2object(l));
         renderer.update(canvas);
         setInterval(() => {
             renderer.update(canvas);
