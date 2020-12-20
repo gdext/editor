@@ -10,6 +10,8 @@ import util from './util';
 import renderer from './canvas';
 import levelparse from './levelparse';
 
+let buildSelection = 1;
+
 export default {
     generateNavbar: (navbar) => {
         const navbarLeft = document.createElement('div');
@@ -144,6 +146,39 @@ export default {
                 }
                 window.onmouseup = stopMove;
                 window.onmouseout = stopMove;
+            } else if (e.button == 0) {
+                let eX = e.offsetX;
+                let eY = e.offsetY;
+                let coordsArray = [];
+                let moving = true;
+                function update() {
+                    let coords = renderer.screen2LevelCoords(eX, eY);
+                    let tx = Math.floor(coords.x/30)*30 + 15;
+                    let ty = Math.floor(coords.y/30)*30 + 15;
+                    let ta = [tx, ty];
+                    if(!coordsArray.includes(ta)) {
+                        renderer.placeObject({ mode: 'add', data: { id: buildSelection, x: tx, y: ty }});
+                        renderer.update(canvas);
+                    }
+                    coordsArray.push(ta);
+                    if (moving)
+                        window.requestAnimationFrame(update);
+                }
+                update();
+                canvas.onmousemove = (e1) => {
+                    eX = e1.offsetX;
+                    eY = e1.offsetY;
+                }
+                
+                function stop() {
+                    canvas.onmousemove = null;
+                    window.onmouseup = null;
+                    moving = false;
+                    window.onmouseout = null;
+                    renderer.update(canvas);
+                }
+                window.onmouseup = stop;
+                window.onmouseout = stop;
             }
         }
 
@@ -270,7 +305,13 @@ export default {
                 return 'h';
             }
 
-            util.loadObjects(buildContentBlocks, category, ow.amount*page+page, ow.amount*(page+1));
+            util.loadObjects(buildContentBlocks, category, ow.amount*page+page, ow.amount*(page+1), (id, obj) => {
+                let selobj = document.querySelector('canvas.sel');
+                if(selobj) selobj.classList.remove('sel');
+                buildSelection = id;
+                obj.classList.add('sel');
+                console.log(id);
+            });
             buildContentBlocks.style.width = ow.parentw;
         }
 

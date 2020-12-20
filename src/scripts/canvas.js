@@ -29,6 +29,12 @@ export default {
     initLevel: (lvl) => {
         level = new EditorLevel(renderer, lvl);
     },
+    getObjects: (x, y) => {
+        return level.getObjectsAt(x, y);
+    },
+    screen2LevelCoords: (x, y) => {
+        return renderer.screenToLevelPos(x, y);
+    },
     placeObject: (opt) => {
         if(!level) return;
         switch (opt.mode) {
@@ -42,6 +48,7 @@ export default {
                     let obj = level.createObject(opt.data.id, opt.data.x, opt.data.y);
                     level.addObject(obj);
                 }
+                level.confirmEdit();
                 break;
             case 'remove':
                 if(Array.isArray(opt.data)) {
@@ -51,6 +58,17 @@ export default {
                 } else {
                     level.removeObject(opt.data.id);
                 }
+                level.confirmEdit();
+                break;
+            case 'edit':
+                if(Array.isArray(opt.data)) {
+                    opt.data.forEach(d => {
+                        level.editObject(d.id, opt.props);
+                    });
+                } else {
+                    level.editObject(opt.data.id, opt.props);
+                }
+                level.confirmEdit();
                 break;
         }
     }

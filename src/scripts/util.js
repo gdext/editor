@@ -10,7 +10,7 @@ export default {
         return { width: w, height: h }
     },
 
-    loadObjects: (elem, category, start, end) => {
+    loadObjects: (elem, category, start, end, onclick) => {
         elem.innerHTML = "";
         if(!elem || !buildtabData.tabscontent[category]) return;
         let bti = -1;
@@ -19,6 +19,9 @@ export default {
             if(bti > end || bti < start || bti > buildtabData.tabscontent[category].length) return;
             let obj = buildPreview.createPreview(o);
             elem.appendChild(obj);
+            obj.onclick = () => {
+                onclick(o, obj);
+            };
         });
     },
 
