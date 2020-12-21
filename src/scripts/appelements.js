@@ -155,12 +155,12 @@ export default {
                     let coords = renderer.screen2LevelCoords(eX, eY);
                     let tx = Math.floor(coords.x/30)*30 + 15;
                     let ty = Math.floor(coords.y/30)*30 + 15;
-                    let ta = [tx, ty];
+                    let ta = tx + '|' + ty;
                     if(!coordsArray.includes(ta)) {
                         renderer.placeObject({ mode: 'add', data: { id: buildSelection, x: tx, y: ty }});
                         renderer.update(canvas);
+                        coordsArray.push(ta);
                     }
-                    coordsArray.push(ta);
                     if (moving)
                         window.requestAnimationFrame(update);
                 }
@@ -311,7 +311,7 @@ export default {
                 buildSelection = id;
                 obj.classList.add('sel');
                 console.log(id);
-            });
+            }, buildSelection);
             buildContentBlocks.style.width = ow.parentw;
         }
 

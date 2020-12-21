@@ -10,7 +10,7 @@ export default {
         return { width: w, height: h }
     },
 
-    loadObjects: (elem, category, start, end, onclick) => {
+    loadObjects: (elem, category, start, end, onclick, selobj) => {
         elem.innerHTML = "";
         if(!elem || !buildtabData.tabscontent[category]) return;
         let bti = -1;
@@ -18,6 +18,7 @@ export default {
             bti++;
             if(bti > end || bti < start || bti > buildtabData.tabscontent[category].length) return;
             let obj = buildPreview.createPreview(o);
+            if(selobj == o) obj.classList.add('sel');
             elem.appendChild(obj);
             obj.onclick = () => {
                 onclick(o, obj);
