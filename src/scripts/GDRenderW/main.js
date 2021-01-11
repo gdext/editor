@@ -800,20 +800,32 @@ function ObjectDef(gl, obj) {
     this.texture_b = null;
     this.texture_l = null;
 
+    this.width = 0;
+    this.height = 0;
+
     this.maincol = null;
     this.seccol  = null;
 
     this.zlayer  = null; // ex. B2, B1, T2
     this.zorder  = null;
 
-    if (obj.sprite_i)
+    if (obj.sprite_i) {
         this.texture_i = obj.sprite_i;
-    if (obj.sprite_a)
+        this.width = Math.max(this.width, obj.sprite_i.w) / 62 * 30;
+        this.height = Math.max(this.height, obj.sprite_i.h) / 62 * 30;
+    } if (obj.sprite_a) {
         this.texture_a = obj.sprite_a;
-    if (obj.sprite_b)
+        this.width = Math.max(this.width, obj.sprite_a.w) / 62 * 30;
+        this.height = Math.max(this.height, obj.sprite_a.h) / 62 * 30;
+    } if (obj.sprite_b) {
         this.texture_b = obj.sprite_b;
-    if (obj.sprite_l)
+        this.width = Math.max(this.width, obj.sprite_b.w) / 62 * 30;
+        this.height = Math.max(this.height, obj.sprite_b.h) / 62 * 30;
+    } if (obj.sprite_l) {
         this.texture_l = obj.sprite_l;
+        this.width = Math.max(this.width, obj.sprite_l.w) / 62 * 30;
+        this.height = Math.max(this.height, obj.sprite_l.h) / 62 * 30;
+    }
 
     if (obj.mainCol)
         this.maincol = obj.mainCol;
