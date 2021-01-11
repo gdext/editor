@@ -41,11 +41,11 @@ export default {
             case 'add':
                 if(Array.isArray(opt.data)) {
                     opt.data.forEach(d => {
-                        let obj = level.createObject(d.id, d.x, d.y);
+                        let obj = level.createObject(d.id, d.x, d.y, true);
                         level.addObject(obj);
                     });
                 } else {
-                    let obj = level.createObject(opt.data.id, opt.data.x, opt.data.y);
+                    let obj = level.createObject(opt.data.id, opt.data.x, opt.data.y, true);
                     level.addObject(obj);
                 }
                 level.confirmEdit();

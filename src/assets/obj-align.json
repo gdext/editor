@@ -1,0 +1,498 @@
+{
+    "1": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "2": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "3": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "4": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "5": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "6": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "7": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "8": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "9": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "10": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "11": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "12": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "13": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "18": {
+        "alignX": "center",
+        "alignY": 4
+    },
+    "19": {
+        "alignX": "center",
+        "alignY": 4
+    },
+    "20": {
+        "alignX": "center",
+        "alignY": -2
+    },
+    "21": {
+        "alignX": "center",
+        "alignY": -8
+    },
+    "22": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "23": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "24": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "25": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "26": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "27": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "28": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "29": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "30": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "31": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "32": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "33": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "34": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "35": {
+        "alignX": "center",
+        "alignY": -13
+    },
+    "36": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "39": {
+        "alignX": "center",
+        "alignY": -9
+    },
+    "40": {
+        "alignX": "center",
+        "alignY": "top"
+    },
+    "41": {
+        "alignX": "center",
+        "alignY": 19.5
+    },
+    "45": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "46": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "47": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "48": {
+        "alignX": "center",
+        "alignY": -2
+    },
+    "49": {
+        "alignX": "center",
+        "alignY": -2
+    },
+    "50": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "51": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "52": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "53": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "54": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "55": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "56": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "57": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "58": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "59": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "60": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "61": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "62": {
+        "alignX": "center",
+        "alignY": "top"
+    },
+    "63": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "64": {
+        "alignX": "left",
+        "alignY": "top"
+    },
+    "65": {
+        "alignX": "center",
+        "alignY": "top"
+    },
+    "66": {
+        "alignX": "center",
+        "alignY": "top"
+    },
+    "67": {
+        "alignX": "center",
+        "alignY": "bottom"
+    },
+    "68": {
+        "alignX": "center",
+        "alignY": "top"
+    },
+    "69": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "70": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "71": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "72": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "73": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "74": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "75": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "76": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "77": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "78": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "80": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "81": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "82": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "83": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "84": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "85": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "86": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "87": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "88": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "89": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "90": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "91": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "92": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "93": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "94": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "95": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "96": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "97": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "98": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "99": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "101": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "103": {
+        "alignX": "center",
+        "alignY": -6
+    },
+    "104": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "105": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "106": {
+        "alignX": "center",
+        "alignY": 17.5
+    },
+    "107": {
+        "alignX": "center",
+        "alignY": 3
+    },
+    "110": {
+        "alignX": "center",
+        "alignY": 1
+    },
+    "111": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "113": {
+        "alignX": "center",
+        "alignY": 1
+    },
+    "114": {
+        "alignX": "center",
+        "alignY": -2
+    },
+    "115": {
+        "alignX": "center",
+        "alignY": -5
+    },
+    "116": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "117": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "118": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "119": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "120": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "121": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "122": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "123": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "124": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "125": {
+        "alignX": "center",
+        "alignY": -1
+    },
+    "126": {
+        "alignX": "center",
+        "alignY": -6
+    },
+    "127": {
+        "alignX": "center",
+        "alignY": -7
+    },
+    "128": {
+        "alignX": "center",
+        "alignY": 8
+    },
+    "129": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "130": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "131": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "132": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "133": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "134": {
+        "alignX": "center",
+        "alignY": 1
+    },
+    "135": {
+        "alignX": "center",
+        "alignY": -11
+    },
+    "136": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "137": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "138": {
+        "alignX": "center",
+        "alignY": "center"
+    },
+    "139": {
+        "alignX": "center",
+        "alignY": "center"
+    }
+}

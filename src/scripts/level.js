@@ -1,4 +1,5 @@
 import { util } from "./GDRenderW/main"
+import aligns from '../assets/obj-align.json';
 
 function getChunk(x) {
     return Math.floor(x / 992);
@@ -280,8 +281,29 @@ export function EditorLevel(renderer, level) {
             this.level.lchunks[Math.floor(obj.x / 992)][obj.z] = [key];
     }
 
-    this.createObject = function(id, x = 0, y = 0) {
+    this.createObject = function(id, x = 0, y = 0, grid_align = false) {
         let def = renderer.objectDefs[id];
+        if (grid_align) {
+            let alg = aligns[id];
+            console.log(alg);
+            if (alg) {
+                if (alg.alignX == "left") {
+                    x = x - 15 + def.width / 2;
+                } else if (alg.alignX == "right") {
+                    x = x + 15 - def.width / 2;
+                } else if (alg.alignX != "center") {
+                    x = x + alg.alignX;
+                }
+
+                if (alg.alignY == "bottom") {
+                    y = y - 15 + def.height / 2;
+                } else if (alg.alignY == "top") {
+                    y = y + 15 - def.height / 2;
+                } else if (alg.alignY != "center") {
+                    y = y + alg.alignY;
+                }
+            }
+        }
         let ret = {id: id, baseCol: def.maincol, x: x, y: y, z: def.zlayer, zorder: def.zorder};
 
         if (def.seccol != null)
