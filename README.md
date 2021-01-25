@@ -9,7 +9,7 @@ This is an external Geometry Dash editor built using electron and webpack. This 
 ![GDExt](https://i.imgur.com/YRC7zHz.png)
 
 ## Getting Started
-After you've cloned the repository, type `npm install`(Node.js is required, install the latest version!) to install all the modules. All the code is located in the `/src` directory. Here's more info:
+After you've cloned the repository, type `npm install` (Node.js is required, obviously) to install all the modules. All the code is located in the `/src` directory. Here's more info:
 * `/src/assets` contains all the assets, excluding scripts and styles
 * `/src/scripts` contains all the scripts
 * `/src/styles` contains, guess what? That's right - css styles
@@ -26,12 +26,14 @@ npx http-server -p 8000 -c -1
 ```
 
 When all of the steps above are complete, you should be able to run GDExt by opening `localhost:8000/dist` in your web browser.
-## Running on a Compooter
-just go here dummy: https://github.com/gdext/electron 
+
+## Installing the app (currently Windows-only)
+You can download GDExt as a standalone app here: https://github.com/gdext/electron/releases
 
 ## Contribute
 GDExt is still far, far, FAR from finished, so if you want to contribute and help, feel free to do so!
 [Create a Pull Request](https://github.com/gdext/editor/pulls)
 [Leave an Issue](https://github.com/gdext/editor/issues)
-## H
+
+## This section will be deleted
 h is superior. h is our lord. bow down to h.
