@@ -9,7 +9,7 @@ This is an external Geometry Dash editor built using electron and webpack. This 
 ![GDExt](https://i.imgur.com/YRC7zHz.png)
 
 ## Getting Started
-After you've cloned the repository, type `npm install` to install all the modules. All the code is located in the `/src` directory. Here's more info:
+After you've cloned the repository, type `npm install`(Node.js is required, install the latest version!) to install all the modules. All the code is located in the `/src` directory. Here's more info:
 * `/src/assets` contains all the assets, excluding scripts and styles
 * `/src/scripts` contains all the scripts
 * `/src/styles` contains, guess what? That's right - css styles
