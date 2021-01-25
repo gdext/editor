@@ -26,6 +26,8 @@ npx http-server -p 8000 -c -1
 ```
 
 When all of the steps above are complete, you should be able to run GDExt by opening `localhost:8000/dist` in your web browser.
+## Running on a Copmpooter
+just go here dummy: https://github.com/gdext/electron 
 
 ## Contribute
 GDExt is still far, far, FAR from finished, so if you want to contribute and help, feel free to do so!
