@@ -35,5 +35,3 @@ GDExt is still far, far, FAR from finished, so if you want to contribute and hel
 [Create a Pull Request](https://github.com/gdext/editor/pulls)
 [Leave an Issue](https://github.com/gdext/editor/issues)
 
-## This section will be deleted
-h is superior. h is our lord. bow down to h.
