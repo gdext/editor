@@ -1037,7 +1037,7 @@ export function GDRenderer(gl) {
         gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 0);
     };
 
-    this.renderTexture = (tex, x, y, rot, xflip, yflip, tint = {r: 1, g: 1, b: 1, a: 1}) => {
+    this.renderTexture = (tex, x, y, rot, xflip, yflip, tint = {r: 1, g: 1, b: 1, a: 1}, scale = 1) => {
         if (tex == undefined)
             return;
 
@@ -1045,8 +1045,8 @@ export function GDRenderer(gl) {
 
         util.setTexture(this, tex);
 
-        var sx = tex.w * 0.48387096774 * xflip;
-        var sy = tex.h * 0.48387096774 * yflip;
+        var sx = tex.w * 0.48387096774 * xflip * scale;
+        var sy = tex.h * 0.48387096774 * yflip * scale;
 
         util.setModelMatrix(this, x, y, sx, sy, rot, true);
 
@@ -1069,13 +1069,13 @@ export function GDRenderer(gl) {
             return;
 
         if (this.level.format == "GDRenderW") {
-            var rot = obj.rot;
+            var rot   = obj.rot;
             var xflip = (obj.flip_hor === undefined) ? 1 : (obj.flip_hor ? -1 : 1);
             var yflip = (obj.flip_ver === undefined) ? 1 : (obj.flip_ver ? -1 : 1);
             var mainc = obj.maincolor;
             var secc  = obj.seccolor;
         } else if (this.level.format == "GDExt") {
-            var rot = obj.r;
+            var rot   = obj.r;
             var xflip = (obj.flipx === undefined) ? 1 : (obj.flipx ? -1 : 1);
             var yflip = (obj.flipy === undefined) ? 1 : (obj.flipy ? -1 : 1);
             var mainc = obj.baseCol;
@@ -1087,18 +1087,21 @@ export function GDRenderer(gl) {
         var maincol = this.cache.getColor(this, mainc);
         var seccol = this.cache.getColor(this, secc);
 
+        var def_tint = {r: 1, g: 1, b: 1, a: 1};
+        var slc      = obj.scale || 1;
+
         monitor.startCategory("Object rendering");
         if (def.texture_i)
-            this.renderTexture(def.texture_i, obj.x, obj.y, rot, xflip, yflip);
+            this.renderTexture(def.texture_i, obj.x, obj.y, rot, xflip, yflip, def_tint, slc);
         if (def.texture_l)
-            this.renderTexture(def.texture_l, obj.x, obj.y, rot, xflip, yflip, maincol);
+            this.renderTexture(def.texture_l, obj.x, obj.y, rot, xflip, yflip, maincol, slc);
         if (def.texture_b)
-            this.renderTexture(def.texture_b, obj.x, obj.y, rot, xflip, yflip, seccol);
+            this.renderTexture(def.texture_b, obj.x, obj.y, rot, xflip, yflip, seccol, slc);
         if (def.texture_a)
             if (def.texture_l)
-                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, seccol);
+                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, seccol, slc);
             else
-                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, maincol);
+                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, maincol, slc);
         monitor.endCategory("Object rendering");
     }
 
