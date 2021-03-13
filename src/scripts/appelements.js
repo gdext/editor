@@ -92,8 +92,27 @@ export default {
         });
 
         //autosaving
-        let autosaveCheckbox = ui.createCheckbox('Autosaving', 'toggleAutosave', false);
-        sectionCheckbox.appendChild(autosaveCheckbox);
+        ui.renderUiObject({
+            properties: {
+                type: 'checkbox',
+                id: 'toggleAutosave',
+                text: 'Autosaving',
+                checked: function(){
+                    if(localStorage.getItem('settings.autosaveEnabled') == '1') {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+                onCheckChange: function(c) {
+                    if(c) {
+                        localStorage.setItem('settings.autosaveEnabled', '1');
+                    } else {
+                        localStorage.setItem('settings.autosaveEnabled', '0');
+                    }
+                }
+            }
+        }, sectionCheckbox);
     },
     generateMain: (elem) => {
         const navbar = document.getElementById('appNavbar');

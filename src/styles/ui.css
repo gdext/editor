@@ -1,3 +1,10 @@
+/* element */
+.ui-element {
+    position: relative;
+    font-size: 12px;
+    display: flex;
+}
+
 /* checkbox */
 .ui-checkbox {
     position: relative;
@@ -52,5 +59,20 @@
 }
 .ui-checkbox.bbg input:checked ~ .checkbox-mark::before{
     filter: none;
+}
+
+/* button */
+.ui-button {
+    background-color: #3C94E4;
+    color: #fff;
+    border-radius: 4px;
+    padding: 6px 10px;
+    border: none;
+    font-size: 12px;
+    min-width: 60px;
+    cursor: pointer;
+}
+.ui-button:hover {
+    background: #3081CC;
 }
   
