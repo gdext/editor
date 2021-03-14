@@ -1,6 +1,22 @@
 import pako from 'pako';
+import plist from 'plist';
 import datakeys from '../assets/levelparse/datakeys.json';
 const Buffer = require('buffer/').Buffer;
+
+function plist_parse(data) {
+    let val = data.toString();
+
+    val = val.replace(/<d>/g, "<dict>").replace(/<\/d>/g, "</dict>");
+    val = val.replace(/<k>/g, "<key>").replace(/<\/k>/g, "</key>");
+    val = val.replace(/<s>/g, "<string>").replace(/<\/s>/g, "</string>");
+    val = val.replace(/<i>/g, "<integer>").replace(/<\/i>/g, "</integer>");
+    val = val.replace(/<r>/g, "<real>").replace(/<\/r>/g, "</real>");
+    val = val.replace(/<a>/g, "<array>").replace(/<\/a>/g, "</array>");
+    val = val.replace(/t \/>/g, "true/>");
+    val = val.replace(/f \/>/g, "false/>");
+
+    return plist.parse(val);
+}
 
 export default {
     decode: (data) => {
@@ -18,38 +34,40 @@ export default {
         catch (e) { return {error: true, reason: 'corrupt'} }
     },
     xml2object: (xml) => {
-        let dataSplitted = xml.split('<d><k>kCEK').slice(1);
+        let pl = plist_parse(xml);
+
         let dataObj = [];
-        for(let i = 0; i < dataSplitted.length; i++){
-            dataSplitted[i] = dataSplitted[i].split('<k>').join('|').split('</k>').join('|').split('|').slice(1, -2);
-            dataSplitted[i].unshift('kCEK');
-            let dat = {};
-            let enterSecondList = false;
-            for(let j = 0; j < dataSplitted[i].length; j+=2){
-                let k = dataSplitted[i][j];
-                let v = dataSplitted[i][j+1];
-                let t = v.slice(0, 2);
-                v = v.slice(3, -4);
-                if(t == "<i") v = parseInt(v);
-                else if(t == "<r") v = parseFloat(v);
-                else if(t == "<t") v = true;
-                else if(t == "<d") enterSecondList = datakeys[k] || k;
-                if(t != "<d" && k.startsWith('k')) enterSecondList = false;
-                if(v.endsWith && v.endsWith('</s></d>')) v = v.slice(0, -8);
-                if(!enterSecondList) dat[datakeys[k] || k] = v;
-                else{
-                    if(typeof dat[enterSecondList] != 'object') dat[enterSecondList] = {};
-                    if(t != "<d") dat[enterSecondList][k] = v;
-                } 
-                if(datakeys[k] == "description") dat[datakeys[k]] = Buffer.from(v, 'base64').toString();
-                if(datakeys[k] == "data"){
-                    let datDecoded = Buffer.from(v, 'base64');
-                    let datUnzip = new TextDecoder("utf-8").decode(pako.ungzip(datDecoded));
-                    dat[datakeys[k]] = datUnzip;
+
+        let lvl_id = 0;
+
+        while (pl.LLM_01["k_" + lvl_id]) {
+            let level = {};
+
+            for (let key in pl.LLM_01["k_" + lvl_id]) {
+                if (Object.prototype.hasOwnProperty.call(pl.LLM_01["k_" + lvl_id], key)) {
+                    let value = pl.LLM_01["k_" + lvl_id][key];
+
+                    if (datakeys[key]) {
+                        if (datakeys[key] == "description")
+                            level[datakeys[key]] = Buffer.from(value, "base64").toString();
+                        else if (datakeys[key] == "data"){
+                            let datDecoded = Buffer.from(value, 'base64');
+                            let datUnzip = new TextDecoder("utf-8").decode(pako.ungzip(datDecoded));
+                            level[datakeys[key]]  = datUnzip;
+                        }
+                        else
+                            level[datakeys[key]] = value;
+                    } else {
+                        level[key] = value;
+                    }
                 }
             }
-            dataObj.push(dat);
+
+            dataObj.push(level);
+            
+            lvl_id++;
         }
+
         return dataObj;
     },
     object2xml: (obj) => {
@@ -61,7 +79,7 @@ export default {
             xml += `<k>k_${li}</k><d>`;
             let keys = Object.keys(lvl).map(key => Object.values(datakeys).includes(key) ? Object.keys(datakeys)[Object.values(datakeys).indexOf(key)] : key);
             keys.forEach(k => {
-                let v = lvl[datakeys[k]];
+                let v = lvl[datakeys[k]] || lvl[k];
                 if(k == 'k3') {
                     try { v = Buffer.from(v, 'utf-8').toString('base64').split('+').join('-').split('/').join('_') }
                     catch { return {error: true, reason: 'cannotDecodeLevelDescription'} } 
@@ -72,12 +90,19 @@ export default {
                 let vtag = `<s>${v}</s>`;
                 if(typeof v == 'number' && Math.round(v) == v) vtag = `<i>${v}</i>`;
                 else if(typeof v == 'number') vtag = `<r>${v}</r>`;
-                else if(typeof v == 'boolean') vtag = `<t />`;
+                else if(typeof v == 'boolean') vtag = `<${v ? 't' : 'f'} />`;
+                else if(typeof v == 'object') {
+                    let vd = '';
+                    Object.keys(v).forEach(vk => {
+                        vd += `<k>${vk}</k><s>${v[vk]}</s>`;
+                    });
+                    vtag = `<d>${vd}</d>`;
+                }
                 xml += `<k>${k}</k>${vtag}`;
             });
             xml += '</d>';
         });
-        xml += '<k>LLM_02</k><i>35</i></dict></plist>';
+        xml += '</d><k>LLM_02</k><i>35</i></dict></plist>';
         return xml;
     }
 }

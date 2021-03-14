@@ -1,6 +1,8 @@
 import buildtabData from '../assets/buildtab.json';
 import buildPreview from './buildPreview';
 
+let unsavedChanges = false;
+
 export default {
 
     calcCanvasSize: (ws, ns, bms) => {
@@ -34,6 +36,14 @@ export default {
             amount: Math.floor(width/objw) * 3 - 1,
             parentw: Math.floor(width/objw)*45 + 'px'
         };
+    },
+
+    setUnsavedChanges: (v) => {
+        unsavedChanges = v;
+    },
+
+    getUnsavedChanges: () => {
+        return unsavedChanges;
     }
 
 }

@@ -14,11 +14,13 @@ export default {
                     let datDecoded = Buffer.from(data.data, 'base64');
                     let datUnzip = new TextDecoder("utf-8").decode(pako.ungzip(datDecoded));
                     localStorage.setItem('lvlcode', datUnzip);
+                    localStorage.setItem('lvlnumber', -1);
                     localStorage.removeItem('lvlid');
                     window.location.reload();
                 });
         } else if(!localStorage.getItem('lvlcode')) {
             localStorage.setItem('lvlcode', defaultLevel);
+            localStorage.setItem('lvlnumber', -1);
             window.location.reload();
         }
 
@@ -33,6 +35,7 @@ export default {
                     break;
                 case 'import code':
                     localStorage.setItem('lvlcode', prompt('Enter Level Code'));
+                    localStorage.setItem('lvlnumber', -1);
                     window.location.reload();
                     break;
                 case 'import from id':
@@ -42,6 +45,7 @@ export default {
                             let datDecoded = Buffer.from(data.data, 'base64');
                             let datUnzip = new TextDecoder("utf-8").decode(pako.ungzip(datDecoded));
                             localStorage.setItem('lvlcode', datUnzip);
+                            localStorage.setItem('lvlnumber', -1);
                             window.location.reload();
                         });
                     break;

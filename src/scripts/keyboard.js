@@ -20,7 +20,6 @@ export default {
 
             if(targetEvent.type == 'event') {
                 let event = new CustomEvent(targetEvent.eventName, { detail: targetEvent.eventInfo });
-                console.log(event);
                 dispatchEvent(event);
             }
         }

@@ -11,6 +11,7 @@ export default {
             let objSplitted = obj.split(',');
             for(let i = 0; i < objSplitted.length; i+=2){
                 let val = objSplitted[i+1];
+                // groups and hsv data split
                 if (propids[objSplitted[i]] == 'groups') val = objSplitted[i+1].split('.') 
                 else if (propids[objSplitted[i]] == 'copiedHSV' || propids[objSplitted[i]] == 'hsv1' || propids[objSplitted[i]] == 'hsv2') val = objSplitted[i+1].split('a');
                 data[propids[objSplitted[i]] || objSplitted[i]] = val;
@@ -45,6 +46,7 @@ export default {
         for(let i = 0; i < levelSettingsSplitted.length; i+=2){
             let val = levelSettingsSplitted[i+1];
             let key = settingids[levelSettingsSplitted[i]];
+            //color data split
             if(key == "colors") levelSettingsObj[key] = val.split('|');
             else if(key) levelSettingsObj[key] = val;
             else levelSettingsObj[levelSettingsSplitted[i]] = val;
@@ -117,6 +119,7 @@ export default {
                 if(customKeys.includes(ok)) return;
                 let ov = o[ok];
                 if(ok == 'groups') ov = ov.join('.');
+                if(ok == 'copiedHSV' || ok == 'hsv1' || ok == 'hsv2') ov = ov.join('a');
                 if(ok == 'text') ov = btoa(ov);
                 if(propids.indexOf(ok) >= 0) ok = propids.indexOf(ok);
                 levelCode += `${ok},${ov},`;
