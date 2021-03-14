@@ -11,6 +11,9 @@ export default {
         renderer = new GDRenderer(gl);
         cvs = canvas;
     },
+    getLevel: () => {
+        return level.getLevel();
+    },
     update: (canvas) => {
         if(!canvas) return;
         renderer.renderLevel(level, canvas.width, canvas.height, options);

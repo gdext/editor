@@ -9,6 +9,7 @@ import ui from './ui';
 import util from './util';
 import renderer from './canvas';
 import levelparse from './levelparse';
+import actionsExec from './actions';
 
 let buildSelection = 1;
 
@@ -59,9 +60,18 @@ export default {
             menuOptions.classList.add('menu-options');
             m.options.forEach(c =>{
                 c.forEach(o => {
-                    menuOptions.innerHTML += `<div id="nav${o.id}" actionid="${o.id}">${o.name}</div>`;
+                    let menuOption = document.createElement('div');
+                    menuOption.id = 'nav' + o.id;
+                    menuOption.setAttribute('actionid', o.id);
+                    menuOption.innerText = o.name;
+                    menuOption.onclick = () => {
+                        actionsExec.executeAction(o.id);
+                    }
+                    console.log(menuOption);
+                    menuOptions.appendChild(menuOption);
                 });
-                menuOptions.innerHTML += `<separator></separator>`;
+                let separator = document.createElement('separator');
+                menuOptions.appendChild(separator);
             });
             menu.appendChild(menuTitle);
             menu.appendChild(menuOptions);

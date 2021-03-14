@@ -1,5 +1,6 @@
 import { util } from "./GDRenderW/main"
 import aligns from '../assets/obj-align.json';
+import utilscript from '../scripts/util';
 
 function getChunk(x) {
     return Math.floor(x / 992);
@@ -193,6 +194,8 @@ export function EditorLevel(renderer, level) {
         
         this.orderSortLog = [];
         this.reloadColorTrgs = [];
+
+        utilscript.setUnsavedChanges(true);
     }
 
     this.isInObject = function(key, x, y) {
