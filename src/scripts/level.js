@@ -16,6 +16,8 @@ export function EditorLevel(renderer, level) {
     this.reloadSpeeds    = false;
     this.reloadCTriggers = false;
 
+    console.log( level );
+
     this.getObject = function(i) {
         return this.level.data[i];
     }
@@ -350,19 +352,24 @@ export function EditorLevel(renderer, level) {
         this.loadCTriggers(i);
 
     for (var obj of this.level.data) {
-        if (obj.z == undefined) {
+        if (!obj.z) {
             if (renderer.objectDefs[obj.id] != undefined)
                 obj.z = renderer.objectDefs[obj.id].zlayer;
             else
                 obj.z = -1;
-        } else
+        } else {
             obj.z = util.zorder[obj.z];
-        if (obj.order == undefined) {
+            if (!obj.z)
+                obj.z = renderer.objectDefs[obj.id].zlayer;
+        }
+
+        if (!obj.order) {
             if (renderer.objectDefs[obj.id] != undefined)
                 obj.order = renderer.objectDefs[obj.id].zorder;
             else
                 obj.order = 5;
         }
+
         if (obj.baseCol == undefined)
             if (renderer.objectDefs[obj.id] != undefined)
                 obj.baseCol = renderer.objectDefs[obj.id].maincol
