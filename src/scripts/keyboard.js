@@ -30,5 +30,8 @@ export default {
         }
 
         window.addEventListener('blur', () => { keys = [] });
+    },
+    getKeys: () => {
+        return keys;
     }
 }

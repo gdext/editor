@@ -10,6 +10,7 @@ import util from './util';
 import renderer from './canvas';
 import levelparse from './levelparse';
 import actionsExec from './actions';
+import keyboard from './keyboard';
 
 let buildSelection = 1;
 
@@ -151,9 +152,8 @@ export default {
         }, 5000);
 
         //mouse events
-        canvas.onmousedown = (e) => {
-            if(e.button == 1) {
-                let coords = renderer.getCoords();
+        function beginScreenPanning() {
+            let coords = renderer.getCoords();
                 let moving = true;
                 function update() {
                     renderer.update(canvas);
@@ -175,39 +175,53 @@ export default {
                 }
                 window.onmouseup = stopMove;
                 window.onmouseout = stopMove;
-            } else if (e.button == 0) {
-                let eX = e.offsetX;
-                let eY = e.offsetY;
-                let coordsArray = [];
-                let moving = true;
-                function update() {
-                    let coords = renderer.screen2LevelCoords(eX, eY);
-                    let tx = Math.floor(coords.x/30)*30 + 15;
-                    let ty = Math.floor(coords.y/30)*30 + 15;
-                    let ta = tx + '|' + ty;
-                    if(!coordsArray.includes(ta)) {
-                        renderer.placeObject({ mode: 'add', data: { id: buildSelection, x: tx, y: ty }});
-                        renderer.update(canvas);
-                        coordsArray.push(ta);
-                    }
-                    if (moving)
-                        window.requestAnimationFrame(update);
+        }
+
+        function beginObjectBuilding(e) {
+            let eX = e.offsetX;
+            let eY = e.offsetY;
+            let coordsArray = [];
+            let moving = true;
+            function update() {
+                let coords = renderer.screen2LevelCoords(eX, eY);
+                let tx = Math.floor(coords.x/30)*30 + 15;
+                let ty = Math.floor(coords.y/30)*30 + 15;
+                let ta = tx + '|' + ty;
+                if(!coordsArray.includes(ta)) {
+                    renderer.placeObject({ mode: 'add', data: { id: buildSelection, x: tx, y: ty }});
+                    renderer.update(canvas);
+                    coordsArray.push(ta);
                 }
-                update();
-                canvas.onmousemove = (e1) => {
-                    eX = e1.offsetX;
-                    eY = e1.offsetY;
+                if (moving)
+                    window.requestAnimationFrame(update);
+            }
+            update();
+            canvas.onmousemove = (e1) => {
+                eX = e1.offsetX;
+                eY = e1.offsetY;
+            }
+            
+            function stop() {
+                canvas.onmousemove = null;
+                window.onmouseup = null;
+                moving = false;
+                window.onmouseout = null;
+                renderer.update(canvas);
+            }
+            window.onmouseup = stop;
+            window.onmouseout = stop;
+        }
+
+        canvas.onmousedown = (e) => {
+            if(e.button == 1) {
+                beginScreenPanning();
+            } else if (e.button == 0) {
+                if(keyboard.getKeys().includes(32)) {
+                    beginScreenPanning();
+                } else {
+                    beginObjectBuilding(e);
                 }
                 
-                function stop() {
-                    canvas.onmousemove = null;
-                    window.onmouseup = null;
-                    moving = false;
-                    window.onmouseout = null;
-                    renderer.update(canvas);
-                }
-                window.onmouseup = stop;
-                window.onmouseout = stop;
             }
         }
 

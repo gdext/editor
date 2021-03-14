@@ -16,8 +16,6 @@ export function EditorLevel(renderer, level) {
     this.reloadSpeeds    = false;
     this.reloadCTriggers = false;
 
-    console.log( level );
-
     this.getObject = function(i) {
         return this.level.data[i];
     }
@@ -290,7 +288,6 @@ export function EditorLevel(renderer, level) {
         let def = renderer.objectDefs[id];
         if (grid_align) {
             let alg = aligns[id];
-            console.log(alg);
             if (alg) {
                 if (alg.alignX == "left") {
                     x = x - 15 + def.width / 2;
