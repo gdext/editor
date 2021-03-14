@@ -312,6 +312,10 @@ export function EditorLevel(renderer, level) {
         return ret;
     }
 
+    this.getLevel = function() {
+        return this.level;
+    }
+
     this.removeObject = function(i) {
         let obj = this.level.data[i];
         delete this.level.data[i];
