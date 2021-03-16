@@ -68,7 +68,6 @@ export default {
                     menuOption.onclick = () => {
                         actionsExec.executeAction(o.id);
                     }
-                    console.log(menuOption);
                     menuOptions.appendChild(menuOption);
                 });
                 let separator = document.createElement('separator');
@@ -118,6 +117,28 @@ export default {
                         return false;
                     }
                 },
+                onCheckChange: function(c) {
+                    if(c) {
+                        localStorage.setItem('settings.autosaveEnabled', '1');
+                    } else {
+                        localStorage.setItem('settings.autosaveEnabled', '0');
+                    }
+                }
+            }
+        }, sectionCheckbox);
+
+        ui.renderUiObject({
+            properties: {
+                type: 'numberInput',
+                id: 'testInput',
+                defaultValue: function(){
+                    return 5;
+                },
+                min: -32,
+                max: 32,
+                scale: 0.05,
+                defaultToInteger: true,
+                icon: 'slide',
                 onCheckChange: function(c) {
                     if(c) {
                         localStorage.setItem('settings.autosaveEnabled', '1');
@@ -359,7 +380,6 @@ export default {
                 if(selobj) selobj.classList.remove('sel');
                 buildSelection = id;
                 obj.classList.add('sel');
-                console.log(id);
             }, buildSelection);
             buildContentBlocks.style.width = ow.parentw;
         }
