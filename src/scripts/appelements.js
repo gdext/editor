@@ -124,27 +124,6 @@ export default {
                 }
             }
         }, sectionCheckbox);
-        let testH = 0;
-        ui.renderUiObject({
-            properties: {
-                type: 'textInput',
-                id: 'testInput',
-                placeholder: 'Test Input',
-                maxlength: 32,
-                minlength: 4,
-                icon: 'info',
-                onIconClick: function(){
-                    alert('you stoopid');
-                },
-                onIconDrag: function(e) {
-                    testH += e.movementX/10;
-                    console.log(testH);
-                },
-                onValueChange: function(v) {
-                    console.log(v);
-                }
-            }
-        }, sectionCheckbox);
     },
     generateMain: (elem) => {
         const navbar = document.getElementById('appNavbar');
