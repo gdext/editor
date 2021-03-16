@@ -27,6 +27,13 @@ import bg19 from "./bg/19.png"
 import bg20 from "./bg/20.png"
 
 export const util = {
+    /**
+     * Creates and compiles the given shader and checks for errors. It then returns the shader.
+     * @param {WebGLRenderingContext} gl gl context
+     * @param {number} type shader type, gl.FRAGMENT_SHADER or gl.VERTEX_SHADER
+     * @param {string} source the shader source code
+     * @returns gl shader or undefined if unsuccessful
+     */
     createShader: function(gl, type, source) {
         var shader = gl.createShader(type);
         gl.shaderSource(shader, source);
@@ -37,6 +44,13 @@ export const util = {
     
         gl.deleteShader(shader);
     },
+    /**
+     * Takes the 2 given shaders and combines them into a WebGLProgram and also checks for errors
+     * @param {WebGLRenderingContext} gl gl context
+     * @param {WebGLShader} vertexShader the vertex shader
+     * @param {WebGLShader} fragmentShader the fragment shader
+     * @returns WebGLProgram or undefined if unsuccessful
+     */
     createProgram: function(gl, vertexShader, fragmentShader) {
         var program = gl.createProgram();
         gl.attachShader(program, vertexShader);
@@ -48,6 +62,12 @@ export const util = {
         
         gl.deleteProgram(program);
     },
+    /**
+     * Takes in given values an puts them in a WebGLBuffer
+     * @param {WebGLRenderingContext} gl 
+     * @param {number[]} values 
+     * @returns a WebGLBuffer containing the given values
+     */
     createBuffer: function(gl, values) {
         var buffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -55,23 +75,56 @@ export const util = {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(values), gl.STATIC_DRAW);
         return buffer;
     },
+    /**
+     * Enabling the given WebGLBuffer so that gl.drawArrays is called with it.
+     * It will give the values contained in the buffer to the GPU to render.
+     * It also asks for how the buffer is layouted and what components to give.
+     * @param {WebGLRenderingContext} gl gl context
+     * @param {WebGLBuffer} buffer buffer to be enabled
+     * @param {number} attr the attribute index the buffer is going to be put in
+     * @param {number} size number of components per vertex. usually 2 because of 2d
+     */
     enableBuffer: function(gl, buffer, attr, size) {
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
         gl.vertexAttribPointer(attr, size, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(attr);
     },
+    /**
+     * Enabling the given WebGLTexture so that gl.drawArrays is called with it.
+     * It will take the texture and give it as a uniform for the shaders to use.
+     * @param {WebGLRenderingContext} gl gl context
+     * @param {WebGLTexture} texture the gl texture to be activated
+     * @param {WebGLUniformLocation} uniLoc uniform location
+     */
     enableTexture: function(gl, texture, uniLoc) {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.uniform1i(uniLoc, 0);
     },
+    /**
+     * It takes in the texture cutout out of the spreadsheet and sets the correct uniforms of the cutout.
+     * The cutout is 0.6 pixels smaller to avoid texture leaking from the nearing textures in the sheet.
+     * @param {GDRenderer} renderer GDRenderer
+     * @param {{x : number, y : number, w : number, h : number}} tex the texture cutout
+     */
     setTexture: function(renderer, tex) {
         renderer.gl.uniform1f(renderer.textX, (tex.x+0.6)/renderer.mainT.width);
         renderer.gl.uniform1f(renderer.textY, (tex.y+0.6)/renderer.mainT.height);
         renderer.gl.uniform1f(renderer.textW, (tex.w-1.2)/renderer.mainT.width);
         renderer.gl.uniform1f(renderer.textH, (tex.h-1.2)/renderer.mainT.height);
     },
+    /**
+     * This sets the model matrix. The model matrix is the transformation of an object.
+     * The vertex shader takes the model matrix in as 3 component matrix uniform and multiplies it
+     * with the vertices of the texture rectangle so it applies the transformations.
+     * @param {GDRenderer} renderer GDRenderer
+     * @param {number} x the x position
+     * @param {number} y the y position
+     * @param {number} w the width scaling
+     * @param {number} h the height scaling
+     * @param {number} rot the rotation in angels (forgot if it was clockwise or counter-clockwise)
+     */
     setModelMatrix: function(renderer, x, y, w, h, rot) {
         let model = glMatrix.mat3.create();
 
@@ -87,6 +140,15 @@ export const util = {
 
         renderer.gl.uniformMatrix3fv(renderer.mmUni, false, model);
     },
+    /**
+     * Sets the view matrix. The view matrix is the transformation of the view (basically the camera).
+     * For the rest, it basically does the same thing as the model matrix.
+     * If the x, y, zoom values are not given. It will use the camera in the GDRenderer.
+     * @param {GDRenderer} renderer GDRenderer
+     * @param {number} x the x position of the camera
+     * @param {number} y the y position of the camera
+     * @param {number} zoom the zoom of the camera (basically scaling the scene)
+     */
     setCamera: function(renderer, x, y, zoom) {
         if (x == undefined) {
             x = -renderer.camera.x;
@@ -107,12 +169,23 @@ export const util = {
         
         gl.uniformMatrix3fv(renderer.vmUni, false, matrix);
     },
+    /**
+     * This sets the projection matrix so that the view looks 2d and normally scaled to the canvas.
+     * Another example of a projection matrix is a perspective matrix that gives the 3d effect.
+     * @param {GDRenderer} renderer GDRenderer
+     */
     setProjection: function(renderer) {
         let matrix = glMatrix.mat3.create();
         glMatrix.mat3.scale(matrix, matrix, [2/renderer.width, 2/renderer.height]);
 
         renderer.gl.uniformMatrix3fv(renderer.pmUni, false, matrix);
     },
+    /**
+     * Sets the tint of the object for the next gl.drawArrays call. This is what basically makes objects different colors.
+     * The given tint is then multiplied with every pixels of the object.
+     * @param {GDRenderer} renderer GDRenderer
+     * @param {{r : number, g : number, b : number, a : number}} tint the tint (values from 0 - 1)
+     */
     setTint: function(renderer, tint) {
         let uniform = renderer.gl.getUniformLocation(renderer.gProg, "a_tint")
         renderer.gl.uniform4fv(uniform, new Float32Array([tint.r, tint.g, tint.b, tint.a]));
@@ -137,6 +210,13 @@ export const util = {
         [3]: 468,
         [4]: 578.1
     },
+    /**
+     * This function takes in a level and a x position and returns the time
+     * it takes to get to that x position given you went through each speed portal
+     * @param {GDExtLevel} level the level in GDExt JSON format. though it also needs the `sps` property.
+     * @param {number} x the x position
+     * @returns {number} the time to get to the x position in seconds.
+     */
     xToSec: function(level, x) {
         var resSP = null;
         var lspd = null;
@@ -154,6 +234,12 @@ export const util = {
         } else
             return parseFloat(x) / parseFloat(this.ups[lspd]);
     },
+    /**
+     * forgot what this does
+     * @param {*} level 
+     * @param {*} x 
+     * @returns 
+     */
     xToSecBC: function(level, x) {
         var resSP = null;
         var lspd = null;
@@ -173,9 +259,23 @@ export const util = {
         } else
             return parseFloat(x) / parseFloat(this.ups[lspd]);
     },
+    /**
+     * Takes in a color object with properties `red, green, blue` (a color trigger for example).
+     * And returns a color object in `r, g, b` format
+     * @param {{red : number, green : number, blue : number}} col the long color object
+     * @returns {{r : number, g : number, b : number}} col the long color object
+     */
     longToShortCol(col) {
-        return {r: parseFloat(col.red), b: parseFloat(col.blue), g: parseFloat(col.green)};
+        return {r: parseFloat(col.red), g: parseFloat(col.green), b: parseFloat(col.blue)};
     },
+    /**
+     * Takes in the level, a x position and a color id and calculates the color
+     * at that x position given you went through each speed portal.
+     * @param {GDExtLevel} level the level in GDExt JSON format. though it also needs the `sps` property.
+     * @param {number} x x position
+     * @param {number} col color id
+     * @returns {{r : number, g : number, b : number}}
+     */
     xToCOL: function(level, x, col) {
         var resCOL = null;
         if (level.cts[col] != undefined) {
@@ -197,11 +297,18 @@ export const util = {
             if (baseColor.length > 0) {
                 baseColor = baseColor[0];
 
-                return {r: baseColor.r, b: baseColor.b, g: baseColor.g};
+                return {r: baseColor.r, g: baseColor.g, b: baseColor.b};
             } else
-                return {r: 255, b: 255, g: 255}
+                return {r: 255, g: 255, b: 255}
         }
     },
+    /**
+     * I think this one calculates a background color value
+     * @param {*} level 
+     * @param {*} x 
+     * @param {*} col 
+     * @returns 
+     */
     xToCOLBC: function(level, x, col) {
         var resCOL = null;
         if (level.listCOLs[col] != undefined) {
@@ -231,15 +338,44 @@ export const util = {
             }
         }
     },
+    /**
+     * This converts each color component so the values go from `0 - 255` to `0 - 1`
+     * which is more useful for WebGL.
+     * @param {{r: number, g: number, b: number}} col color value `0 - 255`
+     * @returns color value `0 - 1`
+     */
     toOne: function(col) {
         return {r: col.r/255, g: col.g/255, b: col.b/255};
     },
+    /**
+     * This interpolates the 2 color components depending on the `blend` value
+     * @param {number} c1 color component 1
+     * @param {number} c2 color component 2
+     * @param {number} blend blend amount `0 - 1`
+     * @returns result blend
+     */
     blendComp: function(c1, c2, blend) {
         return c1 * (1-blend) + c2 * blend;
     },
+    /**
+     * This interpolates the 2 color values depending on the `blend` value
+     * @param {{r: number, g: number, b: number}} col1 color value 1
+     * @param {{r: number, g: number, b: number}} col2 color value 2
+     * @param {number} blend blend amount `0 - 1`
+     * @returns result blend
+     */
     blendColor: function(col1, col2, blend) {
         return {r: this.blendComp(col1.r, col2.r, blend), b: this.blendComp(col1.b, col2.b, blend), g: this.blendComp(col1.g, col2.g, blend)};
     },
+    /**
+     * This function loads all the color triggers from a specific color id so that each
+     * color trigger has a `curCol` which is the color currently at that trigger before
+     * it gets converted and also lists the indexes of the color triggers so you dont have to
+     * go through each object to find the color trigger needed. This is purely for optimisation.
+     * @param {GDExtLevel} level the level in GDExt JSON format
+     * @param {number} color the color id
+     * @returns a list of all the indexes of each color trigger of that color id.
+     */
     loadColors: function(level, color) {
         var listCOLs = [];
 
@@ -305,6 +441,11 @@ export const util = {
     }
 }
 
+/**
+ * Deprecated way of parsing the GD level code that was used when GDRenderW was
+ * a standalone project.
+ * @deprecated
+ */
 export const GDRParse = {
     headkeys: {
         // Current Keys
@@ -724,6 +865,9 @@ export const GDRParse = {
     }
 }
 
+/**
+ * The source code of the vertex shader
+ */
 const VERT_SRC = `
 attribute vec2 a_position;
 attribute vec2 a_texcoord;
@@ -748,6 +892,10 @@ void main(void) {
     o_texcoord = vec2(a_texcoord.x * textW + textX, a_texcoord.y * textH + textY);
 }`;
 
+
+/**
+ * The source code of the fragment shader
+ */
 const FRAG_SRC = `
 precision mediump float;
 
@@ -764,6 +912,11 @@ void main(void) {
         gl_FragColor = texture2D(a_sampler, o_texcoord) * a_tint;
 }`;
 
+/**
+ * This is a texture class that automatically creates a texture.
+ * @param {WebGLRenderingContext} gl gl context
+ * @param {string} url url of the texture
+ */
 function Texture(gl, url) {
     this.width = null;
     this.height = null;
@@ -794,6 +947,13 @@ function Texture(gl, url) {
     this.image.src = url;
 }
 
+/**
+ * This is the object definition class that contains where its textures are located, their size,
+ * their default color id and their default zlayer and zorder.
+ * This is loaded from the `data.json` file.
+ * @param {WebGLRenderingContext} gl gl context
+ * @param {{}} obj an object from `data.json`
+ */
 function ObjectDef(gl, obj) {
     this.texture_i = null;
     this.texture_a = null;
@@ -836,6 +996,12 @@ function ObjectDef(gl, obj) {
     this.zorder  = obj.zorder;
 }
 
+/**
+ * This is a very simple camera class.
+ * @param {number} x x position
+ * @param {number} y y position
+ * @param {number} zoom zoom
+ */
 function Camera(x, y, zoom) {
     this.x = x;
     this.y = y;
@@ -843,6 +1009,10 @@ function Camera(x, y, zoom) {
     this.zoom = zoom;
 }
 
+/**
+ * The core of GDRenderW. The GDRenderer class contains (almost) everything for rendering a level.
+ * @param {WebGLRenderingContext} gl 
+ */
 export function GDRenderer(gl) {
     this.gl =    gl;
     this.gProg = null;
@@ -875,16 +1045,30 @@ export function GDRenderer(gl) {
 
     this.bgs = {};
 
+    /**
+     * This cache caches simple variables and current color value
+     * so they don't have to be calculated every time
+     */
     this.cache = {
         colors: {},
         parent: null,
         camX1: null,
         camX2: null,
         objCount: 0,
+        /**
+         * This clears the cache
+         */
         clear: function() {
             this.colors = {};
             this.objCount = 0;
         },
+        /**
+         * This will get the current color of a color id depending on the camera's x position.
+         * This also caches the color and returns that cached color if it gets called again.
+         * @param {GDRenderer} renderer the renderer since the function is too far in the hiërarchy.
+         * @param {number} color color id
+         * @returns {{r: number, g: number, b: number}} the color from `0 - 1`
+         */
         getColor: function(renderer, color) {
             monitor.startCategory("Color calculation");
             if (color == 1010)
@@ -901,13 +1085,17 @@ export function GDRenderer(gl) {
 
     this.gl = gl;
 
+    // Creates the gl program using the shader source codes above
     this.gProg = util.createProgram(gl, 
         util.createShader(gl, gl.VERTEX_SHADER, VERT_SRC),
         util.createShader(gl, gl.FRAGMENT_SHADER, FRAG_SRC));
 
+    // This enables blending so that objects can be seen through transparent objects 
     gl.enable(gl.BLEND);
     gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
+    // These are the vertices of a rectangle since textures are rectangulair.
+    // This is used in the rendering process.
     const vertices = [
        -0.5,  0.5,
         0.5, -0.5,
@@ -917,6 +1105,7 @@ export function GDRenderer(gl) {
         0.5, -0.5,
     ];
 
+    // These are the corresponding texture coordinates.
     const texCoords = [
         0,  0,
         1,  1,
@@ -926,12 +1115,17 @@ export function GDRenderer(gl) {
         1,  1
     ];
     
+    // This creates the 2 buffers for the vertices and texture coordinates so they can be used
+    // be the shaders.
     this.pBuff = util.createBuffer(gl, vertices);
     this.tBuff = util.createBuffer(gl, texCoords);
 
+    // These are the attribute locations so that each of the 2 buffers above can be linked to
+    // the attribute variables in the shader code called ´a_position´ and ´a_texcoord´
     this.pAttr = gl.getAttribLocation(this.gProg, "a_position");
     this.tAttr = gl.getAttribLocation(this.gProg, "a_texcoord");
 
+    // These are all the other uniform locations
     this.mmUni = gl.getUniformLocation(this.gProg, "model");
     this.pmUni = gl.getUniformLocation(this.gProg, "proj");
     this.vmUni = gl.getUniformLocation(this.gProg, "view");
@@ -946,10 +1140,16 @@ export function GDRenderer(gl) {
     this.textW = gl.getUniformLocation(this.gProg, "textW");
     this.textH = gl.getUniformLocation(this.gProg, "textH");
 
+    // This is the camera
     this.camera = new Camera(0, 0, 1);
 
+    // This is the texture of the spritesheet
     this.mainT = new Texture(this.gl, spritesheet);
 
+    /**
+     * This takes the data json and creates all the object definitions and also
+     * load all the background textures.
+     */
     this.loadTextures = () => {
         for (var i = 0; i < 2000; i++) {
             var obj = dataJson[i];
@@ -979,8 +1179,15 @@ export function GDRenderer(gl) {
         this.bgs[20] = new Texture(this.gl, bg20);
     }
     
+    // Then runs it lol
     this.loadTextures();
 
+    /**
+     * This tries to render the background.
+     * @param {number} bg background id
+     * @param {{r: number, g: number, b: number}} tint the tint of the background
+     * @returns true if successful, false if not
+     */
     this.renderBG = (bg, tint) => {
         var tex = this.bgs[bg];
         if (!tex.loaded)
@@ -1007,6 +1214,14 @@ export function GDRenderer(gl) {
         return true;
     };
 
+    /**
+     * This draws a line and is used for the grid
+     * @param {number} x if vertical is true, this is the x position. Otherwise it is the y position
+     * @param {boolean} vertical if the line is vertical or not.
+     * @param {{r: number, g: number, b: number, a: number}} tint this is the color of the line. White by default.
+     * @param {number} width line width (1 by default)
+     * @param {boolean} toCamera whenever the line should stick to the camera (false by default)
+     */
     this.renderLine = (x, vertical, tint = {r: 1, g: 1, b: 1, a: 1}, width = 1, toCamera = false) => {
         let gl = this.gl;
 
@@ -1037,6 +1252,18 @@ export function GDRenderer(gl) {
         gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 0);
     };
 
+    /**
+     * This will try to render a texture of an object
+     * @param {{x: number, y: number, w: number, h: number}} tex texture cutout
+     * @param {number} x x position
+     * @param {number} y y position
+     * @param {number} rot rotation in angles
+     * @param {boolean} xflip whenever it should be horizontally flipped
+     * @param {boolean} yflip whenever it should be vertically flipped
+     * @param {{r: 1, g: 1, b: 1, a: 1}} tint the tint of the texture (white by default)
+     * @param {number} scale the scaling of the texture
+     * @returns 
+     */
     this.renderTexture = (tex, x, y, rot, xflip, yflip, tint = {r: 1, g: 1, b: 1, a: 1}, scale = 1) => {
         if (tex == undefined)
             return;
@@ -1059,6 +1286,11 @@ export function GDRenderer(gl) {
         //monitor.startCategory("Object rendering");
     }
 
+    /**
+     * This will render the given object
+     * @param {{}} obj object to be rendered
+     * @returns 
+     */
     this.renderObject = (obj) => {
         var def = this.objectDefs[obj.id];
 
@@ -1105,16 +1337,27 @@ export function GDRenderer(gl) {
         monitor.endCategory("Object rendering");
     }
 
+    /**
+     * Takes in a screen position and convers it into a level position (30 units per block).
+     * @param {number} x x position
+     * @param {number} y y position
+     * @returns {{x: number, y: number}} level position
+     */
     this.screenToLevelPos = (x, y) => {
         let cX = (x - this.width / 2) / this.camera.zoom;
         let cY = (y - this.height / 2) / this.camera.zoom;
         return {x: this.camera.x + cX, y: -this.camera.y - cY}
     }
 
+    /**
+     * This will load in a level in the GDExt level json format
+     * @param {GDExtLevel} level level json
+     */
     this.loadGDExtLevel = (level) => {
         this.level = level;
         this.level.format = "GDExt";
 
+        // Loads all the indexes of each speed portal to a seperate table for preformance
         let listSPs = [];
         for (const obj of this.level.data) {
             if (util.getSpeedPortal(obj))
@@ -1136,6 +1379,7 @@ export function GDRenderer(gl) {
 
         this.level.listSPs = listSPs;
 
+        // Loads all the indexes of each color trigger to a seperate table for preformance
         this.level.listCOLs = {};
         for (var i = 1; i < 1010; i++)
             this.level.listCOLs[i] = util.loadColors(this.level, i);
@@ -1166,6 +1410,18 @@ export function GDRenderer(gl) {
                         obj.decorCol = this.objectDefs[obj.id].seccol;
         }
 
+        // This will structure the level in level chunks
+        /* This is the layout of level chunks:
+            lchunks = {
+                0: { <-- The objects in the first 992 units of the level
+                    1: [ <-- The objects in z layer 1 (T1)
+                        43, <--| Indexes of the objects contained here
+                        12,    | These indexes are the indexes for the level.data table
+                        342
+                    ]
+                }
+            }
+        */
         var zlayers = {};
 
         var lchunks = {};
@@ -1192,9 +1448,15 @@ export function GDRenderer(gl) {
                     }
 
 
+        // Level chunks get stored here:
         this.level.lchunks = lchunks;
     }
 
+    /**
+     * This loads the old GDRenderW level format
+     * @param {{}} level level
+     * @deprecated
+     */
     this.loadGDRLevel = (level) => {
         this.level = level;
         this.level.format = "GDRenderW";
@@ -1270,21 +1532,39 @@ export function GDRenderer(gl) {
         this.level.zlayers = zlayers;
     }
 
+    /**
+     * This function prepares for rendering
+     * @param {number} width width of the canvas
+     * @param {number} height height of the canvas
+     */
     this.prepareRender = (width, height) => {
         var gl = this.gl;
+
+        // Clears the cache
         this.cache.clear();
 
+        // Sets dimensions
         this.width  = width;
         this.height = height;
 
+        // Makes WebGL use the program
         gl.useProgram(this.gProg);
 
+        // Enables the buffers
         util.enableBuffer(gl, this.pBuff, this.pAttr, 2);
         util.enableBuffer(gl, this.tBuff, this.tAttr, 2);
 
+        // Sets the 2d projection
         util.setProjection(this);
     }
 
+    /**
+     * This will render the whole level
+     * @param {EditorLevel} level editor level
+     * @param {number} width canvas width
+     * @param {number} height canvas height
+     * @param {{grid?: boolean}} options rendering options
+     */
     this.renderLevel = (level, width, height, options = {}) => {
         let startTime = window.performance.now();
         if (!level.level)
@@ -1292,9 +1572,11 @@ export function GDRenderer(gl) {
 
         this.level = level.level;
 
+        // Starts the monitor
         monitor.startFrame();
         var gl = this.gl;
 
+        // Prepares for rendering
         this.prepareRender(width, height);
 
         monitor.startCategory("Background rendering");
@@ -1303,9 +1585,11 @@ export function GDRenderer(gl) {
 
         gl.viewport(0, 0, this.width, this.height);
 
+        // Sets a default view matrix for drawing the background
         this.viewM = glMatrix.mat3.create();
         gl.uniformMatrix3fv(this.vmUni, false, this.viewM);
 
+        // Tries rendering the background. If not, it will render it as a plain color
         if (this.level.format == "GDRenderW")
             if (!this.renderBG(this.level.keys.background === undefined ? 1 : this.level.keys.background, bgcol)) {
                 gl.clearColor(bgcol.r, bgcol.g, bgcol.b, 1);
@@ -1321,6 +1605,8 @@ export function GDRenderer(gl) {
         monitor.endCategory("Background rendering");
 
         monitor.startCategory("Grid rendering");
+
+        // This will render the grid
         if (options.grid) {
             let cw = this.width / this.camera.zoom;
             let ch = this.height / this.camera.zoom;
@@ -1349,17 +1635,23 @@ export function GDRenderer(gl) {
             return;
         }
 
+        // Calculates the begin x and end x of the camera viewing rectangle
         this.cache.camX1 = this.camera.x - this.width / this.camera.zoom / 2 - 60;
         this.cache.camX2 = this.camera.x + this.width / this.camera.zoom / 2 + 60;
 
         //console.log(this);
 
+        // This sets the view matrix to the camera's view
         util.setCamera(this);
+
+        // This will enable the spritesheet texture
         util.enableTexture(gl, this.mainT.texture, this.spUni);
 
+        // This calculates the first chunk in viewing range and the last chunk
         let camB = Math.floor( this.cache.camX1 / 992 );
         let camE = Math.floor( this.cache.camX2 / 992 );
 
+        // This renders each object in each z layer in each level chunk
         for (let c = camB; c <= camE; c++)
             if (this.level.lchunks[c]) {
                 let chunk = this.level.lchunks[c];

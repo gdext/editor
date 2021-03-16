@@ -75,4 +75,41 @@
 .ui-button:hover {
     background: #3081CC;
 }
-  
+
+.ui-button.bbg {
+    background-color: #fff;
+}
+.ui-button.bbg:hover {
+    background-color: #ffffffcc;
+}
+
+/* input */
+.ui-input {
+    display: flex;
+    background-color: #1D1D1D;
+    border: 1px solid #111;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.ui-input.f {
+    border-color: #3C94E4;
+}
+
+.ui-input input {
+    color: #fff;
+    background: none;
+    border: none;
+    padding: 7px 9px;
+    padding-right: 0;
+    font-size: 12px;
+    min-width: 60px;
+}
+
+.ui-input img {
+    opacity: 0.5;
+    padding: 7px 9px;
+    height: 14px;
+    width: 14px;
+}
