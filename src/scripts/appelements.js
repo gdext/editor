@@ -126,28 +126,6 @@ export default {
                 }
             }
         }, sectionCheckbox);
-
-        ui.renderUiObject({
-            properties: {
-                type: 'numberInput',
-                id: 'testInput',
-                defaultValue: function(){
-                    return 5;
-                },
-                min: -32,
-                max: 32,
-                scale: 0.05,
-                defaultToInteger: true,
-                icon: 'slide',
-                onCheckChange: function(c) {
-                    if(c) {
-                        localStorage.setItem('settings.autosaveEnabled', '1');
-                    } else {
-                        localStorage.setItem('settings.autosaveEnabled', '0');
-                    }
-                }
-            }
-        }, sectionCheckbox);
     },
     generateMain: (elem) => {
         const navbar = document.getElementById('appNavbar');
