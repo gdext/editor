@@ -94,6 +94,9 @@ export default {
             action.classList.add('navbar-action');
             action.setAttribute('actionid', img.id);
             action.title = img.name;
+            action.onclick = () => {
+                actionsExec.executeAction(img.id);
+            }
             import(`../assets/${img.icon}`).then(({default: i}) => {
                 action.src = i;
                 sectionActions.appendChild(action);
@@ -142,7 +145,6 @@ export default {
         elem.appendChild(canvas);
 
         let l = localStorage.getItem('lvlcode');
-        //localStorage.setItem('lvlcode', l);
 
         renderer.init(canvas);
         renderer.initLevel(levelparse.code2object(l));
@@ -212,6 +214,14 @@ export default {
             window.onmouseout = stop;
         }
 
+        function beginScreenZooming(e) {
+            let coords = renderer.getCoords();
+            if(e.deltaY < 0) coords.z *= 1.1;
+            else coords.z /= 1.1;
+            renderer.moveTo(coords.x, coords.y, coords.z);
+            renderer.update(canvas);
+        }
+
         canvas.onmousedown = (e) => {
             if(e.button == 1) {
                 beginScreenPanning();
@@ -241,11 +251,7 @@ export default {
         window.addEventListener('resizeCanvas', resizeCanvas);
 
         canvas.onwheel = (e) => {
-            let coords = renderer.getCoords();
-            if(e.deltaY < 0) coords.z *= 1.1;
-            else coords.z /= 1.1;
-            renderer.moveTo(coords.x, coords.y, coords.z);
-            renderer.update(canvas);
+            beginScreenZooming(e);
         }  
     },
     generateBottom: (elem) => {

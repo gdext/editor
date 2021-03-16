@@ -71,24 +71,6 @@ function executeAction(action) {
 
             break;
         case 'new':
-            /*if(fs) {
-                let ccll = readLocalLevels();
-                let newlevel = {
-                    kCEK:4,
-                    name: "GDExt Level",
-                    data: defaultLevel,
-                    author: ccll[0].author || '-',
-                    k13: true,
-                    k21: 2,
-                    version: 1,
-                    gameversion: 35,
-                    editorcamx: 0,
-                    editorcamy: 0,
-                    editorcamz: 0
-                }
-                ccll.unshift(newlevel);
-                writeLocalLevels(ccll);
-            }*/
             if(!confirmUnsavedChanges()) return;
 
             localStorage.setItem('lvlcode', defaultLevel);
