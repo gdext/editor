@@ -1214,6 +1214,27 @@ export function GDRenderer(gl) {
         return true;
     };
 
+    this.renderRect = (x, y, width, height, tint = {r: 1, g: 1, b: 1, a: 1}, toCamera = false) => {
+        let gl = this.gl;
+
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 1);
+        
+        if (toCamera)
+            util.setCamera(this);
+        else
+            util.setCamera(this, 0, 0);
+
+        let zoom = this.camera.zoom;
+
+        util.setModelMatrix(this, x, y, width, height);
+
+        util.setTint(this, tint);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 0);
+    }
+
     /**
      * This draws a line and is used for the grid
      * @param {number} x if vertical is true, this is the x position. Otherwise it is the y position
@@ -1338,7 +1359,19 @@ export function GDRenderer(gl) {
     }
 
     /**
-     * Takes in a screen position and convers it into a level position (30 units per block).
+     * Takes in a level position (30 units per block) and converts it into a screen position.
+     * @param {number} x x position
+     * @param {number} y y position
+     * @returns {{x: number, y: number}} screen position
+     */
+    this.levelToScreenPos = (x, y) => {
+        let cX = x - this.camera.x;
+        let cY = -( y + this.camera.y );
+        return {x: (cX * this.camera.zoom) + this.width / 2, y: (cY * this.camera.zoom) + this.height / 2}
+    }
+
+    /**
+     * Takes in a screen position and converts it into a level position (30 units per block).
      * @param {number} x x position
      * @param {number} y y position
      * @returns {{x: number, y: number}} level position
@@ -1606,6 +1639,10 @@ export function GDRenderer(gl) {
 
         monitor.startCategory("Grid rendering");
 
+        // Calculates the begin x and end x of the camera viewing rectangle
+        this.cache.camX1 = this.camera.x - this.width / this.camera.zoom / 2 - 60;
+        this.cache.camX2 = this.camera.x + this.width / this.camera.zoom / 2 + 60;
+
         // This will render the grid
         if (options.grid) {
             let cw = this.width / this.camera.zoom;
@@ -1625,8 +1662,12 @@ export function GDRenderer(gl) {
             for (let y = Math.floor(y1/BLOCK) * BLOCK; y <= Math.floor(y2/BLOCK) * BLOCK; y+=BLOCK)
                 this.renderLine(y, false, BLACK, 0.7, true);
 
-            this.renderLine(0, false, {r: 1, g: 1, b: 1, a: 1},   1.5, true);
             this.renderLine(0, true, {r: 0, g: 0.6, b: 0, a: 1}, 1.5, true);
+
+            let bx = Math.max( 0, this.cache.camX1 );
+            let ex = this.cache.camX2;
+
+            this.renderRect(bx + (ex - bx) / 2, 0, ex - bx, 1.5, {r: 1, g: 1, b: 1, a: 1}, true);
         }
         monitor.endCategory("Grid rendering");
 
@@ -1634,10 +1675,6 @@ export function GDRenderer(gl) {
             monitor.endFrame(false);
             return;
         }
-
-        // Calculates the begin x and end x of the camera viewing rectangle
-        this.cache.camX1 = this.camera.x - this.width / this.camera.zoom / 2 - 60;
-        this.cache.camX2 = this.camera.x + this.width / this.camera.zoom / 2 + 60;
 
         //console.log(this);
 
