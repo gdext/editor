@@ -63,7 +63,7 @@
 
 /* button */
 .ui-button {
-    background-color: #3C94E4;
+    background-color: #4C4C4C;
     color: #fff;
     border-radius: 4px;
     padding: 6px 10px;
@@ -71,13 +71,26 @@
     font-size: 12px;
     min-width: 60px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .ui-button:hover {
+    background: #444;
+}
+
+.ui-button.primary {
+    background-color: #3C94E4;
+}
+.ui-button.primary:hover {
     background: #3081CC;
 }
 
 .ui-button.bbg {
     background-color: #fff;
+}
+.ui-button.s img {
+    margin-right: 5px;
 }
 .ui-button.bbg:hover {
     background-color: #ffffffcc;

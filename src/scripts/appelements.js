@@ -129,18 +129,12 @@ export default {
 
         ui.renderUiObject({
             properties: {
-                type: 'numberInput',
-                id: 'testInput',
-                placeholder: 'Direction',
-                icon: 'slide',
-                unit: '°',
-                scale: 0.55,
-                defaultToInteger: true,
-                defaultValue: function(){
-                    return 5
-                },
-                min: 0,
-                max: 360
+                type: 'button',
+                id: 'testButton',
+                primary: true,
+                text: 'Locate',
+                icon: 'ic-pick.svg',
+                iconHeight: 11,
             }
         }, sectionCheckbox);
     },

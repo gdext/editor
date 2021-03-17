@@ -37,13 +37,21 @@ function UiObject() {
         }).catch(() => {
             console.error('Cannot load asset');
         });
+        buttonIcon.height = options.iconHeight;
         
 
         if(options && options.light) button.classList.add('bbg');
+        if(options && options.primary) button.classList.add('primary');
+        if(options && options.width) {
+            button.style.width = options.width + 'px';
+            button.style.minWidth = '0px';
+        }
+        if(options && options.height) button.style.height = options.height + 'px';
+        if(icon && name) button.classList.add('s');
         button.id = id;
 
         if(icon) button.appendChild(buttonIcon);
-        button.appendChild(buttonText);
+        if(name) button.appendChild(buttonText);
         return button;
     }
 
@@ -205,7 +213,7 @@ export default {
                     elementContainer.appendChild(checkboxElement);
                     break;
                 case 'button':
-                    let buttonElement = uiObject.createButton(p.text, p.id, p.icon);
+                    let buttonElement = uiObject.createButton(p.text, p.id, p.icon, p);
                     buttonElement.onclick = p.onClick;
                     elementContainer.appendChild(buttonElement);
                     break;
