@@ -2,6 +2,7 @@ import icPick from '../assets/ic-pick.svg';
 import icSlide from '../assets/ic-slide.svg';
 import icInfo from '../assets/ic-info.svg';
 import keyboard from './keyboard';
+import util from './util';
 
 function UiObject() {
 
@@ -52,11 +53,12 @@ function UiObject() {
         if(options && options.light) checkboxContainer.classList.add('bbg');
 
         let input = document.createElement('input');
-        input.type = type;
+        input.type = 'text';
         input.id = options.id;
         if(options.placeholder) input.placeholder = options.placeholder;
 
         if(options.defaultValue) input.value = options.defaultValue();
+        if(type == 'number' && options.unit) input.value += options.unit;
 
         if(options.maxlength) input.maxLength = options.maxlength;
         if(options.minlength) input.minLength = options.minlength;
@@ -66,10 +68,23 @@ function UiObject() {
 
         inputContainer.appendChild(input);
         input.onchange = () => {
+            //handle min/max
+            if(input.value > options.max) input.value = options.max;
+            else if(input.value < options.min) input.value = options.min;
+
+            if(!input.value.endsWith(options.unit)) {  input.type = 'text'; input.value += options.unit; input.blur() }
+
             options.onValueChange(input.value);
         }
-        input.onfocus = () => inputContainer.classList.add('f');
-        input.onblur = () => inputContainer.classList.remove('f');
+        input.onfocus = () => {
+            inputContainer.classList.add('f');
+            if(type == 'number') input.value = parseFloat(input.value);
+            input.type = type;
+        }
+        input.onblur = () => {
+            inputContainer.classList.remove('f');
+            input.type = 'text';
+        }
 
         if(options.icon) {
             let inputIcon = document.createElement('img');
@@ -108,7 +123,12 @@ function UiObject() {
                 let p;
                 function moveFunction(e) {
                     click = false;
+                    util.setCursor('e-resize');
                     v += e.movementX * (options.scale || 1);
+                    //handle min/max
+                    if(v > options.max) v = options.max;
+                    else if(v < options.min) v = options.min;
+
                     let pv = isInteger() ? Math.round(v) : Math.round(v*100)/100;
                     //handle numbers after the decimal point
                     if(!isInteger()) {
@@ -116,10 +136,14 @@ function UiObject() {
                         if(!afterDecimal) pv = pv + '.00';
                         else if(afterDecimal.length < 2) pv += '0';
                     }
+
+                    if(options.unit) pv += options.unit;
                     p.value = pv;
                 }
                 function stopFunction() {
+                    util.setCursor();
                     p.value = isInteger() ? Math.round(v) : Math.round(v*100)/100;
+                    if(options.unit) p.value += options.unit;
                     document.removeEventListener('pointermove', moveFunction);
                     document.removeEventListener('pointerup', stopFunction);
                 }

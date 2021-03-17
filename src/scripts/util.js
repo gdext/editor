@@ -44,6 +44,10 @@ export default {
 
     getUnsavedChanges: () => {
         return unsavedChanges;
+    },
+
+    setCursor: (n) => {
+        document.body.style.cursor = n || "";
     }
 
 }

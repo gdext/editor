@@ -126,6 +126,23 @@ export default {
                 }
             }
         }, sectionCheckbox);
+
+        ui.renderUiObject({
+            properties: {
+                type: 'numberInput',
+                id: 'testInput',
+                placeholder: 'Direction',
+                icon: 'slide',
+                unit: '°',
+                scale: 0.55,
+                defaultToInteger: true,
+                defaultValue: function(){
+                    return 5
+                },
+                min: 0,
+                max: 360
+            }
+        }, sectionCheckbox);
     },
     generateMain: (elem) => {
         const navbar = document.getElementById('appNavbar');
@@ -155,27 +172,29 @@ export default {
         //mouse events
         function beginScreenPanning() {
             let coords = renderer.getCoords();
-                let moving = true;
-                function update() {
-                    renderer.update(canvas);
-                    if (moving)
-                        window.requestAnimationFrame(update);
-                }
-                update();
-                window.onmousemove = (e1) => {
-                    coords.x -= e1.movementX / coords.z;
-                    coords.y -= e1.movementY / coords.z;
-                    renderer.moveTo(coords.x, coords.y, coords.z);
-                }
-                function stopMove() {
-                    window.onmousemove = null;
-                    window.onmouseup = null;
-                    window.onmouseout = null;
-                    moving = false;
-                    renderer.update(canvas);
-                }
-                window.onmouseup = stopMove;
-                window.onmouseout = stopMove;
+            let moving = true;
+            util.setCursor('grab');
+            function update() {
+                renderer.update(canvas);
+                if (moving)
+                    window.requestAnimationFrame(update);
+            }
+            update();
+            window.onmousemove = (e1) => {
+                coords.x -= e1.movementX / coords.z;
+                coords.y -= e1.movementY / coords.z;
+                renderer.moveTo(coords.x, coords.y, coords.z);
+            }
+            function stopMove() {
+                window.onmousemove = null;
+                window.onmouseup = null;
+                window.onmouseout = null;
+                moving = false;
+                renderer.update(canvas);
+                util.setCursor();
+            }
+            window.onmouseup = stopMove;
+            window.onmouseout = stopMove;
         }
 
         function beginObjectBuilding(e) {
