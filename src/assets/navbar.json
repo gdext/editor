@@ -26,6 +26,10 @@
                     { "name": "Redo", "id": "redo" }
                 ],
                 [
+                    { "name": "Rename Level", "id": "rename" },
+                    { "name": "Level Settings", "id": "lvlsettings" }
+                ],
+                [
                     { "name": "About", "id": "about" }
                 ]
             ]

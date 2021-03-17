@@ -38,7 +38,25 @@
     {
         "keys": [ 17, 81 ],
         "type": "event",
-        "eventName": "electronApi",
-        "eventInfo": "quit"
+        "eventName": "action",
+        "eventInfo": "exit"
+    },
+    {
+        "keys": [ 17, 83 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "save"
+    },
+    {
+        "keys": [ 17, 78 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "new"
+    },
+    {
+        "keys": [ 17, 79 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "load"
     }
 ]

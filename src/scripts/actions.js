@@ -28,56 +28,29 @@ function confirmUnsavedChanges() {
     else return !util.getUnsavedChanges();
 }
 
-export default {
-    executeAction: (action) => {
-        switch(action) {
-            case 'load':
-                if(fs) {
-                    if(!confirmUnsavedChanges()) return;
-                    let ccll = readLocalLevels();
-                    localStorage.setItem('lvlcode', ccll[0].data);
-                    localStorage.setItem('lvlnumber', 0);
-                    window.location.reload();
-                } 
-                else alert('Reading files is only supported on GDExt Desktop!');
-                break;
-            case 'save':
-                let levelObj = canvas.getLevel();
-                let levelTxt = levelparse.object2code(levelObj);
+function executeAction(action) {
+    switch(action) {
+        case 'load':
+            if(fs) {
+                if(!confirmUnsavedChanges()) return;
+                let ccll = readLocalLevels();
+                localStorage.setItem('lvlcode', ccll[0].data);
+                localStorage.setItem('lvlnumber', 0);
+                window.location.reload();
+            } 
+            else alert('Reading files is only supported on GDExt Desktop!');
+            break;
+        case 'save':
+            let levelObj = canvas.getLevel();
+            let levelTxt = levelparse.object2code(levelObj);
 
-                if(fs) {
-                    let ccll = readLocalLevels();
-                    if(localStorage.getItem('lvlnumber') == -1) {
-                        let newlevel = {
-                            kCEK:4,
-                            name: "GDExt Level",
-                            data: levelTxt,
-                            author: ccll[0].author || '-',
-                            k13: true,
-                            k21: 2,
-                            version: 1,
-                            gameversion: 35,
-                            editorcamx: 0,
-                            editorcamy: 0,
-                            editorcamz: 0
-                        }
-                        ccll.unshift(newlevel);
-                    } else {
-                        ccll[parseInt(localStorage.getItem('lvlnumber'))].data = levelTxt;
-                    } 
-                    writeLocalLevels(ccll);
-                    util.setUnsavedChanges(false);
-                } 
-                else alert('Saving levels is only supported on GDExt Desktop!');
-
-                break;
-            case 'new':
-                /*if(fs) {
-                    let ccll = readLocalLevels();
+            if(fs) {
+                let ccll = readLocalLevels();
+                if(localStorage.getItem('lvlnumber') == -1) {
                     let newlevel = {
                         kCEK:4,
                         name: "GDExt Level",
-                        data: defaultLevel,
+                        data: levelTxt,
                         author: ccll[0].author || '-',
                         k13: true,
                         k21: 2,
@@ -88,19 +61,37 @@ export default {
                         editorcamz: 0
                     }
                     ccll.unshift(newlevel);
-                    writeLocalLevels(ccll);
-                }*/
-                if(!confirmUnsavedChanges()) return;
+                } else {
+                    ccll[parseInt(localStorage.getItem('lvlnumber'))].data = levelTxt;
+                } 
+                writeLocalLevels(ccll);
+                util.setUnsavedChanges(false);
+            } 
+            else alert('Saving levels is only supported on GDExt Desktop!');
 
-                localStorage.setItem('lvlcode', defaultLevel);
-                localStorage.setItem('lvlnumber', -1);
-                window.location.reload();
-                break;
-            case 'quit':
-                if(!confirmUnsavedChanges()) return;
-                let event = new CustomEvent('electronApi', 'quit');
-                dispatchEvent(event);
-                break;
-        }
+            break;
+        case 'new':
+            if(!confirmUnsavedChanges()) return;
+
+            localStorage.setItem('lvlcode', defaultLevel);
+            localStorage.setItem('lvlnumber', -1);
+            window.location.reload();
+            break;
+        case 'exit':
+            if(!confirmUnsavedChanges()) return;
+            let event = new CustomEvent('electronApi', { detail: 'quit' });
+            dispatchEvent(event);
+            break;
+    }
+}
+
+export default {
+    init: () => {
+        window.addEventListener('action', e => {
+            executeAction(e.detail);
+        });
+    },
+    executeAction: (action) => {
+        executeAction(action);   
     }
 }
