@@ -136,7 +136,7 @@ export default {
                 },
                 items: ['RobTop', 'kinda', 'SUS!'],
                 onSelectChange: (v, i) => {
-                    console.log(i[v] + ' selected!!!');
+                    alert(util.isGDRunning());
                 },
             }
         }, sectionCheckbox);

@@ -48,6 +48,10 @@ export default {
 
     setCursor: (n) => {
         document.body.style.cursor = n || "";
+    },
+
+    isGDRunning: () => {
+        return window.gdext ? window.gdext.isGdRunning : undefined;
     }
 
 }
