@@ -237,8 +237,8 @@ export default {
             } else {
                 let a = ['z', 'x', 'y']
                 let b = a[mode];
-                if(e.deltaY < 0) coords[b] += 15/coords.z;
-                else coords[b] -= 15/coords.z;
+                if(e.deltaY < 0) coords[b] -= 15/coords.z;
+                else coords[b] += 15/coords.z;
             }
             renderer.moveTo(coords.x, coords.y, coords.z);
             renderer.update(canvas);
