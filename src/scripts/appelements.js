@@ -229,10 +229,17 @@ export default {
             window.onmouseout = stop;
         }
 
-        function beginScreenZooming(e) {
+        function beginScreenZooming(e, mode) {
             let coords = renderer.getCoords();
-            if(e.deltaY < 0) coords.z *= 1.1;
-            else coords.z /= 1.1;
+            if(!mode || mode == 0) {
+                if(e.deltaY < 0) coords.z *= 1.1;
+                else coords.z /= 1.1;
+            } else {
+                let a = ['z', 'x', 'y']
+                let b = a[mode];
+                if(e.deltaY < 0) coords[b] += 15/coords.z;
+                else coords[b] -= 15/coords.z;
+            }
             renderer.moveTo(coords.x, coords.y, coords.z);
             renderer.update(canvas);
         }
@@ -266,7 +273,12 @@ export default {
         window.addEventListener('resizeCanvas', resizeCanvas);
 
         canvas.onwheel = (e) => {
-            beginScreenZooming(e);
+            let mode = 0;
+            let keys = keyboard.getKeys()
+            if(keys.includes(16)) mode = 1;
+            else if(keys.includes(17)) mode = 2;
+            beginScreenZooming(e, mode);
+            return false;
         }  
     },
     generateBottom: (elem) => {
