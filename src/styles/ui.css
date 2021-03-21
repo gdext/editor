@@ -126,3 +126,34 @@
     height: 14px;
     width: 14px;
 }
+
+/* tab */
+.ui-tabs {
+    color: #fff;
+    background: #1D1D1D;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #111;
+    font-size: 12px;
+    display: flex;
+    width: 180px;
+}
+
+.ui-tab-part {
+    width: 100%;
+    user-select: none;
+    cursor: pointer;
+    padding: 6px 9px;
+    border-right: 1px solid #111;
+    color: #fff;
+    text-align: center;
+}
+.ui-tab-part:last-child {
+    border-right: none;
+}
+.ui-tab-part:hover {
+    background: #141414;
+}
+.ui-tab-part.sel {
+    background: #3081CC;
+}

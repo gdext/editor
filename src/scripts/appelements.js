@@ -129,12 +129,15 @@ export default {
 
         ui.renderUiObject({
             properties: {
-                type: 'button',
-                id: 'testButton',
-                primary: true,
-                text: 'Locate',
-                icon: 'ic-pick.svg',
-                iconHeight: 11,
+                type: 'tabs',
+                id: 'testTab',
+                selected: () => {
+                    return 0;
+                },
+                items: ['RobTop', 'kinda', 'SUS!'],
+                onSelectChange: (v, i) => {
+                    console.log(i[v] + ' selected!!!');
+                },
             }
         }, sectionCheckbox);
     },

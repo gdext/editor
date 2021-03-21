@@ -188,6 +188,36 @@ function UiObject() {
         return inputContainer;
     }
 
+    this.createTabs = (items, id, selected, options) => {
+        let tabContainer = document.createElement('div');
+        tabContainer.classList.add('ui-tabs');
+        tabContainer.id = id;
+        tabContainer.setAttribute('items', items.join('|'));
+        tabContainer.setAttribute('value', selected);
+
+        let ii = -1;
+        items.forEach(i => {
+            ii++;
+            let localii = parseInt(ii);
+            let tab = document.createElement('div');
+            tab.classList.add('ui-tab-part');
+            if(ii == selected) tab.classList.add('sel');
+            tab.innerText = i;
+
+            tab.onclick = () => {
+                let prevsel = tabContainer.getElementsByClassName('sel')[0];
+                prevsel.classList.remove('sel');
+                tab.classList.add('sel');
+                tabContainer.setAttribute('value', localii);
+                if(options && options.onSelectChange) options.onSelectChange(localii, items);
+            }
+
+            tabContainer.appendChild(tab);
+        });
+
+        return tabContainer;
+    }
+
 }
 
 let uiObject = new UiObject();
@@ -224,6 +254,10 @@ export default {
                 case 'numberInput':
                     let ninputElement = uiObject.createInput('number', p);
                     elementContainer.appendChild(ninputElement);
+                    break;
+                case 'tabs':
+                    let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), { onSelectChange: p.onSelectChange });
+                    elementContainer.appendChild(tabsElement);
                     break;
             }
 
