@@ -163,6 +163,7 @@
     font-size: 12px;
     font-weight: normal;
     color: #fff;
+    margin: 4px 0;
 }
 .ui-label.bold {
     font-weight: 600;
@@ -179,4 +180,33 @@
     font-size: 11px;
     color: #888;
     font-weight: 700;
+    margin-bottom: 6px;
+}
+
+/* container */
+.ui-container {
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.ui-container.r {
+    flex-direction: row;
+    padding: 7px;
+}
+.ui-container.i {
+    display: block;
+}
+
+.ui-container.sh {
+    overflow-x: auto;
+}
+.ui-container.sv {
+    overflow-y: auto;
+}
+
+.ui-container.bbg {
+    background: #3C94E4;
+    border-top: 1px solid #000;
 }

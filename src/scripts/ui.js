@@ -14,7 +14,7 @@ function UiObject() {
 
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.id = id;
+        if(id) checkbox.id = id;
         if(state) checkbox.checked = 'checked';
 
         let checkmark = document.createElement('span');
@@ -48,7 +48,7 @@ function UiObject() {
         }
         if(options && options.height) button.style.height = options.height + 'px';
         if(icon && name) button.classList.add('s');
-        button.id = id;
+        if(id) button.id = id;
 
         if(icon) button.appendChild(buttonIcon);
         if(name) button.appendChild(buttonText);
@@ -62,7 +62,7 @@ function UiObject() {
 
         let input = document.createElement('input');
         input.type = 'text';
-        input.id = options.id;
+        if(options.id) input.id = options.id;
         if(options.placeholder) input.placeholder = options.placeholder;
 
         if(options.defaultValue) input.value = options.defaultValue();
@@ -191,7 +191,7 @@ function UiObject() {
     this.createTabs = (items, id, selected, options) => {
         let tabContainer = document.createElement('div');
         tabContainer.classList.add('ui-tabs');
-        tabContainer.id = id;
+        if(id) tabContainer.id = id;
         tabContainer.setAttribute('items', items.join('|'));
         tabContainer.setAttribute('value', selected);
 
@@ -222,7 +222,7 @@ function UiObject() {
         let labelElement = document.createElement('p');
         labelElement.classList.add('ui-label');
         if(style) labelElement.classList.add(style);
-        labelElement.id = id;
+        if(id) labelElement.id = id;
         labelElement.innerText = text;
         labelElement.style.color = options.color || "";
 
@@ -231,8 +231,33 @@ function UiObject() {
             labelElement.style.overflow = 'hidden';
             labelElement.style.textOverflow = 'ellipsis';
         }
+        if(options.marginTop) labelElement.style.marginTop = options.marginTop + 'px';
+        if(options.marginBottom) labelElement.style.marginBottom = options.marginBottom + 'px';
 
         return labelElement;
+    }
+
+    this.createContainer = (id, title, direction, options) => {
+        //create container itself
+        let container = document.createElement('div');
+        container.classList.add('ui-container');
+        if(id) container.id = id;
+        let directions = {row: 'r', column: 'c', inline: 'i'};
+        container.classList.add(directions[direction] || 'c');
+        container.style.padding = `${options.paddingY}px ${options.paddingX}px`;
+        let scrolls = {none: '', vertical: 'sv', horizontal: 'sh'};
+        if(options.scroll) container.classList.add(scrolls[options.scroll]);
+        if(options.isBottomBar) container.classList.add('bbg');
+
+        //create title
+        if(title) {
+            let titleElem = document.createElement('p');
+            titleElem.className = 'ui-label heading';
+            titleElem.innerText = title;
+            container.appendChild(title);
+        }
+
+        return container;
     }
 
 }
@@ -280,13 +305,17 @@ export default {
                     let labelElement = uiObject.createLabel(p.id, p.text, p.style, {textCutoff: p.textCutoff, color: p.color});
                     elementContainer.appendChild(labelElement);
                     break;
+                case 'container':
+                    let containerElement = uiObject.createContainer(p.id, p.title, p.direction, p);
+                    elementContainer.appendChild(containerElement);
+                    break;
             }
 
             e.appendChild(elementContainer);
 
             if(o.children) {
                 o.children.forEach(c => {
-                    cycle(c, elementContainer);
+                    cycle(c, elementContainer.children[0]);
                 });
             }
         }

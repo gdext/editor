@@ -386,6 +386,7 @@ export default {
             buildContentBlocks.style.width = ow.parentw;
         }
 
+        //build tab
         let tab1 = document.getElementById('tabBuild');
         tab1.appendChild(buildTitle);
         tab1.appendChild(buildContent);
@@ -407,6 +408,46 @@ export default {
                 loadObjs(lastCategory, page);
             }
         }
+
+        //edit tab
+        let tab2 = document.getElementById('tabEdit');
+        let editTitle = document.createElement('h4');
+        editTitle.innerText = 'Edit';
+        tab2.appendChild(editTitle);
+        let editContent = document.createElement('div');
+        ui.renderUiObject({
+            properties: {
+                type: 'container',
+                id: 'test',
+                direction: 'column',
+                paddingX: 15,
+                paddingY: 7
+            },
+            children: [
+                {
+                    properties: {
+                        type: 'label',
+                        text: 'Hello Mario',
+                        style: 'heading',
+                    }
+                },
+                {
+                    properties: {
+                        type: 'label',
+                        text: 'Luigi',
+                    }
+                },
+                {
+                    properties: {
+                        type: 'textInput',
+                        placeholder: 'idk',
+                        defaultValue: () => { return 'fekrjrekogjr' },
+                        icon: 'info'
+                    }
+                }
+            ]
+        }, editContent);
+        tab2.appendChild(editContent);
 
         //minimize/maximize button
         const resizeEvent = new Event('resizeCanvas');
