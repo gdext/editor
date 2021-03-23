@@ -157,3 +157,26 @@
 .ui-tab-part.sel {
     background: #3081CC;
 }
+
+/* label */
+.ui-label {
+    font-size: 12px;
+    font-weight: normal;
+    color: #fff;
+}
+.ui-label.bold {
+    font-weight: 600;
+}
+.ui-label.italic {
+    font-style: italic;
+}
+.ui-label.bolditalic {
+    font-weight: 600;
+    font-style: italic;
+}
+.ui-label.heading {
+    text-transform: uppercase;
+    font-size: 11px;
+    color: #888;
+    font-weight: 700;
+}

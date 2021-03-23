@@ -218,6 +218,23 @@ function UiObject() {
         return tabContainer;
     }
 
+    this.createLabel = (id, text, style, options) => {
+        let labelElement = document.createElement('p');
+        labelElement.classList.add('ui-label');
+        if(style) labelElement.classList.add(style);
+        labelElement.id = id;
+        labelElement.innerText = text;
+        labelElement.style.color = options.color || "";
+
+        if(options.textCutoff == 'trim') {
+            labelElement.style.whiteSpace = 'nowrap';
+            labelElement.style.overflow = 'hidden';
+            labelElement.style.textOverflow = 'ellipsis';
+        }
+
+        return labelElement;
+    }
+
 }
 
 let uiObject = new UiObject();
@@ -258,6 +275,10 @@ export default {
                 case 'tabs':
                     let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), { onSelectChange: p.onSelectChange });
                     elementContainer.appendChild(tabsElement);
+                    break;
+                case 'label':
+                    let labelElement = uiObject.createLabel(p.id, p.text, p.style, {textCutoff: p.textCutoff, color: p.color});
+                    elementContainer.appendChild(labelElement);
                     break;
             }
 

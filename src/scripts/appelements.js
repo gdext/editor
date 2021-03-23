@@ -129,15 +129,11 @@ export default {
 
         ui.renderUiObject({
             properties: {
-                type: 'tabs',
-                id: 'testTab',
-                selected: () => {
-                    return 0;
-                },
-                items: ['RobTop', 'kinda', 'SUS!'],
-                onSelectChange: (v, i) => {
-                    alert(util.isGDRunning());
-                },
+                type: 'label',
+                id: 'testLabel',
+                style: 'italic',
+                color: '#888',
+                text: 'Last Saved Never'
             }
         }, sectionCheckbox);
     },
