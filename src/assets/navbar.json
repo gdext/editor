@@ -35,6 +35,25 @@
             ]
         },
         {
+            "title": "Build",
+            "options": [
+                [
+                    { "name": "Build Helper", "id": "buildhelper" },
+                    { "name": "Align Horizontally", "id": "alignx" },
+                    { "name": "Align Vertically", "id": "aligny" }
+                ],
+                [
+                    { "name": "Create Block Base", "id": "makebase" },
+                    { "name": "Create Block Outlines", "id": "makeoutlines" },
+                    { "name": "Create Block Edges", "id": "makeedges" }
+                ],
+                [
+                    { "name": "Reset Unused Colors and Groups", "id": "resetunused" },
+                    { "name": "Uncheck Portals", "id": "uncheckportals" }
+                ]
+            ]
+        },
+        {
             "title": "Settings",
             "options": [
                 [

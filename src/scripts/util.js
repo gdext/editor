@@ -1,7 +1,26 @@
+import ui from './ui';
 import buildtabData from '../assets/buildtab.json';
 import buildPreview from './buildPreview';
 
 let unsavedChanges = false;
+
+function closeDialog (id) {
+    let dialog = document.getElementById(id);
+    if(!dialog) return;
+
+    dialog.classList.add('closing');
+    let bg = document.getElementById(id + 'Bg');
+    if(bg && bg.parentElement) bg.style.animation = 'fadeOut ease 0.3s';
+    setTimeout(() => {
+        dialog.classList.remove('vis');
+        if(dialog.parentElement) dialog.parentElement.removeChild(dialog);
+        if(bg && bg.parentElement) {
+            let rootelem = bg.parentElement;
+            bg.parentElement.removeChild(bg);
+            rootelem.parentElement.removeChild(rootelem);
+        }
+    }, 250);
+}
 
 export default {
 
@@ -44,6 +63,135 @@ export default {
 
     getUnsavedChanges: () => {
         return unsavedChanges;
+    },
+
+    setCursor: (n) => {
+        document.body.style.cursor = n || "";
+    },
+
+    isGDRunning: () => {
+        return window.gdext ? window.gdext.isGdRunning : undefined;
+    },
+
+    createDialog: (id, title, closeButton, content) => {
+        ui.renderUiObject({
+            properties: {
+                type: 'dialog',
+                id: id,
+                title: title,
+                closeButton: closeButton
+            },
+            children: content
+        }, document.body);
+    },
+
+    closeDialog: (id) => {
+        closeDialog(id);
+    },
+
+    alert: (id, title, description, button) => {
+        ui.renderUiObject({
+            properties: {
+                type: 'dialog',
+                id: id,
+                title: title,
+                closeButton: true
+            },
+            children: [
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 15,
+                        paddingY: 10,
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                text: description,
+                                align: 'center',
+                                marginBottom: 10,
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: id + 'Ok',
+                                text: button,
+                                primary: true,
+                                onClick: () => {
+                                    closeDialog(id);
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }, document.body);
+    },
+
+    confirm: (id, title, description, options) => {
+        if(!options) return
+        let buttons = [options.buttonYes || 'OK', options.buttonNo || 'Cancel'];
+
+        ui.renderUiObject({
+            properties: {
+                type: 'dialog',
+                id: id,
+                title: title,
+                closeButton: true
+            },
+            children: [
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 15,
+                        paddingY: 10,
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                text: description,
+                                align: 'center',
+                                marginBottom: 10,
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'container',
+                                direction: 'row'
+                            },
+                            children: [
+                                {
+                                    properties: {
+                                        type: 'button',
+                                        id: id + 'Ok',
+                                        text: buttons[0],
+                                        primary: true,
+                                        onClick: () => {
+                                            closeDialog(id);
+                                            if(options.onConfirm) options.onConfirm(true);
+                                        }
+                                    }
+                                },
+                                {
+                                    properties: {
+                                        type: 'button',
+                                        id: id + 'Cancel',
+                                        text: buttons[1],
+                                        onClick: () => {
+                                            closeDialog(id);
+                                            if(options.onConfirm) options.onConfirm(false);
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }, document.body);
     }
 
 }

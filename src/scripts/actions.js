@@ -22,23 +22,32 @@ function writeLocalLevels(ccll) {
     fs.writeFileSync(window.process.env.LOCALAPPDATA + "\\GeometryDash\\CCLocalLevels.dat", ccll);
 }
 
-function confirmUnsavedChanges() {
-    if(util.getUnsavedChanges() && confirm('There are unsaved changes in your level! Are you sure you want to quit?'))
-        return true;
-    else return !util.getUnsavedChanges();
+function confirmUnsavedChanges(onConfirm) {
+    if(util.getUnsavedChanges()) {
+        util.confirm(
+            'unsavedChangesConfirm', 'Hold Up!', 
+            'There are unsaved changes in your level! Are you sure you want to quit?',
+            { buttonYes: 'Yes', buttonNo: 'No', onConfirm: onConfirm }
+        );
+    } else {
+        onConfirm(true);
+    }
 }
 
 function executeAction(action) {
     switch(action) {
         case 'load':
-            if(fs) {
-                if(!confirmUnsavedChanges()) return;
-                let ccll = readLocalLevels();
-                localStorage.setItem('lvlcode', ccll[0].data);
-                localStorage.setItem('lvlnumber', 0);
-                window.location.reload();
-            } 
-            else alert('Reading files is only supported on GDExt Desktop!');
+            confirmUnsavedChanges((t) => {
+                if(t) {
+                    if(fs) {
+                        let ccll = readLocalLevels();
+                        localStorage.setItem('lvlcode', ccll[0].data);
+                        localStorage.setItem('lvlnumber', 0);
+                        window.location.reload();
+                    }
+                    else util.alert('loadDialog', 'Couldn\'t load!', 'Reading files is only supported on GDExt desktop!', "OK")
+                } 
+            });
             break;
         case 'save':
             let levelObj = canvas.getLevel();
@@ -67,20 +76,24 @@ function executeAction(action) {
                 writeLocalLevels(ccll);
                 util.setUnsavedChanges(false);
             } 
-            else alert('Saving levels is only supported on GDExt Desktop!');
-
+            else util.alert('saveDialog', 'Couldn\'t save!', 'Saving is only supported on GDExt desktop!', "OK");
             break;
         case 'new':
-            if(!confirmUnsavedChanges()) return;
-
-            localStorage.setItem('lvlcode', defaultLevel);
-            localStorage.setItem('lvlnumber', -1);
-            window.location.reload();
+            confirmUnsavedChanges((t) => {
+                if(t) {
+                    localStorage.setItem('lvlcode', defaultLevel);
+                    localStorage.setItem('lvlnumber', -1);
+                    window.location.reload();
+                }
+            });
             break;
         case 'exit':
-            if(!confirmUnsavedChanges()) return;
-            let event = new CustomEvent('electronApi', { detail: 'quit' });
-            dispatchEvent(event);
+            confirmUnsavedChanges((t) => {
+                if(t) {
+                    let event = new CustomEvent('electronApi', { detail: 'quit' });
+                    dispatchEvent(event);
+                }
+            });
             break;
     }
 }

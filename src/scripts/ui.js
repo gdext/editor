@@ -2,6 +2,8 @@ import icPick from '../assets/ic-pick.svg';
 import icSlide from '../assets/ic-slide.svg';
 import icInfo from '../assets/ic-info.svg';
 import keyboard from './keyboard';
+import util from './util';
+import icExit from '../assets/ic-exit.svg';
 
 function UiObject() {
 
@@ -13,7 +15,7 @@ function UiObject() {
 
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.id = id;
+        if(id) checkbox.id = id;
         if(state) checkbox.checked = 'checked';
 
         let checkmark = document.createElement('span');
@@ -36,13 +38,21 @@ function UiObject() {
         }).catch(() => {
             console.error('Cannot load asset');
         });
+        buttonIcon.height = options.iconHeight;
         
 
         if(options && options.light) button.classList.add('bbg');
-        button.id = id;
+        if(options && options.primary) button.classList.add('primary');
+        if(options && options.width) {
+            button.style.width = options.width + 'px';
+            button.style.minWidth = '0px';
+        }
+        if(options && options.height) button.style.height = options.height + 'px';
+        if(icon && name) button.classList.add('s');
+        if(id) button.id = id;
 
         if(icon) button.appendChild(buttonIcon);
-        button.appendChild(buttonText);
+        if(name) button.appendChild(buttonText);
         return button;
     }
 
@@ -52,11 +62,12 @@ function UiObject() {
         if(options && options.light) checkboxContainer.classList.add('bbg');
 
         let input = document.createElement('input');
-        input.type = type;
-        input.id = options.id;
+        input.type = 'text';
+        if(options.id) input.id = options.id;
         if(options.placeholder) input.placeholder = options.placeholder;
 
         if(options.defaultValue) input.value = options.defaultValue();
+        if(type == 'number' && options.unit) input.value += options.unit;
 
         if(options.maxlength) input.maxLength = options.maxlength;
         if(options.minlength) input.minLength = options.minlength;
@@ -66,10 +77,23 @@ function UiObject() {
 
         inputContainer.appendChild(input);
         input.onchange = () => {
+            //handle min/max
+            if(input.value > options.max) input.value = options.max;
+            else if(input.value < options.min) input.value = options.min;
+
+            if(!input.value.endsWith(options.unit)) {  input.type = 'text'; input.value += options.unit; input.blur() }
+
             options.onValueChange(input.value);
         }
-        input.onfocus = () => inputContainer.classList.add('f');
-        input.onblur = () => inputContainer.classList.remove('f');
+        input.onfocus = () => {
+            inputContainer.classList.add('f');
+            if(type == 'number') input.value = parseFloat(input.value);
+            input.type = type;
+        }
+        input.onblur = () => {
+            inputContainer.classList.remove('f');
+            input.type = 'text';
+        }
 
         if(options.icon) {
             let inputIcon = document.createElement('img');
@@ -108,7 +132,12 @@ function UiObject() {
                 let p;
                 function moveFunction(e) {
                     click = false;
+                    util.setCursor('e-resize');
                     v += e.movementX * (options.scale || 1);
+                    //handle min/max
+                    if(v > options.max) v = options.max;
+                    else if(v < options.min) v = options.min;
+
                     let pv = isInteger() ? Math.round(v) : Math.round(v*100)/100;
                     //handle numbers after the decimal point
                     if(!isInteger()) {
@@ -116,10 +145,14 @@ function UiObject() {
                         if(!afterDecimal) pv = pv + '.00';
                         else if(afterDecimal.length < 2) pv += '0';
                     }
+
+                    if(options.unit) pv += options.unit;
                     p.value = pv;
                 }
                 function stopFunction() {
+                    util.setCursor();
                     p.value = isInteger() ? Math.round(v) : Math.round(v*100)/100;
+                    if(options.unit) p.value += options.unit;
                     document.removeEventListener('pointermove', moveFunction);
                     document.removeEventListener('pointerup', stopFunction);
                 }
@@ -156,20 +189,133 @@ function UiObject() {
         return inputContainer;
     }
 
+    this.createTabs = (items, id, selected, options) => {
+        let tabContainer = document.createElement('div');
+        tabContainer.classList.add('ui-tabs');
+        if(id) tabContainer.id = id;
+        tabContainer.setAttribute('items', items.join('|'));
+        tabContainer.setAttribute('value', selected);
+
+        let ii = -1;
+        items.forEach(i => {
+            ii++;
+            let localii = parseInt(ii);
+            let tab = document.createElement('div');
+            tab.classList.add('ui-tab-part');
+            if(ii == selected) tab.classList.add('sel');
+            tab.innerText = i;
+
+            tab.onclick = () => {
+                let prevsel = tabContainer.getElementsByClassName('sel')[0];
+                prevsel.classList.remove('sel');
+                tab.classList.add('sel');
+                tabContainer.setAttribute('value', localii);
+                if(options && options.onSelectChange) options.onSelectChange(localii, items);
+            }
+
+            tabContainer.appendChild(tab);
+        });
+
+        return tabContainer;
+    }
+
+    this.createLabel = (id, text, style, options) => {
+        let labelElement = document.createElement('p');
+        labelElement.classList.add('ui-label');
+        if(style) labelElement.classList.add(style);
+        if(id) labelElement.id = id;
+        labelElement.innerText = text;
+        labelElement.style.color = options.color || "";
+
+        if(options.textCutoff == 'trim') {
+            labelElement.style.whiteSpace = 'nowrap';
+            labelElement.style.overflow = 'hidden';
+            labelElement.style.textOverflow = 'ellipsis';
+        }
+        if(options.marginTop) labelElement.style.marginTop = options.marginTop + 'px';
+        if(options.marginBottom) labelElement.style.marginBottom = options.marginBottom + 'px';
+        if(options.align == 'center') labelElement.style.textAlign = 'center';
+        if(options.align == 'right') labelElement.style.textAlign = 'right';
+
+        return labelElement;
+    }
+
+    this.createContainer = (id, title, direction, options) => {
+        //create container itself
+        let container = document.createElement('div');
+        container.classList.add('ui-container');
+        if(id) container.id = id;
+        let directions = {row: 'r', column: 'c', inline: 'i'};
+        container.classList.add(directions[direction] || 'c');
+        container.style.padding = `${options.paddingY}px ${options.paddingX}px`;
+        let scrolls = {none: '', vertical: 'sv', horizontal: 'sh'};
+        if(options.scroll) container.classList.add(scrolls[options.scroll]);
+        if(options.isBottomBar) container.classList.add('bbg');
+
+        //create title
+        if(title) {
+            let titleElem = document.createElement('p');
+            titleElem.className = 'ui-label heading';
+            titleElem.innerText = title;
+            container.appendChild(title);
+        }
+
+        return container;
+    }
+
+    this.createDialog = (id, title, closeButton) => {
+        let dialog = document.createElement('div');
+        dialog.classList.add('ui-dialog');
+        dialog.classList.add('uistretch');
+        if(id) dialog.id = id;
+
+        if(title) {
+            let dialogTitle = document.createElement('h2');
+            dialogTitle.innerText = title;
+            dialog.appendChild(dialogTitle);
+        }
+
+        function openDialog() {
+            dialog.classList.add('vis');
+        }
+
+        function closeDialog() {
+            util.closeDialog(id);
+        }
+
+        if(closeButton) {
+            let closeBtnElem = document.createElement('img');
+            closeBtnElem.src = icExit;
+            closeBtnElem.classList.add('ui-dialog-close');
+            closeBtnElem.onclick = () => {
+                closeDialog();
+            }
+            dialog.appendChild(closeBtnElem);
+        }
+
+        openDialog();
+        return dialog;
+    }
+
+    this.createDialogBg = (id) => {
+        let dialogBg = document.createElement('div');
+        dialogBg.classList.add('ui-dialog-bg');
+        dialogBg.id = id + 'Bg';
+
+        return dialogBg;
+    }
+
 }
 
 let uiObject = new UiObject();
 
 export default {
-    createCheckbox: (name, id, state, options) => {
-        return uiObject.createCheckbox(name, id, state, options);
-    },
-
     renderUiObject: (obj, elem) => {
         function cycle(o, e) {
             let elementContainer = document.createElement('div');
             let p = o.properties;
             elementContainer.classList.add('ui-element');
+            let targetElement;
 
             switch(o.properties.type) {
                 case 'checkbox':
@@ -181,7 +327,7 @@ export default {
                     elementContainer.appendChild(checkboxElement);
                     break;
                 case 'button':
-                    let buttonElement = uiObject.createButton(p.text, p.id, p.icon);
+                    let buttonElement = uiObject.createButton(p.text, p.id, p.icon, p);
                     buttonElement.onclick = p.onClick;
                     elementContainer.appendChild(buttonElement);
                     break;
@@ -193,13 +339,35 @@ export default {
                     let ninputElement = uiObject.createInput('number', p);
                     elementContainer.appendChild(ninputElement);
                     break;
+                case 'tabs':
+                    let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), { onSelectChange: p.onSelectChange });
+                    elementContainer.appendChild(tabsElement);
+                    break;
+                case 'label':
+                    let labelElement = uiObject.createLabel(p.id, p.text, p.style, p);
+                    elementContainer.appendChild(labelElement);
+                    break;
+                case 'container':
+                    let containerElement = uiObject.createContainer(p.id, p.title, p.direction, p);
+                    elementContainer.appendChild(containerElement);
+                    targetElement = containerElement;
+                    break;
+                case 'dialog':
+                    let dialogElement = uiObject.createDialog(p.id, p.title, p.closeButton);
+                    let dialogBgElement = uiObject.createDialogBg(p.id);
+
+                    dialogBgElement.appendChild(dialogElement);
+                    elementContainer.appendChild(dialogBgElement);
+                    targetElement = dialogElement;
+                    break;
             }
 
             e.appendChild(elementContainer);
 
+            if(!targetElement) return;
             if(o.children) {
                 o.children.forEach(c => {
-                    cycle(c, elementContainer);
+                    cycle(c, targetElement);
                 });
             }
         }

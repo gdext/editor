@@ -96,11 +96,14 @@ export default {
             action.onclick = () => {
                 actionsExec.executeAction(img.id);
             }
+            action.style.display = 'none';
+            sectionActions.appendChild(action);
             import(`../assets/${img.icon}`).then(({default: i}) => {
                 action.src = i;
-                sectionActions.appendChild(action);
+                action.style.display = '';
             }).catch(() => {
                 console.error('Cannot load asset');
+                action.style.display = '';
             });
         });
 
@@ -124,6 +127,16 @@ export default {
                         localStorage.setItem('settings.autosaveEnabled', '0');
                     }
                 }
+            }
+        }, sectionCheckbox);
+
+        ui.renderUiObject({
+            properties: {
+                type: 'label',
+                id: 'testLabel',
+                style: 'italic',
+                color: '#888',
+                text: 'Last Saved Never'
             }
         }, sectionCheckbox);
     },
@@ -155,27 +168,29 @@ export default {
         //mouse events
         function beginScreenPanning() {
             let coords = renderer.getCoords();
-                let moving = true;
-                function update() {
-                    renderer.update(canvas);
-                    if (moving)
-                        window.requestAnimationFrame(update);
-                }
-                update();
-                window.onmousemove = (e1) => {
-                    coords.x -= e1.movementX / coords.z;
-                    coords.y -= e1.movementY / coords.z;
-                    renderer.moveTo(coords.x, coords.y, coords.z);
-                }
-                function stopMove() {
-                    window.onmousemove = null;
-                    window.onmouseup = null;
-                    window.onmouseout = null;
-                    moving = false;
-                    renderer.update(canvas);
-                }
-                window.onmouseup = stopMove;
-                window.onmouseout = stopMove;
+            let moving = true;
+            util.setCursor('grab');
+            function update() {
+                renderer.update(canvas);
+                if (moving)
+                    window.requestAnimationFrame(update);
+            }
+            update();
+            window.onmousemove = (e1) => {
+                coords.x -= e1.movementX / coords.z;
+                coords.y -= e1.movementY / coords.z;
+                renderer.moveTo(coords.x, coords.y, coords.z);
+            }
+            function stopMove() {
+                window.onmousemove = null;
+                window.onmouseup = null;
+                window.onmouseout = null;
+                moving = false;
+                renderer.update(canvas);
+                util.setCursor();
+            }
+            window.onmouseup = stopMove;
+            window.onmouseout = stopMove;
         }
 
         function beginObjectBuilding(e) {
@@ -213,10 +228,17 @@ export default {
             window.onmouseout = stop;
         }
 
-        function beginScreenZooming(e) {
+        function beginScreenZooming(e, mode) {
             let coords = renderer.getCoords();
-            if(e.deltaY < 0) coords.z *= 1.1;
-            else coords.z /= 1.1;
+            if(!mode || mode == 0) {
+                if(e.deltaY < 0) coords.z *= 1.1;
+                else coords.z /= 1.1;
+            } else {
+                let a = ['z', 'x', 'y']
+                let b = a[mode];
+                if(e.deltaY < 0) coords[b] -= 15/coords.z;
+                else coords[b] += 15/coords.z;
+            }
             renderer.moveTo(coords.x, coords.y, coords.z);
             renderer.update(canvas);
         }
@@ -250,7 +272,12 @@ export default {
         window.addEventListener('resizeCanvas', resizeCanvas);
 
         canvas.onwheel = (e) => {
-            beginScreenZooming(e);
+            let mode = 0;
+            let keys = keyboard.getKeys()
+            if(keys.includes(16)) mode = 1;
+            else if(keys.includes(17)) mode = 2;
+            beginScreenZooming(e, mode);
+            return false;
         }  
     },
     generateBottom: (elem) => {
@@ -362,6 +389,7 @@ export default {
             buildContentBlocks.style.width = ow.parentw;
         }
 
+        //build tab
         let tab1 = document.getElementById('tabBuild');
         tab1.appendChild(buildTitle);
         tab1.appendChild(buildContent);
@@ -383,6 +411,46 @@ export default {
                 loadObjs(lastCategory, page);
             }
         }
+
+        //edit tab
+        let tab2 = document.getElementById('tabEdit');
+        let editTitle = document.createElement('h4');
+        editTitle.innerText = 'Edit';
+        tab2.appendChild(editTitle);
+        let editContent = document.createElement('div');
+        ui.renderUiObject({
+            properties: {
+                type: 'container',
+                id: 'test',
+                direction: 'column',
+                paddingX: 15,
+                paddingY: 7
+            },
+            children: [
+                {
+                    properties: {
+                        type: 'label',
+                        text: 'Hello Mario',
+                        style: 'heading',
+                    }
+                },
+                {
+                    properties: {
+                        type: 'label',
+                        text: 'Luigi',
+                    }
+                },
+                {
+                    properties: {
+                        type: 'textInput',
+                        placeholder: 'idk',
+                        defaultValue: () => { return 'fekrjrekogjr' },
+                        icon: 'info'
+                    }
+                }
+            ]
+        }, editContent);
+        tab2.appendChild(editContent);
 
         //minimize/maximize button
         const resizeEvent = new Event('resizeCanvas');
