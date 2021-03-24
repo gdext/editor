@@ -79,6 +79,47 @@ export default {
             if(dialog.parentElement) dialog.parentElement.removeChild(dialog);
             if(bg && bg.parentElement) bg.parentElement.removeChild(bg);
         }, 250);
+    },
+
+    alert: (id, title, description, button) => {
+        ui.renderUiObject({
+            properties: {
+                type: 'dialog',
+                id: id,
+                title: title,
+                closeButton: true
+            },
+            children: [
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 15,
+                        paddingY: 10,
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                text: description,
+                                align: 'center',
+                                marginBottom: 10,
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: id + 'Ok',
+                                text: button,
+                                primary: true,
+                                onClick: () => {
+                                    util.closeDialog(id);
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }, document.body);
     }
 
 }
