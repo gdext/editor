@@ -96,11 +96,14 @@ export default {
             action.onclick = () => {
                 actionsExec.executeAction(img.id);
             }
+            action.style.display = 'none';
+            sectionActions.appendChild(action);
             import(`../assets/${img.icon}`).then(({default: i}) => {
                 action.src = i;
-                sectionActions.appendChild(action);
+                action.style.display = '';
             }).catch(() => {
                 console.error('Cannot load asset');
+                action.style.display = '';
             });
         });
 
@@ -447,58 +450,6 @@ export default {
                 }
             ]
         }, editContent);
-        util.createDialog('testDialog', 'This is Test!', true, 
-            [
-                {
-                    properties: {
-                        type: 'container',
-                        paddingX: 15,
-                        paddingY: 10
-                    },
-                    children: [
-                        {
-                            properties: {
-                                type: 'label',
-                                id: 'testDialogText',
-                                text: 'Bro wtf Robtop cringe!!!!!!!',
-                                align: 'center',
-                                marginBottom: 10
-                            }
-                        },
-                        {
-                            properties: {
-                                type: 'container',
-                                direction: 'row',
-                            },
-                            children: [
-                                {
-                                    properties: {
-                                        type: 'button',
-                                        id: 'testDialogOk',
-                                        text: 'OK',
-                                        primary: true,
-                                        onClick: () => {
-                                            util.closeDialog('testDialog');
-                                        }
-                                    }
-                                },
-                                {
-                                    properties: {
-                                        type: 'button',
-                                        id: 'testDialogCancel',
-                                        text: 'No, not true!!!',
-                                        onClick: () => {
-                                            alert('your wrong');
-                                            util.closeDialog('testDialog');
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        );
         tab2.appendChild(editContent);
 
         //minimize/maximize button

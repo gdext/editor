@@ -124,6 +124,70 @@ export default {
                 }
             ]
         }, document.body);
+    },
+
+    confirm: (id, title, description, options) => {
+        if(!options) return
+        let buttons = [options.buttonYes || 'OK', options.buttonNo || 'Cancel'];
+
+        ui.renderUiObject({
+            properties: {
+                type: 'dialog',
+                id: id,
+                title: title,
+                closeButton: true
+            },
+            children: [
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 15,
+                        paddingY: 10,
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                text: description,
+                                align: 'center',
+                                marginBottom: 10,
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'container',
+                                direction: 'row'
+                            },
+                            children: [
+                                {
+                                    properties: {
+                                        type: 'button',
+                                        id: id + 'Ok',
+                                        text: buttons[0],
+                                        primary: true,
+                                        onClick: () => {
+                                            closeDialog(id);
+                                            if(options.onConfirm) options.onConfirm(true);
+                                        }
+                                    }
+                                },
+                                {
+                                    properties: {
+                                        type: 'button',
+                                        id: id + 'Cancel',
+                                        text: buttons[1],
+                                        onClick: () => {
+                                            closeDialog(id);
+                                            if(options.onConfirm) options.onConfirm(false);
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }, document.body);
     }
 
 }

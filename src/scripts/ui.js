@@ -310,10 +310,6 @@ function UiObject() {
 let uiObject = new UiObject();
 
 export default {
-    createCheckbox: (name, id, state, options) => {
-        return uiObject.createCheckbox(name, id, state, options);
-    },
-
     renderUiObject: (obj, elem) => {
         function cycle(o, e) {
             let elementContainer = document.createElement('div');
