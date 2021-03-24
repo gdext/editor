@@ -4,6 +4,20 @@ import buildPreview from './buildPreview';
 
 let unsavedChanges = false;
 
+function closeDialog (id) {
+    let dialog = document.getElementById(id);
+    if(!dialog) return;
+
+    dialog.classList.add('closing');
+    let bg = document.getElementById(id + 'Bg');
+    if(bg && bg.parentElement) bg.style.animation = 'fadeOut ease 0.3s';
+    setTimeout(() => {
+        dialog.classList.remove('vis');
+        if(dialog.parentElement) dialog.parentElement.removeChild(dialog);
+        if(bg && bg.parentElement) bg.parentElement.removeChild(bg);
+    }, 250);
+}
+
 export default {
 
     calcCanvasSize: (ws, ns, bms) => {
@@ -68,17 +82,7 @@ export default {
     },
 
     closeDialog: (id) => {
-        let dialog = document.getElementById(id);
-        if(!dialog) return;
-
-        dialog.classList.add('closing');
-        let bg = document.getElementById(id + 'Bg');
-        if(bg && bg.parentElement) bg.style.animation = 'fadeOut ease 0.3s';
-        setTimeout(() => {
-            dialog.classList.remove('vis');
-            if(dialog.parentElement) dialog.parentElement.removeChild(dialog);
-            if(bg && bg.parentElement) bg.parentElement.removeChild(bg);
-        }, 250);
+        closeDialog(id);
     },
 
     alert: (id, title, description, button) => {
@@ -112,7 +116,7 @@ export default {
                                 text: button,
                                 primary: true,
                                 onClick: () => {
-                                    util.closeDialog(id);
+                                    closeDialog(id);
                                 }
                             }
                         }
