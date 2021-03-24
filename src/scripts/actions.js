@@ -38,7 +38,7 @@ function executeAction(action) {
                 localStorage.setItem('lvlnumber', 0);
                 window.location.reload();
             } 
-            else alert('Reading files is only supported on GDExt Desktop!');
+            else util.alert('loadDialog', 'Couldn\'t load!', 'Reading files is only supported on GDExt desktop!', "OK")
             break;
         case 'save':
             let levelObj = canvas.getLevel();
@@ -67,8 +67,7 @@ function executeAction(action) {
                 writeLocalLevels(ccll);
                 util.setUnsavedChanges(false);
             } 
-            else alert('Saving levels is only supported on GDExt Desktop!');
-
+            else util.alert('saveDialog', 'Couldn\'t save!', 'Saving is only supported on GDExt desktop!', "OK");
             break;
         case 'new':
             if(!confirmUnsavedChanges()) return;
