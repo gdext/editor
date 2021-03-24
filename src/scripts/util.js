@@ -14,7 +14,11 @@ function closeDialog (id) {
     setTimeout(() => {
         dialog.classList.remove('vis');
         if(dialog.parentElement) dialog.parentElement.removeChild(dialog);
-        if(bg && bg.parentElement) bg.parentElement.removeChild(bg);
+        if(bg && bg.parentElement) {
+            let rootelem = bg.parentElement;
+            bg.parentElement.removeChild(bg);
+            rootelem.parentElement.removeChild(rootelem);
+        }
     }, 250);
 }
 
