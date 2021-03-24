@@ -1,3 +1,4 @@
+import ui from './ui';
 import buildtabData from '../assets/buildtab.json';
 import buildPreview from './buildPreview';
 
@@ -52,6 +53,32 @@ export default {
 
     isGDRunning: () => {
         return window.gdext ? window.gdext.isGdRunning : undefined;
+    },
+
+    createDialog: (id, title, closeButton, content) => {
+        ui.renderUiObject({
+            properties: {
+                type: 'dialog',
+                id: id,
+                title: title,
+                closeButton: closeButton
+            },
+            children: content
+        }, document.body);
+    },
+
+    closeDialog: (id) => {
+        let dialog = document.getElementById(id);
+        if(!dialog) return;
+
+        dialog.classList.add('closing');
+        let bg = document.getElementById(id + 'Bg');
+        if(bg && bg.parentElement) bg.style.animation = 'fadeOut ease 0.3s';
+        setTimeout(() => {
+            dialog.classList.remove('vis');
+            if(dialog.parentElement) dialog.parentElement.removeChild(dialog);
+            if(bg && bg.parentElement) bg.parentElement.removeChild(bg);
+        }, 250);
     }
 
 }

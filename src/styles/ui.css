@@ -4,6 +4,15 @@
     font-size: 12px;
     display: flex;
 }
+.uistretch .ui-element {
+    width: 100%;
+}
+.ui-container.r .ui-element {
+    margin-right: 5px;
+}
+.ui-container.r .ui-element:last-child {
+    margin-right: 0;
+}
 
 /* checkbox */
 .ui-checkbox {
@@ -79,6 +88,10 @@
     background: #444;
 }
 
+.uistretch .ui-button {
+    width: 100%;
+}
+
 .ui-button.primary {
     background-color: #3C94E4;
 }
@@ -127,6 +140,10 @@
     width: 14px;
 }
 
+.uistretch .ui-input {
+    width: 100%;
+}
+
 /* tab */
 .ui-tabs {
     color: #fff;
@@ -158,6 +175,10 @@
     background: #3081CC;
 }
 
+.uistretch .ui-tabs {
+    width: 100%;
+}
+
 /* label */
 .ui-label {
     font-size: 12px;
@@ -183,12 +204,19 @@
     margin-bottom: 6px;
 }
 
+.uistretch .ui-label {
+    width: 100%;
+}
+
 /* container */
 .ui-container {
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: hidden;
+}
+.uistretch .ui-container {
+    width: 100%;
 }
 
 .ui-container.r {
@@ -209,4 +237,101 @@
 .ui-container.bbg {
     background: #3C94E4;
     border-top: 1px solid #000;
+}
+
+/* dialog */
+.ui-dialog {
+    background: #272727;
+    border-radius: 4px;
+    border: 1px solid #000;
+    overflow: hidden;
+    min-width: 400px;
+    min-height: 20px;
+    position: relative;
+    box-shadow: 0 3px 10px rgba(0,0,0,.4);
+    display: none;
+}
+.ui-dialog.vis {
+    display: block;
+    animation: popIn ease 0.32s;
+}
+.ui-dialog.closing {
+    display: block;
+    animation: popOut ease 0.25s;
+}
+
+.ui-dialog-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn ease 0.25s;
+}
+
+.ui-dialog h2 {
+    font-size: 24px;
+    font-weight: normal;
+    margin-top: 10px;
+    color: #fff;
+    text-align: center;
+}
+
+.ui-dialog-close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    opacity: 0.5;
+    cursor: pointer;
+}
+.ui-dialog-close:hover {
+    opacity: 1;
+}
+
+/* animations */
+@keyframes popIn {
+    0% {
+        transform: scale(0.6);
+    }
+    65% {
+        transform: scale(1.05);
+    }
+    99% {
+        transform: scale(1);
+    }
+    100% {
+        transform: none;
+    }
+}
+
+@keyframes popOut {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(0.25);
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }

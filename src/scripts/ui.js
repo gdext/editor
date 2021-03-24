@@ -3,6 +3,7 @@ import icSlide from '../assets/ic-slide.svg';
 import icInfo from '../assets/ic-info.svg';
 import keyboard from './keyboard';
 import util from './util';
+import icExit from '../assets/ic-exit.svg';
 
 function UiObject() {
 
@@ -233,6 +234,8 @@ function UiObject() {
         }
         if(options.marginTop) labelElement.style.marginTop = options.marginTop + 'px';
         if(options.marginBottom) labelElement.style.marginBottom = options.marginBottom + 'px';
+        if(options.align == 'center') labelElement.style.textAlign = 'center';
+        if(options.align == 'right') labelElement.style.textAlign = 'right';
 
         return labelElement;
     }
@@ -260,6 +263,48 @@ function UiObject() {
         return container;
     }
 
+    this.createDialog = (id, title, closeButton) => {
+        let dialog = document.createElement('div');
+        dialog.classList.add('ui-dialog');
+        dialog.classList.add('uistretch');
+        if(id) dialog.id = id;
+
+        if(title) {
+            let dialogTitle = document.createElement('h2');
+            dialogTitle.innerText = title;
+            dialog.appendChild(dialogTitle);
+        }
+
+        function openDialog() {
+            dialog.classList.add('vis');
+        }
+
+        function closeDialog() {
+            util.closeDialog(id);
+        }
+
+        if(closeButton) {
+            let closeBtnElem = document.createElement('img');
+            closeBtnElem.src = icExit;
+            closeBtnElem.classList.add('ui-dialog-close');
+            closeBtnElem.onclick = () => {
+                closeDialog();
+            }
+            dialog.appendChild(closeBtnElem);
+        }
+
+        openDialog();
+        return dialog;
+    }
+
+    this.createDialogBg = (id) => {
+        let dialogBg = document.createElement('div');
+        dialogBg.classList.add('ui-dialog-bg');
+        dialogBg.id = id + 'Bg';
+
+        return dialogBg;
+    }
+
 }
 
 let uiObject = new UiObject();
@@ -274,6 +319,7 @@ export default {
             let elementContainer = document.createElement('div');
             let p = o.properties;
             elementContainer.classList.add('ui-element');
+            let targetElement;
 
             switch(o.properties.type) {
                 case 'checkbox':
@@ -302,20 +348,30 @@ export default {
                     elementContainer.appendChild(tabsElement);
                     break;
                 case 'label':
-                    let labelElement = uiObject.createLabel(p.id, p.text, p.style, {textCutoff: p.textCutoff, color: p.color});
+                    let labelElement = uiObject.createLabel(p.id, p.text, p.style, p);
                     elementContainer.appendChild(labelElement);
                     break;
                 case 'container':
                     let containerElement = uiObject.createContainer(p.id, p.title, p.direction, p);
                     elementContainer.appendChild(containerElement);
+                    targetElement = containerElement;
+                    break;
+                case 'dialog':
+                    let dialogElement = uiObject.createDialog(p.id, p.title, p.closeButton);
+                    let dialogBgElement = uiObject.createDialogBg(p.id);
+
+                    dialogBgElement.appendChild(dialogElement);
+                    elementContainer.appendChild(dialogBgElement);
+                    targetElement = dialogElement;
                     break;
             }
 
             e.appendChild(elementContainer);
 
+            if(!targetElement) return;
             if(o.children) {
                 o.children.forEach(c => {
-                    cycle(c, elementContainer.children[0]);
+                    cycle(c, targetElement);
                 });
             }
         }
