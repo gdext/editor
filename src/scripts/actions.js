@@ -38,7 +38,37 @@ function executeAction(action) {
                 localStorage.setItem('lvlnumber', 0);
                 window.location.reload();
             } 
-            else alert('Reading files is only supported on GDExt Desktop!');
+            else util.createDialog('loadDialog', 'Couldn\'t load!', true, [
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 15,
+                        paddingY: 10,
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                id: 'loadDialogText',
+                                text: 'Reading files is only supported on GDExt desktop!',
+                                align: 'center',
+                                marginBottom: 10,
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'loadDialogOk',
+                                text: "OK",
+                                primary: true,
+                                onClick: () => {
+                                    util.closeDialog('loadDialog');
+                                }
+                            }
+                        }
+                    ]
+                }
+            ])
             break;
         case 'save':
             let levelObj = canvas.getLevel();
@@ -67,7 +97,37 @@ function executeAction(action) {
                 writeLocalLevels(ccll);
                 util.setUnsavedChanges(false);
             } 
-            else alert('Saving levels is only supported on GDExt Desktop!');
+            else util.createDialog('saveDialog', 'Couldn\'t save!', true, [
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 15,
+                        paddingY: 10,
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                id: 'saveDialogText',
+                                text: 'Saving is only supported on GDExt desktop!',
+                                align: 'center',
+                                marginBottom: 10,
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'saveDialogOk',
+                                text: "OK",
+                                primary: true,
+                                onClick: () => {
+                                    util.closeDialog('saveDialog');
+                                }
+                            }
+                        }
+                    ]
+                }
+            ])
 
             break;
         case 'new':
