@@ -256,6 +256,53 @@ export default {
             }
         }
 
+        canvas.oncontextmenu = (e) => {
+            //test context menu
+            ui.renderUiObject({
+                properties: {
+                    type: 'contextMenu',
+                    id: 'testContext',
+                    title: 'Test Context Menu',
+                    x: e.pageX,
+                    y: e.pageY
+                },
+                children: [
+                    {
+                        properties: {
+                            type: 'container',
+                            paddingX: 7,
+                            paddingY: 10
+                        },
+                        children: [
+                            {
+                                properties: {
+                                    type: 'label',
+                                    text: 'Coming Soon!'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        properties: {
+                            type: 'container',
+                            isBottomBar: true,
+                            paddingX: 7,
+                            paddingY: 5
+                        },
+                        children: [
+                            {
+                                properties: {
+                                    type: 'label',
+                                    text: 'idk...'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }, document.body);
+            return false;
+        }
+
         //on resize
         function resizeCanvas() {
             canvasSize = util.calcCanvasSize(

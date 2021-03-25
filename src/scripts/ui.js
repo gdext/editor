@@ -305,6 +305,50 @@ function UiObject() {
         return dialogBg;
     }
 
+    this.createContextMenu = (id, title, options) => {
+        let menu = document.createElement('div');
+        menu.classList.add('ui-context-menu');
+        menu.classList.add('uistretch');
+        if(id) menu.id = id;
+        if(options && options.maxwidth) menu.style.width = options.maxwidth;
+        if(options && options.maxheight) menu.style.maxHeight = options.maxheight;
+        if(options && options.x) menu.style.left = options.x + 'px';
+        if(options && options.y) menu.style.top = options.y + 'px';
+
+        if(title) {
+            let menuTitle = document.createElement('p');
+            menuTitle.classList.add('ui-label');
+            menuTitle.classList.add('heading');
+            menuTitle.classList.add('dialogtitle');
+            menuTitle.innerText = title;
+            menu.appendChild(menuTitle);
+        }
+
+        //if clicked outside context menu, remove it
+        let clickedInsideContextMenu = false
+        function windowClickEventListener() {
+            let i = 0;
+            while(!clickedInsideContextMenu && i < 100) {
+                i++;
+            }
+            if(!clickedInsideContextMenu) {
+                let menuParent = menu.parentElement;
+                if(menuParent.parentElement) menuParent.parentElement.removeChild(menuParent);
+                window.removeEventListener('mousedown', windowClickEventListener);
+            }
+            clickedInsideContextMenu = false;
+        }
+
+        window.addEventListener('mousedown', windowClickEventListener);
+
+        menu.onmousedown = () => {
+            clickedInsideContextMenu = true;
+        }
+        
+
+        return menu;
+    }
+
 }
 
 let uiObject = new UiObject();
@@ -359,6 +403,11 @@ export default {
                     dialogBgElement.appendChild(dialogElement);
                     elementContainer.appendChild(dialogBgElement);
                     targetElement = dialogElement;
+                    break;
+                case 'contextMenu':
+                    let menuElement = uiObject.createContextMenu(p.id, p.title, p);
+                    elementContainer.appendChild(menuElement);
+                    targetElement = menuElement;
                     break;
             }
 
