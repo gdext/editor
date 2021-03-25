@@ -21,6 +21,12 @@ module.exports = {
           'file-loader',
         ],
       },
+      {
+        test: /\.(fsh|vsh)$/,
+        use: [
+          'raw-loader',
+        ],
+      },
     ],
   },
 };

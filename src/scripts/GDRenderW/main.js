@@ -5,6 +5,9 @@ import spritesheet from "./spritesheet.png"
 
 import dataJson from "./data.json"
 
+import VERT_SRC from "./vertex_shader.vsh"
+import FRAG_SRC from "./fragment_shader.fsh"
+
 import bg1 from "./bg/1.png"
 import bg2 from "./bg/2.png"
 import bg3 from "./bg/3.png"
@@ -26,6 +29,8 @@ import bg18 from "./bg/18.png"
 import bg19 from "./bg/19.png"
 import bg20 from "./bg/20.png"
 
+const TEXTURE_INSET = 0.6;
+
 export const util = {
     /**
      * Creates and compiles the given shader and checks for errors. It then returns the shader.
@@ -41,7 +46,10 @@ export const util = {
         var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
         if (success)
             return shader;
-    
+
+        let message = gl.getShaderInfoLog(shader);
+
+        console.error("SHADER ERROR: " + message);
         gl.deleteShader(shader);
     },
     /**
@@ -109,10 +117,15 @@ export const util = {
      * @param {{x : number, y : number, w : number, h : number}} tex the texture cutout
      */
     setTexture: function(renderer, tex) {
-        renderer.gl.uniform1f(renderer.textX, (tex.x+0.6)/renderer.mainT.width);
-        renderer.gl.uniform1f(renderer.textY, (tex.y+0.6)/renderer.mainT.height);
-        renderer.gl.uniform1f(renderer.textW, (tex.w-1.2)/renderer.mainT.width);
-        renderer.gl.uniform1f(renderer.textH, (tex.h-1.2)/renderer.mainT.height);
+        let w = renderer.mainT.width;
+        let h = renderer.mainT.height;
+
+        let texM = glMatrix.mat3.create();
+
+        glMatrix.mat3.translate(texM, texM, [(tex.x + TEXTURE_INSET) / w, (tex.y + TEXTURE_INSET) / h]);
+        glMatrix.mat3.scale(texM, texM, [(tex.w - TEXTURE_INSET * 2) / w, (tex.h - TEXTURE_INSET) / h]);
+
+        renderer.gl.uniformMatrix3fv(renderer.textM, false, texM);
     },
     /**
      * This sets the model matrix. The model matrix is the transformation of an object.
@@ -866,53 +879,6 @@ export const GDRParse = {
 }
 
 /**
- * The source code of the vertex shader
- */
-const VERT_SRC = `
-attribute vec2 a_position;
-attribute vec2 a_texcoord;
-
-uniform mat3 model;
-uniform mat3 proj;
-uniform mat3 view;
-
-uniform float camx;
-uniform float camy;
-
-uniform float textX;
-uniform float textY;
-uniform float textW;
-uniform float textH;
-
-varying vec2 o_texcoord;
-
-void main(void) {
-    vec3 pos = proj * (model * vec3(a_position, 1) + vec3(camx, camy, 1));
-    gl_Position = vec4((pos * view).xy, 0.0, 1.0);
-    o_texcoord = vec2(a_texcoord.x * textW + textX, a_texcoord.y * textH + textY);
-}`;
-
-
-/**
- * The source code of the fragment shader
- */
-const FRAG_SRC = `
-precision mediump float;
-
-varying vec2 o_texcoord;
-uniform sampler2D a_sampler;
-
-uniform vec4 a_tint;
-uniform int  render_line;
-
-void main(void) {
-    if (render_line == 1)
-        gl_FragColor = a_tint;
-    else
-        gl_FragColor = texture2D(a_sampler, o_texcoord) * a_tint;
-}`;
-
-/**
  * This is a texture class that automatically creates a texture.
  * @param {WebGLRenderingContext} gl gl context
  * @param {string} url url of the texture
@@ -940,6 +906,7 @@ function Texture(gl, url) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
         tex.loaded = true;
     }
@@ -997,7 +964,7 @@ function ObjectDef(gl, obj) {
 }
 
 /**
- * This is a very simple camera class.
+ * This is a kinda simple camera class.
  * @param {number} x x position
  * @param {number} y y position
  * @param {number} zoom zoom
@@ -1007,6 +974,21 @@ function Camera(x, y, zoom) {
     this.y = y;
 
     this.zoom = zoom;
+
+    /**
+     * DOES NOT WORK
+     */
+    this.zoomTo = function(zoom, x, y) {
+        let dx = x - this.x;
+        let dy = y - this.y;
+
+        let dz = this.zoom - zoom;
+
+        this.x += dx * dz;
+        this.y += dy * dz;
+
+        this.zoom = zoom;
+    }
 }
 
 /**
@@ -1014,7 +996,7 @@ function Camera(x, y, zoom) {
  * @param {WebGLRenderingContext} gl 
  */
 export function GDRenderer(gl) {
-    this.gl =    gl;
+    this.gl    = gl;
     this.gProg = null;
     this.pBuff = null;
     this.pAttr = null;
@@ -1027,12 +1009,10 @@ export function GDRenderer(gl) {
     this.cyUni = null;
     this.projM = null;
     this.viewM = null;
-    this.textX = null;
-    this.textY = null;
-    this.textW = null;
-    this.textH = null;
     this.spUni = null;
     this.mainT = null;
+
+    this.textM = null;
 
     this.width = null;
     this.height = null;
@@ -1134,11 +1114,8 @@ export function GDRenderer(gl) {
     this.cyUni = gl.getUniformLocation(this.gProg, "camy");
 
     this.spUni = gl.getUniformLocation(this.gProg, "a_sampler");
-    
-    this.textX = gl.getUniformLocation(this.gProg, "textX");
-    this.textY = gl.getUniformLocation(this.gProg, "textY");
-    this.textW = gl.getUniformLocation(this.gProg, "textW");
-    this.textH = gl.getUniformLocation(this.gProg, "textH");
+
+    this.textM = gl.getUniformLocation(this.gProg, "textM");
 
     // This is the camera
     this.camera = new Camera(0, 0, 1);
@@ -1200,10 +1177,7 @@ export function GDRenderer(gl) {
         var size = Math.max(this.width, this.height);
         util.setModelMatrix(this, 0, 0, size);
 
-        gl.uniform1f(this.textX, 0);
-        gl.uniform1f(this.textY, 0);
-        gl.uniform1f(this.textW, 1);
-        gl.uniform1f(this.textH, 1);
+        gl.uniformMatrix3fv(this.textM, false, glMatrix.mat3.create());
         
         util.setTint(this, tint);
         
@@ -1214,6 +1188,15 @@ export function GDRenderer(gl) {
         return true;
     };
 
+    /**
+     * This draws a rectangle and is used for the grid
+     * @param {number} x x position (center)
+     * @param {number} y y position (center)
+     * @param {number} width width of the rectangle
+     * @param {number} height height of the rectangle
+     * @param {{r: number, g: number, b: number, a: number}} tint This is the color of the rectangle. White by default.
+     * @param {boolean} toCamera whenever the line should stick to the camera (false by default)
+     */
     this.renderRect = (x, y, width, height, tint = {r: 1, g: 1, b: 1, a: 1}, toCamera = false) => {
         let gl = this.gl;
 
@@ -1291,14 +1274,14 @@ export function GDRenderer(gl) {
 
         var gl = this.gl;
 
-        util.setTexture(this, tex);
-
         var sx = tex.w * 0.48387096774 * xflip * scale;
         var sy = tex.h * 0.48387096774 * yflip * scale;
 
         util.setModelMatrix(this, x, y, sx, sy, rot, true);
 
         util.setTint(this, tint);
+
+        util.setTexture(this, tex);
 
         //monitor.endCategory("Object rendering");
         monitor.startCategory("WebGL rendering");
@@ -1667,7 +1650,7 @@ export function GDRenderer(gl) {
             let bx = Math.max( 0, this.cache.camX1 );
             let ex = this.cache.camX2;
 
-            this.renderRect(bx + (ex - bx) / 2, 0, ex - bx, 1.5, {r: 1, g: 1, b: 1, a: 1}, true);
+            this.renderRect(bx + (ex - bx) / 2, 0, ex - bx, 1.5 / this.camera.zoom, {r: 1, g: 1, b: 1, a: 1}, true);
         }
         monitor.endCategory("Grid rendering");
 
@@ -1675,8 +1658,6 @@ export function GDRenderer(gl) {
             monitor.endFrame(false);
             return;
         }
-
-        //console.log(this);
 
         // This sets the view matrix to the camera's view
         util.setCamera(this);
