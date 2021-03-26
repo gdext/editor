@@ -117,6 +117,8 @@
     color: #fff;
     border-radius: 4px;
     font-size: 12px;
+    width: 160px;
+    min-width: 60px;
 }
 
 .ui-input.f {
@@ -130,7 +132,6 @@
     padding: 7px 9px;
     padding-right: 0;
     font-size: 12px;
-    min-width: 60px;
 }
 
 .ui-input img {
@@ -221,7 +222,6 @@
 
 .ui-container.r {
     flex-direction: row;
-    padding: 7px;
 }
 .ui-container.i {
     display: block;

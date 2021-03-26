@@ -11,6 +11,7 @@ import renderer from './canvas';
 import levelparse from './levelparse';
 import actionsExec from './actions';
 import keyboard from './keyboard';
+import menus from './menus';
 
 let buildSelection = 1;
 
@@ -465,38 +466,7 @@ export default {
         editTitle.innerText = 'Edit';
         tab2.appendChild(editTitle);
         let editContent = document.createElement('div');
-        ui.renderUiObject({
-            properties: {
-                type: 'container',
-                id: 'test',
-                direction: 'column',
-                paddingX: 15,
-                paddingY: 7
-            },
-            children: [
-                {
-                    properties: {
-                        type: 'label',
-                        text: 'Hello Mario',
-                        style: 'heading',
-                    }
-                },
-                {
-                    properties: {
-                        type: 'label',
-                        text: 'Luigi',
-                    }
-                },
-                {
-                    properties: {
-                        type: 'textInput',
-                        placeholder: 'idk',
-                        defaultValue: () => { return 'fekrjrekogjr' },
-                        icon: 'info'
-                    }
-                }
-            ]
-        }, editContent);
+        ui.renderUiObject(menus.getBottomMenus().editMenu, editContent);
         tab2.appendChild(editContent);
 
         //minimize/maximize button

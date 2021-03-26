@@ -81,7 +81,9 @@ function UiObject() {
             if(input.value > options.max) input.value = options.max;
             else if(input.value < options.min) input.value = options.min;
 
-            if(!input.value.endsWith(options.unit)) {  input.type = 'text'; input.value += options.unit; input.blur() }
+            input.type = 'text'; 
+
+            if(options.unit && !input.value.endsWith(options.unit)) {  input.value += options.unit; input.blur() }
 
             options.onValueChange(input.value);
         }
@@ -133,7 +135,9 @@ function UiObject() {
                 function moveFunction(e) {
                     click = false;
                     util.setCursor('e-resize');
-                    v += e.movementX * (options.scale || 1);
+                    let scale = options.scale || 1;
+                    if(options.defaultToInteger && !isInteger()) scale = scale/10;
+                    v += e.movementX * scale;
                     //handle min/max
                     if(v > options.max) v = options.max;
                     else if(v < options.min) v = options.min;
