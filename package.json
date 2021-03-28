@@ -18,17 +18,17 @@
   },
   "homepage": "https://github.com/gdext/editor#readme",
   "devDependencies": {
-    "css-loader": "^5.0.1",
+    "css-loader": "^5.2.0",
     "file-loader": "^6.2.0",
     "raw-loader": "^4.0.2",
     "style-loader": "^2.0.0",
-    "webpack-cli": "^4.2.0"
+    "webpack-cli": "^4.5.0"
   },
   "dependencies": {
-    "buffer": "^6.0.2",
+    "buffer": "^6.0.3",
     "http-server": "^0.12.3",
     "pako": "^1.0.11",
-    "plist": "^3.0.1",
-    "webpack": "^5.4.0"
+    "plist": "^3.0.2",
+    "webpack": "^5.28.0"
   }
 }

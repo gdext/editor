@@ -11,6 +11,7 @@ import renderer from './canvas';
 import levelparse from './levelparse';
 import actionsExec from './actions';
 import keyboard from './keyboard';
+import menus from './menus';
 
 let buildSelection = 1;
 
@@ -256,6 +257,53 @@ export default {
             }
         }
 
+        canvas.oncontextmenu = (e) => {
+            //test context menu
+            ui.renderUiObject({
+                properties: {
+                    type: 'contextMenu',
+                    id: 'testContext',
+                    title: 'Test Context Menu',
+                    x: e.pageX,
+                    y: e.pageY
+                },
+                children: [
+                    {
+                        properties: {
+                            type: 'container',
+                            paddingX: 7,
+                            paddingY: 10
+                        },
+                        children: [
+                            {
+                                properties: {
+                                    type: 'label',
+                                    text: 'Coming Soon!'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        properties: {
+                            type: 'container',
+                            isBottomBar: true,
+                            paddingX: 7,
+                            paddingY: 5
+                        },
+                        children: [
+                            {
+                                properties: {
+                                    type: 'label',
+                                    text: 'idk...'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }, document.body);
+            return false;
+        }
+
         //on resize
         function resizeCanvas() {
             canvasSize = util.calcCanvasSize(
@@ -418,38 +466,7 @@ export default {
         editTitle.innerText = 'Edit';
         tab2.appendChild(editTitle);
         let editContent = document.createElement('div');
-        ui.renderUiObject({
-            properties: {
-                type: 'container',
-                id: 'test',
-                direction: 'column',
-                paddingX: 15,
-                paddingY: 7
-            },
-            children: [
-                {
-                    properties: {
-                        type: 'label',
-                        text: 'Hello Mario',
-                        style: 'heading',
-                    }
-                },
-                {
-                    properties: {
-                        type: 'label',
-                        text: 'Luigi',
-                    }
-                },
-                {
-                    properties: {
-                        type: 'textInput',
-                        placeholder: 'idk',
-                        defaultValue: () => { return 'fekrjrekogjr' },
-                        icon: 'info'
-                    }
-                }
-            ]
-        }, editContent);
+        ui.renderUiObject(menus.getBottomMenus().editMenu, editContent);
         tab2.appendChild(editContent);
 
         //minimize/maximize button
