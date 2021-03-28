@@ -105,10 +105,14 @@ export const util = {
      * @param {WebGLTexture} texture the gl texture to be activated
      * @param {WebGLUniformLocation} uniLoc uniform location
      */
-    enableTexture: function(gl, texture, uniLoc) {
+    enableTexture: function(renderer, texture, uniLoc) {
+        let gl = renderer.gl;
+
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.bindTexture(gl.TEXTURE_2D, texture.texture);
         gl.uniform1i(uniLoc, 0);
+
+        renderer.current_texture = texture;
     },
     /**
      * It takes in the texture cutout out of the spreadsheet and sets the correct uniforms of the cutout.
@@ -117,14 +121,25 @@ export const util = {
      * @param {{x : number, y : number, w : number, h : number}} tex the texture cutout
      */
     setTexture: function(renderer, tex) {
-        let w = renderer.mainT.width;
-        let h = renderer.mainT.height;
+        if (!renderer.current_texture) return;
+        let tx = renderer.current_texture;
+
+        let w = tx.width;
+        let h = tx.height;
 
         let texM = glMatrix.mat3.create();
 
         glMatrix.mat3.translate(texM, texM, [(tex.x + TEXTURE_INSET) / w, (tex.y + TEXTURE_INSET) / h]);
         glMatrix.mat3.scale(texM, texM, [(tex.w - TEXTURE_INSET * 2) / w, (tex.h - TEXTURE_INSET) / h]);
 
+        renderer.gl.uniformMatrix3fv(renderer.textM, false, texM);
+    },
+    /**
+     * Sets the texture so that it renders the whole thing.
+     * @param {GDRenderer} renderer 
+     */
+    setFullTexture: function(renderer) {
+        let texM = glMatrix.mat3.create();
         renderer.gl.uniformMatrix3fv(renderer.textM, false, texM);
     },
     /**
@@ -1025,6 +1040,8 @@ export function GDRenderer(gl) {
 
     this.bgs = {};
 
+    this.current_texture = null;
+
     /**
      * This cache caches simple variables and current color value
      * so they don't have to be calculated every time
@@ -1177,11 +1194,11 @@ export function GDRenderer(gl) {
         var size = Math.max(this.width, this.height);
         util.setModelMatrix(this, 0, 0, size);
 
-        gl.uniformMatrix3fv(this.textM, false, glMatrix.mat3.create());
+        util.setFullTexture(this);
         
         util.setTint(this, tint);
         
-        util.enableTexture(gl, tex.texture, this.spUni);
+        util.enableTexture(this, tex, this.spUni);
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         
@@ -1663,7 +1680,7 @@ export function GDRenderer(gl) {
         util.setCamera(this);
 
         // This will enable the spritesheet texture
-        util.enableTexture(gl, this.mainT.texture, this.spUni);
+        util.enableTexture(this, this.mainT, this.spUni);
 
         // This calculates the first chunk in viewing range and the last chunk
         let camB = Math.floor( this.cache.camX1 / 992 );
