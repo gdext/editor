@@ -1343,6 +1343,8 @@ export function GDRenderer(gl) {
         var def_tint = {r: 1, g: 1, b: 1, a: 1};
         var slc      = obj.scale || 1;
 
+        if (obj._MICHIGUN) maincol = {r: 1, g: 1, b: 1, a: 0.5};
+
         monitor.startCategory("Object rendering");
         if (def.texture_i)
             this.renderTexture(def.texture_i, obj.x, obj.y, rot, xflip, yflip, def_tint, slc);
@@ -1696,6 +1698,10 @@ export function GDRenderer(gl) {
                             this.renderObject(this.level.data[obj]);
                     }
             }
+            
+        this.renderObject({id: 8, x: -1005, y: 15, _MICHIGUN: true});
+        this.renderObject({id: 8, x: -1035, y: 15, _MICHIGUN: true});
+        this.renderObject({id: 8, x: -1065, y: 15, _MICHIGUN: true});
 
         var frameTime = window.performance.now() - startTime;
 
