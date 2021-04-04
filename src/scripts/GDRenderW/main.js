@@ -29,6 +29,12 @@ import bg18 from "./bg/18.png"
 import bg19 from "./bg/19.png"
 import bg20 from "./bg/20.png"
 
+import font1_img  from "./font/font1.png"
+import font1_json from "./font/font1.json"
+
+import chatfont_img  from "./font/chat_font.png"
+import chatfont_json from "./font/chat_font.json"
+
 const TEXTURE_INSET = 0.6;
 
 export const util = {
@@ -197,6 +203,9 @@ export const util = {
         
         gl.uniformMatrix3fv(renderer.vmUni, false, matrix);
     },
+    color255: function(r = 255, g = 255, b = 255, a = 255) {
+        return {r, g, b, a};
+    },
     /**
      * This sets the projection matrix so that the view looks 2d and normally scaled to the canvas.
      * Another example of a projection matrix is a perspective matrix that gives the 3d effect.
@@ -237,6 +246,13 @@ export const util = {
         [2]: 388.8,
         [3]: 468,
         [4]: 578.1
+    },
+    color_names: {
+        1000: "BG",
+        1001: "G1",
+        1002: "LINE",
+        1003: "3DL",
+        1004: "OBJ"
     },
     /**
      * This function takes in a level and a x position and returns the time
@@ -929,6 +945,25 @@ function Texture(gl, url) {
     this.image.src = url;
 }
 
+function Font(gl, json, img) {
+    this.json = json;
+    this.img  = img;
+
+    this.tex  = new Texture(gl, this.img);
+
+    this.getChar = function(char) {
+        for (let c of this.json.chars)
+            if (c.letter == char) return c;
+    }
+
+    this.getKerning = function(char1, char2) {
+        for (let k of this.json.kernings)
+            if (k.first == char1 && k.second == char2) return k.amount;
+
+        return 0;
+    }
+}
+
 /**
  * This is the object definition class that contains where its textures are located, their size,
  * their default color id and their default zlayer and zorder.
@@ -1068,8 +1103,12 @@ export function GDRenderer(gl) {
          */
         getColor: function(renderer, color) {
             monitor.startCategory("Color calculation");
-            if (color == 1010)
+
+            if (color == 1011)
                 return {r: 1, g: 1, b: 1, a: 1};
+            if (color == 1012)
+                return {r: 0, g: 0, b: 0, a: 1};
+
             if (this.colors[color])
                 return this.colors[color];
 
@@ -1171,6 +1210,10 @@ export function GDRenderer(gl) {
         this.bgs[18] = new Texture(this.gl, bg18);
         this.bgs[19] = new Texture(this.gl, bg19);
         this.bgs[20] = new Texture(this.gl, bg20);
+
+        this.font = new Font(this.gl, font1_json, font1_img);
+
+        this.chat_font = new Font(this.gl, chatfont_json, chatfont_img);
     }
     
     // Then runs it lol
@@ -1273,6 +1316,56 @@ export function GDRenderer(gl) {
         gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 0);
     };
 
+    this.renderText = (text, x, y, font, scale = 0.5, tint = {r: 1, g: 1, b: 1, a: 1}, toCamera = true, centered = true) => {
+        let gl = this.gl;
+
+        if (toCamera)
+            util.setCamera(this);
+        else util.setCamera(this, 0, 0, 1);
+
+        util.enableTexture(this, font.tex, this.spUni);
+
+        y += 30 * 1.1 * scale;
+
+        let len = 0;
+
+        if (centered)
+            for (let i = 0; i < text.length; i++) {
+                let char = font.getChar(text[i]);
+
+                let krn = 0;
+
+                if (text[i + 1]) krn = font.getKerning(char, font.getChar(text[i + 1]) );
+                len += char.advance + krn;
+            }
+
+        let adv = 0;
+
+        util.setTint(this, tint);
+
+        for (let i = 0; i < text.length; i++) {
+            let c    = text[i];
+            let char = font.getChar(c);
+
+            let nxt;
+            if (text[i + 1])
+                nxt = font.getChar(text[i + 1]);
+
+            let krn = 0;
+
+            if (nxt) krn = font.getKerning(char, nxt);
+
+            util.setTexture(this, {x: char.x, y: char.y, w: char.width, h: char.height});
+            util.setModelMatrix(this, x + (adv + char.xoffset + char.width / 2 + krn - len / 2) * scale, y - (char.yoffset + char.height / 2) * scale, char.width * scale, char.height * scale);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+            adv += char.advance + krn;
+        }
+        
+        util.enableTexture(this, this.mainT, this.spUni);
+    }
+
     /**
      * This will try to render a texture of an object
      * @param {{x: number, y: number, w: number, h: number}} tex texture cutout
@@ -1300,11 +1393,7 @@ export function GDRenderer(gl) {
 
         util.setTexture(this, tex);
 
-        //monitor.endCategory("Object rendering");
-        monitor.startCategory("WebGL rendering");
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-        monitor.endCategory("WebGL rendering");
-        //monitor.startCategory("Object rendering");
     }
 
     /**
@@ -1315,24 +1404,25 @@ export function GDRenderer(gl) {
     this.renderObject = (obj) => {
         var def = this.objectDefs[obj.id];
 
-        if (!def)
+        if (!def && obj.type != "text")
             return;
 
-        if (obj.x > this.cache.camX2 || obj.x < this.cache.camX1)
+        if ((obj.x > this.cache.camX2 || obj.x < this.cache.camX1) && obj.type != "text")
             return;
 
+        var rot, xflip, yflip, mainc, secc;
         if (this.level.format == "GDRenderW") {
-            var rot   = obj.rot;
-            var xflip = (obj.flip_hor === undefined) ? 1 : (obj.flip_hor ? -1 : 1);
-            var yflip = (obj.flip_ver === undefined) ? 1 : (obj.flip_ver ? -1 : 1);
-            var mainc = obj.maincolor;
-            var secc  = obj.seccolor;
+            rot   = obj.rot;
+            xflip = (obj.flip_hor === undefined) ? 1 : (obj.flip_hor ? -1 : 1);
+            yflip = (obj.flip_ver === undefined) ? 1 : (obj.flip_ver ? -1 : 1);
+            mainc = obj.maincolor || 1004;
+            secc  = obj.seccolor  || 1;
         } else if (this.level.format == "GDExt") {
-            var rot   = obj.r;
-            var xflip = (obj.flipx === undefined) ? 1 : (obj.flipx ? -1 : 1);
-            var yflip = (obj.flipy === undefined) ? 1 : (obj.flipy ? -1 : 1);
-            var mainc = obj.baseCol;
-            var secc  = obj.decorCol;
+            rot   = obj.r;
+            xflip = (obj.flipx === undefined) ? 1 : (obj.flipx ? -1 : 1);
+            yflip = (obj.flipy === undefined) ? 1 : (obj.flipy ? -1 : 1);
+            mainc = obj.baseCol  || 1004;
+            secc  = obj.decorCol || 1;
         }
 
         this.cache.objCount++;
@@ -1346,17 +1436,41 @@ export function GDRenderer(gl) {
         if (obj._MICHIGUN) maincol = {r: 1, g: 1, b: 1, a: 0.5};
 
         monitor.startCategory("Object rendering");
-        if (def.texture_i)
-            this.renderTexture(def.texture_i, obj.x, obj.y, rot, xflip, yflip, def_tint, slc);
-        if (def.texture_l)
-            this.renderTexture(def.texture_l, obj.x, obj.y, rot, xflip, yflip, maincol, slc);
-        if (def.texture_b)
-            this.renderTexture(def.texture_b, obj.x, obj.y, rot, xflip, yflip, seccol, slc);
-        if (def.texture_a)
+        if (obj.type == "text") {
+            this.renderText(obj.text, +obj.x, +obj.y, this.font, 0.5 * slc, seccol); // TODO: Text Rotation!!!
+        } else {
+            if (def.texture_i)
+                this.renderTexture(def.texture_i, obj.x, obj.y, rot, xflip, yflip, def_tint, slc);
             if (def.texture_l)
-                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, seccol, slc);
-            else
-                this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, maincol, slc);
+                this.renderTexture(def.texture_l, obj.x, obj.y, rot, xflip, yflip, maincol, slc);
+            if (def.texture_b)
+                this.renderTexture(def.texture_b, obj.x, obj.y, rot, xflip, yflip, seccol, slc);
+            if (def.texture_a)
+                if (def.texture_l)
+                    this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, seccol, slc);
+                else
+                    this.renderTexture(def.texture_a, obj.x, obj.y, rot, xflip, yflip, maincol, slc);
+        }
+
+        let text;
+
+        if (obj.type == "trigger") {
+            switch (obj.info) {
+                case "color":
+                    text = util.color_names[+obj.color] || obj.color; break;
+                case "toggle":
+                case "touch":   
+                case "pulse":  
+                case "stop":
+                case "spawn":
+                case "follow":
+                case "alpha":
+                case "animate":
+                    text = obj.targetGroupID; break;
+            }
+        }
+
+        if (text) this.renderText(text, +obj.x - 1, +obj.y - 4, this.font, Math.min(0.5 / text.length, 0.25));
         monitor.endCategory("Object rendering");
     }
 
@@ -1485,6 +1599,16 @@ export function GDRenderer(gl) {
 
         // Level chunks get stored here:
         this.level.lchunks = lchunks;
+    }
+
+    this.renderGUIText = (text, x, y) => {
+        this.renderText(text,
+                        x - this.width / 2,
+                        -y + this.height / 2,
+                        this.chat_font,
+                        0.6,
+                        {r: 1, g: 1, b: 1, a: 1},
+                        false, false);
     }
 
     /**
@@ -1638,7 +1762,6 @@ export function GDRenderer(gl) {
         }
 
         monitor.endCategory("Background rendering");
-
         monitor.startCategory("Grid rendering");
 
         // Calculates the begin x and end x of the camera viewing rectangle
@@ -1698,12 +1821,31 @@ export function GDRenderer(gl) {
                             this.renderObject(this.level.data[obj]);
                     }
             }
-            
+
+        console.log(this.level);
+        
+        /*   RIP /\/\/\   */
         this.renderObject({id: 8, x: -1005, y: 15, _MICHIGUN: true});
         this.renderObject({id: 8, x: -1035, y: 15, _MICHIGUN: true});
         this.renderObject({id: 8, x: -1065, y: 15, _MICHIGUN: true});
 
         var frameTime = window.performance.now() - startTime;
+
+        let fps = Math.round(1000 / frameTime);
+        let spo = Math.round(monitor.getTime("Object rendering") / this.cache.objCount * 100) / 100;
+
+        const DOWN = 30;
+
+        if (options.troubleshoot) {
+            this.renderGUIText(`GDRenderW by IliasHDZ (for GDExt), ${fps} FPS, ${this.cache.objCount} Objects, ${spo} ms per object`, 10, 30);
+            this.renderGUIText(gl.getParameter(gl.VERSION), 10, 30 + DOWN);
+
+            this.renderGUIText(`Camera   X: ${Math.round(this.camera.x * 100) / 100}, Y: ${Math.round(this.camera.y * 100) / 100}, Zoom: ${Math.round(this.camera.zoom * 100) / 100}`, 10, 30 + DOWN * 3);
+
+            this.renderGUIText(`Object rendering:          ${Math.round(monitor.getTime("Object rendering") * 100) / 100}ms`, 10, 30 + DOWN * 5);
+            this.renderGUIText(`Background rendering: ${Math.round(monitor.getTime("Background rendering") * 100) / 100}ms`, 10, 30 + DOWN * 6);
+            this.renderGUIText(`Grid rendering:               ${Math.round(monitor.getTime("Grid rendering") * 100) / 100}ms`, 10, 30 + DOWN * 7);
+        }
 
         //console.log((1000 / frameTime) + " FPS");
 

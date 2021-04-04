@@ -47,48 +47,45 @@ export function EditorLevel(renderer, level) {
     }
 
     this.loadCTriggers = function(color) {
-        var listCOLs = [];
+        let level  = this.level;
 
-        this.level.data.forEach((obj, i) => {
-            if (obj.type == "trigger" && obj.info == "color" && (obj.color == "" + color || (color == 1 && !obj.color)))
-                listCOLs.push(i);
+        let objs   = level.data;
+        let ctriggers = [];
+
+        let base   = level.info.colors.filter(f => f.channel == color);
+
+        if (base.length > 0) base = base[0]
+        else base = {r: 255, g: 255, b: 255, a: 255};
+
+        objs.forEach((obj, i) => {
+            if (obj.type == "trigger" &&
+                obj.info == "color" &&
+                (obj.color || 1) == color)
+                ctriggers.push(i);
         });
 
-        if (listCOLs.length == 0)
-            return;
+        ctriggers.sort( (a, b) => objs[a].x - objs[b].x );
 
-        listCOLs.sort((a, b) => this.getObject(a).x - this.getObject(b).x);
+        let pcol = {r: base.r, g: base.g, b: base.b};
+        let ccol = pcol;
 
-        var lastCOL = {x: -200000, red: 255, blue: 255, green: 255, duration: 0};
-        var curCol  = {r: 255, g: 255, b: 255};
-        if (level.format == "GDRenderW") {
-            if (level.keys.colors[color] != undefined) {
-                lastCOL = {x: -200000, red: level.keys.colors[color].red, blue: level.keys.colors[color].blue, green: level.keys.colors[color].green, duration: 0};
-                curCol = {r: level.keys.colors[color].red, b: level.keys.colors[color].blue, g: level.keys.colors[color].green};
-            }
-        } else if (level.format == "GDExt") {
-            var baseColor = level.info.colors.filter((f) => {return f.channel == color;});
-            if (baseColor.length > 0) {
-                baseColor = baseColor[0];
+        let csec = -100000;
+        let cdur = 0;
 
-                lastCOL = {x: -200000, red: baseColor.r, blue: baseColor.b, green: baseColor.g, duration: 0};
-                curCol = {r: baseColor.r, b: baseColor.b, g: baseColor.g};
-            }
-        }
+        for (let i of ctriggers) {
+            let obj   = objs[i];
+            let delta = util.xToSec(level, obj.x) - csec;
 
-        for (const i of listCOLs) {
-            let obj = this.getObject(i);
-            var delta = util.xToSec(level, obj.x) - util.xToSec(level, lastCOL.x);
-            if (delta < lastCOL.duration) {
-                curCol = util.blendColor(curCol, util.longToShortCol(lastCOL), delta / lastCOL.duration);
-            } else {
-                curCol = util.longToShortCol(lastCOL);
-            }
-            obj.curCol = curCol;
-            lastCOL = obj;
+            pcol =  util.blendColor(pcol, ccol, Math.min(delta / cdur, 1));
+            ccol =  util.longToShortCol(obj);
+
+            csec += delta;
+            cdur =  obj.duration;
+
+            obj.curCol = pcol;
         }
         
-        this.level.cts[color] = listCOLs;
+        this.level.cts[color] = ctriggers;
     }
 
     this.removeObjectZList = function(key, chunkn, layern) {

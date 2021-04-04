@@ -103,3 +103,4 @@ dist
 # TernJS port file
 .tern-port
 index.html
+src/assets/obj-align-notes.js
