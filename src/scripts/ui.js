@@ -1,9 +1,12 @@
 import icPick from '../assets/ic-pick.svg';
 import icSlide from '../assets/ic-slide.svg';
 import icInfo from '../assets/ic-info.svg';
+import icExit from '../assets/ic-exit.svg';
+import icArrowLeft from '../assets/ic-arrowleft.svg';
+import icArrowRight from '../assets/ic-arrowright.svg';
+import icArrowDown from '../assets/ic-arrowdown.svg';
 import keyboard from './keyboard';
 import util from './util';
-import icExit from '../assets/ic-exit.svg';
 
 function UiObject() {
 
@@ -223,6 +226,131 @@ function UiObject() {
         return tabContainer;
     }
 
+    this.createList = (items, id, selected, options) => {
+        let listContainer = document.createElement('div');
+        listContainer.classList.add('ui-list');
+        if(id) listContainer.id = id;
+        listContainer.setAttribute('items', items.join('|'));
+        listContainer.setAttribute('value', selected);
+
+        let mode = 1;
+        if(options && options.mode == 'dropdown') mode = 2;
+        let listDisplay = document.createElement('p');
+        listDisplay.classList.add('ui-list-display');
+        listDisplay.innerText = items[selected];
+
+        function updateSelected(n, mode) {
+            var currentSelected = parseInt(listContainer.getAttribute('value'));
+            if(mode) currentSelected=n;
+            else currentSelected+=n;
+            if(currentSelected >= items.length) currentSelected = 0;
+            else if(currentSelected < 0) currentSelected = items.length-1;
+
+            listDisplay.innerText = items[currentSelected];
+            listContainer.setAttribute('value', currentSelected);
+
+            if(options.onSelectChange) {
+                options.onSelectChange(currentSelected, items);
+            }
+        }
+
+        if(mode == 1) {
+            let v;
+            function moveFunction(e) {
+                util.setCursor('e-resize');
+                v += e.movementX * 0.06;
+                if(v >= items.length) v = 0;
+                else if(v < 0) v = items.length-1;
+                updateSelected(Math.round(v), true);
+            }
+            function stopFunction() {
+                util.setCursor();
+                document.removeEventListener('pointermove', moveFunction);
+                document.removeEventListener('pointerup', stopFunction);
+            }
+
+            listDisplay.onpointerdown = e => {
+                v = parseInt(listContainer.getAttribute('value'));
+                document.addEventListener('pointermove', moveFunction);
+                document.addEventListener('pointerup', stopFunction);
+            }
+
+            let listArrowLeft = document.createElement('img');
+            listArrowLeft.classList.add('ui-list-arrow');
+            listArrowLeft.src = icArrowLeft
+            listArrowLeft.onclick = () => {
+                updateSelected(-1);
+            }
+
+            let listArrowRight = document.createElement('img');
+            listArrowRight.classList.add('ui-list-arrow');
+            listArrowRight.src = icArrowRight
+            listArrowRight.onclick = () => {
+                updateSelected(1);
+            }
+
+            listContainer.appendChild(listArrowLeft);
+            listContainer.appendChild(listDisplay);
+            listContainer.appendChild(listArrowRight);
+        } else {
+            listDisplay.classList.add('dropdown');
+            let listDropdown = document.createElement('div');
+            listDropdown.classList.add('ui-list-dropdown');
+
+            let itemi = -1;
+            items.forEach(item => {
+                itemi++;
+                let localitemi = itemi;
+                let listDropdownItem = document.createElement('div');
+                listDropdownItem.classList.add('ui-list-dropdown-item');
+                listDropdownItem.innerText = item;
+                listDropdownItem.onclick = () => {
+                    updateSelected(localitemi, true);
+                    setTimeout(() => {
+                        closeFunction();
+                    }, 64);
+                }
+                listDropdown.appendChild(listDropdownItem);
+            });
+
+            function closeFunction() {
+                listDropdown.classList.remove('vis');
+                document.removeEventListener('click', closeFunction);
+            }
+
+            let listArrowDropdown = document.createElement('img');
+            listArrowDropdown.classList.add('ui-list-arrow');
+            listArrowDropdown.src = icArrowDown;
+            
+            listContainer.onclick = () => {
+                if(!listDropdown.classList.contains('vis')) {
+                    listDropdown.classList.add('vis');
+                    listDropdown.classList.remove('b');
+                    let dropdownBox = listDropdown.getBoundingClientRect();
+                    let listBox = listContainer.getBoundingClientRect();
+                    let appBox = document.querySelector('#app').getBoundingClientRect();
+                    listDropdown.style.top = (listBox.y + 28) + 'px';
+                    listDropdown.style.left = (listBox.x - 1) + 'px';
+                    listDropdown.style.width = listBox.width + 'px';
+                    if(listBox.y + dropdownBox.height + 28 > appBox.height) {
+                        listDropdown.classList.add('b');
+                        listDropdown.style.top = (listBox.y - dropdownBox.height) + 'px';
+                    }
+                    setTimeout(() => {
+                        document.addEventListener('click', closeFunction);
+                    }, 64);
+                }
+                else closeFunction();
+            }
+
+            listContainer.appendChild(listDisplay);
+            listContainer.appendChild(listArrowDropdown);
+            listContainer.appendChild(listDropdown);
+        }
+
+        return listContainer;
+    }
+
     this.createLabel = (id, text, style, options) => {
         let labelElement = document.createElement('p');
         labelElement.classList.add('ui-label');
@@ -252,7 +380,7 @@ function UiObject() {
         let directions = {row: 'r', column: 'c', inline: 'i'};
         container.classList.add(directions[direction] || 'c');
         container.style.padding = `${options.paddingY}px ${options.paddingX}px`;
-        let scrolls = {none: '', vertical: 'sv', horizontal: 'sh'};
+        let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
         if(options.scroll) container.classList.add(scrolls[options.scroll]);
         if(options.isBottomBar) container.classList.add('bbg');
 
@@ -390,6 +518,10 @@ export default {
                 case 'tabs':
                     let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), { onSelectChange: p.onSelectChange });
                     elementContainer.appendChild(tabsElement);
+                    break;
+                case 'list':
+                    let listElement = uiObject.createList(p.items, p.id, p.selected(), p);
+                    elementContainer.appendChild(listElement);
                     break;
                 case 'label':
                     let labelElement = uiObject.createLabel(p.id, p.text, p.style, p);
