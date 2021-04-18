@@ -10,6 +10,7 @@ export default {
             let data = {};
             let objSplitted = obj.split(',');
             for(let i = 0; i < objSplitted.length; i+=2){
+                if(!objSplitted[i] || !objSplitted[i+1]) break;
                 let val = objSplitted[i+1];
                 // groups and hsv data split
                 if (propids[objSplitted[i]] == 'groups') val = objSplitted[i+1].split('.') 
@@ -44,6 +45,7 @@ export default {
         let levelSettingsObj = {};
         let levelSettingsSplitted = code.split(';')[0].split(',');
         for(let i = 0; i < levelSettingsSplitted.length; i+=2){
+            if(!levelSettingsSplitted[i] || !levelSettingsSplitted[i+1]) break;
             let val = levelSettingsSplitted[i+1];
             let key = settingids[levelSettingsSplitted[i]];
             //color data split
@@ -83,6 +85,18 @@ export default {
             });
             levelSettingsObj.colors = Object.values(colorz);
         }
+
+        //level guidelines
+        if(levelSettingsObj.guidelines) {
+            let guidelinesSplit = levelSettingsObj.guidelines.split('~');
+            let guidelinesArray = [];
+            for(let i = 0; i < guidelinesSplit.length; i+=2) {
+                if(!guidelinesSplit[i] || !guidelinesSplit[i+1]) break;
+                guidelinesArray.push({ timestamp: parseFloat(guidelinesSplit[i]), color: parseFloat(guidelinesSplit[i+1]) });
+            }
+            levelSettingsObj.guidelines = guidelinesArray;
+        }
+
         return { info: levelSettingsObj, data: levelObjects }
     },
     object2code: (obj) => {
@@ -90,7 +104,7 @@ export default {
         //info to code
         Object.keys(obj.info).forEach(k => {
             let v = obj.info[k];
-            if(k == "colors"){
+            if(k == "colors") {
                 let newv = "";
                 v.forEach(c => {
                     let ck = {};
@@ -106,6 +120,13 @@ export default {
                     newv += '|';
                 });
                 v = newv;
+            } else if(k == 'guidelines') {
+                let newv = "";
+                v.forEach(g => {
+                    newv += `${g.timestamp}~${g.color}~`
+                });
+                newv = newv.slice(0, -1);
+                v = newv;
             }
             let kk = k;
             if(Object.values(settingids).includes(k)) kk = Object.keys(settingids)[Object.values(settingids).indexOf(k)];
@@ -118,6 +139,7 @@ export default {
             Object.keys(o).forEach(ok => {
                 if(customKeys.includes(ok)) return;
                 let ov = o[ok];
+                if(ov == null) return;
                 if(ok == 'groups') ov = ov.join('.');
                 if(ok == 'copiedHSV' || ok == 'hsv1' || ok == 'hsv2') ov = ov.join('a');
                 if(ok == 'text') ov = btoa(ov);
@@ -126,6 +148,7 @@ export default {
             });
             levelCode = levelCode.slice(0, -1) + ';';
         });
+        console.log(levelCode);
         return levelCode;
     }
 }

@@ -10,6 +10,8 @@ const defaultLevel = 'kS38,1_40_2_125_3_255_4_-1_6_1000_7_1|1_0_2_102_3_255_4_-1
 let gdPath = '';
 if(window.process) gdPath = window.process.env.LOCALAPPDATA + "\\GeometryDash\\CCLocalLevels.dat";
 
+let dateSaved = null;
+
 function readLocalLevels() {
     if(!fs) return;
     if(!fs.existsSync(gdPath)) return -1; // -1 = gd is not installed
@@ -53,9 +55,11 @@ function executeAction(action) {
                         if(!checkGDExists()) util.alert('loadDialog', 'Couldn\'t load!', 'Geometry Dash is not detected on your computer! Make sure you install GD before saving/loading levels.', "OK");
                         
                         let ccll = readLocalLevels();
-                        localStorage.setItem('lvlcode', ccll[0].data);
-                        localStorage.setItem('lvlnumber', 0);
-                        window.location.reload();
+                        if(localStorage.getItem('lvlcode') != ccll[0].data) {
+                            localStorage.setItem('lvlcode', ccll[0].data);
+                            localStorage.setItem('lvlnumber', 0);
+                            window.location.reload();
+                        }
                     }
                     else util.alert('loadDialog', 'Couldn\'t load!', 'Reading files is only supported on GDExt desktop!', "OK");
                 } 
@@ -96,6 +100,10 @@ function executeAction(action) {
                 writeLocalLevels(ccll);
                 util.setUnsavedChanges(false);
                 util.showNotif('levelSavedNotif', 'Level Saved!', 4500, 'success');
+
+                dateSaved = new Date();
+                let autosaveTimeLabel = document.querySelector('#autosaveTimeLabel');
+                if(autosaveTimeLabel) autosaveTimeLabel.innerText = 'Last saved just now';
             } 
             else util.alert('saveDialog', 'Couldn\'t save!', 'Saving is only supported on GDExt desktop!', "OK");
             break;
@@ -132,6 +140,21 @@ export default {
                 util.alert('gdRunningAlert', 'Seems Like You\'ve Opened GD!', 'For stability reasons, you won\'t be able to save levels in GDExt until you close Geometry Dash', 'Got It', true);     
             }
         });
+
+        //autosaving
+        let autosaveInterval = setInterval(() => {
+            if(localStorage.getItem('settings.autosaveEnabled') == '1') {
+                let autosaveTimeLabel = document.querySelector('#autosaveTimeLabel');
+                if(autosaveTimeLabel) autosaveTimeLabel.innerText = 'Autosaving...';
+                executeAction('save');
+            }
+        }, 600000); //600,000 (10 minutes)
+
+        //last saved text
+        let lastSavedTextInterval = setInterval(() => {
+            let autosaveTimeLabel = document.querySelector('#autosaveTimeLabel');
+            if(autosaveTimeLabel) autosaveTimeLabel.innerText = 'Last saved ' + (dateSaved ? util.getTimeDifferenceText(dateSaved) : 'a while back');
+        }, 60000);
     },
     executeAction: (action) => {
         executeAction(action);   

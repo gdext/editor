@@ -226,6 +226,18 @@ export default {
         }, time);
 
         document.getElementById('app').appendChild(notification);
+    },
+
+    getTimeDifferenceText: (date) =>{
+        let now = new Date();
+        let diff = (now - date);
+        let text;
+        if(diff < 30000) text = 'just now';
+        else if(diff < 3600000) text = `${Math.round(diff/60000)} minutes ago`;
+        else if(diff < 36000000) text = `${Math.floor(diff/3600000)} hours ago`;
+        else text = `a while back`;
+
+        return text;
     }
 
 }

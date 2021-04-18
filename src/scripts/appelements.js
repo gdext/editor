@@ -135,10 +135,10 @@ export default {
         ui.renderUiObject({
             properties: {
                 type: 'label',
-                id: 'testLabel',
+                id: 'autosaveTimeLabel',
                 style: 'italic',
                 color: '#888',
-                text: 'Last Saved Never'
+                text: 'Last saved a while back'
             }
         }, sectionCheckbox);
     },
