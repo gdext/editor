@@ -148,7 +148,6 @@ export default {
             });
             levelCode = levelCode.slice(0, -1) + ';';
         });
-        console.log(levelCode);
         return levelCode;
     }
 }
