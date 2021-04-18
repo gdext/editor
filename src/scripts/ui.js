@@ -15,6 +15,8 @@ function UiObject() {
         checkboxContainer.classList.add('ui-checkbox');
         checkboxContainer.innerText = name;
         if(options && options.light) checkboxContainer.classList.add('bbg');
+        if(options && options.marginTop) checkboxContainer.style.marginTop = options.marginTop + 'px';
+        if(options && options.marginBottom) checkboxContainer.style.marginTop = options.marginBottom + 'px';
 
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -495,7 +497,7 @@ export default {
 
             switch(o.properties.type) {
                 case 'checkbox':
-                    let checkboxElement = uiObject.createCheckbox(p.text, p.id, p.checked());
+                    let checkboxElement = uiObject.createCheckbox(p.text, p.id, p.checked(), p);
                     checkboxElement.getElementsByTagName('input')[0].onchange = () => {
                         let c = checkboxElement.getElementsByTagName('input')[0].checked;
                         p.onCheckChange(c);

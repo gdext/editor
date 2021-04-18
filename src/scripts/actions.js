@@ -45,13 +45,18 @@ function executeAction(action) {
                         localStorage.setItem('lvlnumber', 0);
                         window.location.reload();
                     }
-                    else util.alert('loadDialog', 'Couldn\'t load!', 'Reading files is only supported on GDExt desktop!', "OK")
+                    else util.alert('loadDialog', 'Couldn\'t load!', 'Reading files is only supported on GDExt desktop!', "OK");
                 } 
             });
             break;
         case 'save':
             let levelObj = canvas.getLevel();
             let levelTxt = levelparse.object2code(levelObj);
+
+            if(window.gdext && window.gdext.isGdRunning) {
+                util.alert('saveDialog', 'Couldn\'t save!', 'Geometry Dash is currently running! Please close it and try again.', "OK")
+                return;
+            }
 
             if(fs) {
                 let ccll = readLocalLevels();
@@ -102,6 +107,14 @@ export default {
     init: () => {
         window.addEventListener('action', e => {
             executeAction(e.detail);
+        });
+
+        //notify if gd is running
+        window.addEventListener('gdRunningStateChange', e => {
+            console.log('GD Running State changes to: ', e.detail);
+            if(e.detail && localStorage.getItem(`gdRunningAlertDontShowAgain`) != 'true') {
+                util.alert('gdRunningAlert', 'Seems Like You\'ve Opened GD!', 'For stability reasons, you won\'t be able to save levels in GDExt until you close Geometry Dash', 'Got It', true);     
+            }
         });
     },
     executeAction: (action) => {

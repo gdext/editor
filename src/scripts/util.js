@@ -89,8 +89,8 @@ export default {
         closeDialog(id);
     },
 
-    alert: (id, title, description, button) => {
-        ui.renderUiObject({
+    alert: (id, title, description, button, dontShowAgain) => {
+        let obj = {
             properties: {
                 type: 'dialog',
                 id: id,
@@ -127,7 +127,24 @@ export default {
                     ]
                 }
             ]
-        }, document.body);
+        }
+        if(dontShowAgain) 
+            obj.children[0].children.push({
+                properties: {
+                    type: 'checkbox',
+                    id: id + 'DontShowAgain',
+                    text: 'Don\'t show this again',
+                    marginTop: 8,
+                    checked: () => {
+                        return false
+                    },
+                    onCheckChange: (t) => {
+                        if(t) localStorage.setItem(`${id}DontShowAgain`, 'true');
+                        else localStorage.setItem(`${id}DontShowAgain`, 'false');
+                    }
+                }
+            });
+        ui.renderUiObject(obj, document.body);
     },
 
     confirm: (id, title, description, options) => {
