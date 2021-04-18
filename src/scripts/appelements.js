@@ -433,7 +433,7 @@ export default {
                 return 'h';
             }
 
-            util.loadObjects(buildContentBlocks, category, ow.amount*page+page, ow.amount*(page+1), (id, obj) => {
+            util.loadObjects(buildContentBlocks, category, ow.amount*page+page, ow.amount*(page+1)+page, (id, obj) => {
                 let selobj = document.querySelector('canvas.sel');
                 if(selobj) selobj.classList.remove('sel');
                 buildSelection = id;
@@ -464,6 +464,15 @@ export default {
                 loadObjs(lastCategory, page);
             }
         }
+
+        let buildTabSelObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type == "attributes") {
+                loadObjs(lastCategory, page);
+              }
+            });
+        });
+        buildTabSelObserver.observe(tab1, { attributes: true });
 
         //edit tab
         let tab2 = document.getElementById('tabEdit');
