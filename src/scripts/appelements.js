@@ -68,6 +68,7 @@ export default {
                     menuOption.innerText = o.name;
                     menuOption.onclick = () => {
                         actionsExec.executeAction(o.id);
+                        menu.blur();
                     }
                     menuOptions.appendChild(menuOption);
                 });
@@ -134,10 +135,10 @@ export default {
         ui.renderUiObject({
             properties: {
                 type: 'label',
-                id: 'testLabel',
+                id: 'autosaveTimeLabel',
                 style: 'italic',
                 color: '#888',
-                text: 'Last Saved Never'
+                text: 'Last saved a while back'
             }
         }, sectionCheckbox);
     },

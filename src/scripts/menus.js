@@ -3,7 +3,7 @@ const bottomMenus = {
         properties: {
             type: 'container',
             direction: 'row',
-            scroll: 'horizontal', 
+            scroll: 'both', 
             paddingX: 15,
             paddingY: 0
         },
@@ -68,10 +68,10 @@ const bottomMenus = {
                             },
                             {
                                 properties: {
-                                    type: 'textInput',
+                                    type: 'list',
                                     id: 'editZLayer',
-                                    placeholder: 'Number',
-                                    defaultValue: () => { return 'Coming Soon' },
+                                    items: ['B4', 'B3', 'B2', 'B1', 'T1', 'T2', 'T3'],
+                                    selected:  () => { return 4 },
                                 }
                             }
                         ]

@@ -89,8 +89,8 @@ export default {
         closeDialog(id);
     },
 
-    alert: (id, title, description, button) => {
-        ui.renderUiObject({
+    alert: (id, title, description, button, dontShowAgain) => {
+        let obj = {
             properties: {
                 type: 'dialog',
                 id: id,
@@ -127,7 +127,24 @@ export default {
                     ]
                 }
             ]
-        }, document.body);
+        }
+        if(dontShowAgain) 
+            obj.children[0].children.push({
+                properties: {
+                    type: 'checkbox',
+                    id: id + 'DontShowAgain',
+                    text: 'Don\'t show this again',
+                    marginTop: 8,
+                    checked: () => {
+                        return false
+                    },
+                    onCheckChange: (t) => {
+                        if(t) localStorage.setItem(`${id}DontShowAgain`, 'true');
+                        else localStorage.setItem(`${id}DontShowAgain`, 'false');
+                    }
+                }
+            });
+        ui.renderUiObject(obj, document.body);
     },
 
     confirm: (id, title, description, options) => {
@@ -192,6 +209,35 @@ export default {
                 }
             ]
         }, document.body);
+    },
+
+    showNotif: (id, text, time, type) => {
+        let notification = document.createElement('div');
+        notification.classList.add('app-notification');
+        notification.id = id;
+        notification.innerText = text;
+        if(type) notification.classList.add(type);
+
+        setTimeout(() => {
+            notification.classList.add('cls');
+            setTimeout(() => {
+                if(notification.parentElement) notification.parentElement.removeChild(notification);
+            }, 800);
+        }, time);
+
+        document.getElementById('app').appendChild(notification);
+    },
+
+    getTimeDifferenceText: (date) =>{
+        let now = new Date();
+        let diff = (now - date);
+        let text;
+        if(diff < 30000) text = 'just now';
+        else if(diff < 3600000) text = `${Math.round(diff/60000)} minutes ago`;
+        else if(diff < 36000000) text = `${Math.floor(diff/3600000)} hours ago`;
+        else text = `a while back`;
+
+        return text;
     }
 
 }

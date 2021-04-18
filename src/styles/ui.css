@@ -127,6 +127,7 @@
 
 .ui-input input {
     color: #fff;
+    width: 100%;
     background: none;
     border: none;
     padding: 7px 9px;
@@ -143,6 +144,70 @@
 
 .uistretch .ui-input {
     width: 100%;
+}
+
+/* list */
+.ui-list {
+    display: flex;
+    background-color: #1D1D1D;
+    border: 1px solid #111;
+    color: #fff;
+    border-radius: 4px;
+    width: 160px;
+    min-width: 60px;
+    font-size: 12px;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.ui-list-arrow {
+    padding: 6px 9px; /*69 nice*/
+    height: 8px;    
+    cursor: pointer;
+}
+
+.ui-list-display {
+    padding: 6px 0;
+    width: 100%;
+    user-select: none;
+    cursor: E-RESIZE;
+    text-align: center;
+}
+
+.ui-list-display.dropdown {
+    padding-left: 9px;
+    text-align-last: left;
+    cursor: pointer;
+}
+
+.ui-list-dropdown {
+    background: #1D1D1D;
+    border: 1px solid #111;
+    display: none;
+    border-radius: 0 0 4px 4px;
+    position: fixed;
+    width: fit-content;
+    left: 0;
+    top: 0;
+    height: fit-content;
+}
+.ui-list-dropdown.vis {
+    display: block;
+    animation: slideBottom 0.25s ease;
+}
+.ui-list-dropdown.b {
+    border-radius: 4px 4px 0 0;
+    animation: slideTop 0.25s ease;
+}
+.ui-list-dropdown-item {
+    padding: 6px 9px;
+    font-size: 12px;
+    user-select: none;
+    cursor: pointer;
+}
+.ui-list-dropdown-item:hover {
+    background: rgba(0,0,0,.25);
 }
 
 /* tab */
@@ -231,6 +296,10 @@
     overflow-x: auto;
 }
 .ui-container.sv {
+    overflow-y: auto;
+}
+.ui-container.sb {
+    overflow-x: auto;
     overflow-y: auto;
 }
 
@@ -363,6 +432,30 @@
     }
     99% {
         transform: translateX(0);
+    }
+    100% {
+        transform: none;
+    }
+}
+
+@keyframes slideBottom {
+    0% {
+        transform: translateY(10px);
+    }
+    99% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: none;
+    }
+}
+
+@keyframes slideTop {
+    0% {
+        transform: translateY(-10px);
+    }
+    99% {
+        transform: translateY(0);
     }
     100% {
         transform: none;
