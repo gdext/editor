@@ -209,6 +209,23 @@ export default {
                 }
             ]
         }, document.body);
+    },
+
+    showNotif: (id, text, time, type) => {
+        let notification = document.createElement('div');
+        notification.classList.add('app-notification');
+        notification.id = id;
+        notification.innerText = text;
+        if(type) notification.classList.add(type);
+
+        setTimeout(() => {
+            notification.classList.add('cls');
+            setTimeout(() => {
+                if(notification.parentElement) notification.parentElement.removeChild(notification);
+            }, 800);
+        }, time);
+
+        document.getElementById('app').appendChild(notification);
     }
 
 }

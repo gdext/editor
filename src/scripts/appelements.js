@@ -68,6 +68,7 @@ export default {
                     menuOption.innerText = o.name;
                     menuOption.onclick = () => {
                         actionsExec.executeAction(o.id);
+                        menu.blur();
                     }
                     menuOptions.appendChild(menuOption);
                 });

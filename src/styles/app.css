@@ -303,3 +303,53 @@
 .app-bottom.min .bottom-floatbutton{
     transform: rotate(180deg);
 }
+
+.app-notification {
+    position: fixed;
+    z-index: 128;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    background: #1f5f9a;
+    padding: 10px 20px;
+    width: fit-content;
+    margin: auto;
+    border-radius: 4px;
+    box-shadow: 0 5px 10px rgba(0,0,0,.5);
+    opacity: 1;
+    animation: notifAppear 0.25s ease;
+}
+.app-notification.cls {
+    animation: notifDisappear 0.8s ease;
+    animation-fill-mode: both;
+}
+.app-notification.success {
+    background: #1d9a2d;
+}
+.app-notification.warn {
+    background: #c1680d;
+}
+.app-notification.err {
+    background: #c11b23;
+}
+
+@keyframes notifAppear {
+    0% {
+        transform: translateY(60px);
+    }
+    99% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: none;
+    }
+}
+
+@keyframes notifDisappear {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
