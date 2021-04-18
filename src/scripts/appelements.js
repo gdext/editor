@@ -159,6 +159,10 @@ export default {
         elem.appendChild(canvas);
 
         let l = localStorage.getItem('lvlcode');
+        if(localStorage.getItem('lvlnumber') && localStorage.getItem('lvlnumber') != '-1') {
+            l = actionsExec.getLevelData(localStorage.getItem('lvlnumber')).data;
+            localStorage.setItem('lvlcode', l);
+        }
 
         renderer.init(canvas);
         renderer.initLevel(levelparse.code2object(l));

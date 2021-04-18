@@ -100,6 +100,7 @@ function executeAction(action) {
                 writeLocalLevels(ccll);
                 util.setUnsavedChanges(false);
                 util.showNotif('levelSavedNotif', 'Level Saved!', 4500, 'success');
+                localStorage.setItem('lvlcode', levelTxt);
 
                 dateSaved = new Date();
                 let autosaveTimeLabel = document.querySelector('#autosaveTimeLabel');
@@ -136,8 +137,12 @@ export default {
         //notify if gd is running
         window.addEventListener('gdRunningStateChange', e => {
             console.log('GD Running State changes to: ', e.detail);
-            if(e.detail && localStorage.getItem(`gdRunningAlertDontShowAgain`) != 'true') {
-                util.alert('gdRunningAlert', 'Seems Like You\'ve Opened GD!', 'For stability reasons, you won\'t be able to save levels in GDExt until you close Geometry Dash', 'Got It', true);     
+            if(localStorage.getItem(`gdRunningAlertDontShowAgain`) != 'true') {
+                if(e.detail) {
+                    util.alert('gdRunningAlert', 'Looks Like You\'ve Opened GD!', 'For stability reasons, you won\'t be able to save levels in GDExt until you close Geometry Dash', 'Got It', true);     
+                } else {
+                    if(document.querySelector('#gdRunningAlert')) util.closeDialog('gdRunningAlert');
+                }
             }
         });
 
@@ -155,8 +160,34 @@ export default {
             let autosaveTimeLabel = document.querySelector('#autosaveTimeLabel');
             if(autosaveTimeLabel) autosaveTimeLabel.innerText = 'Last saved ' + (dateSaved ? util.getTimeDifferenceText(dateSaved) : 'a while back');
         }, 60000);
+
+        //check if level has changed on focus
+        window.addEventListener('focus', () => {
+            if(localStorage.getItem('lvlnumber') && localStorage.getItem('lvlnumber') != '-1') {
+                let level = readLocalLevels()[localStorage.getItem('lvlnumber')];
+                if(level.data != localStorage.getItem('lvlcode')) {
+                    if(document.querySelector('#fileChangedConfirm')) return;
+                    util.confirm(
+                        'fileChangedConfirm', 'The Level Was Modified Externally', 
+                        'Would you like to reload it? (You will lose all of your unsaved data)',
+                        {
+                            buttonYes: 'Yes', buttonNo: 'No', onConfirm: (t) => {
+                                if(t) window.location.reload();
+                                else localStorage.setItem('lvlcode', level.data);
+                            } 
+                        }
+                    );
+                }
+            }
+        })
     },
     executeAction: (action) => {
         executeAction(action);   
+    },
+    getLevelData: (num) => {
+        if(checkGDExists()) { 
+            let ccll = readLocalLevels();
+            return ccll[num];
+        }
     }
 }
