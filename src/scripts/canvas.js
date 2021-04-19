@@ -29,6 +29,9 @@ export default {
     setOption: (opt, val) => {
         options[opt] = val;
     },
+    toggleOption: (opt) => {
+        options[opt] = !options[opt];
+    },
     initLevel: (lvl) => {
         level = new EditorLevel(renderer, lvl);
     },

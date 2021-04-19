@@ -247,6 +247,14 @@ export default {
             renderer.update(canvas);
         }
 
+        //renderer events
+        window.addEventListener('renderer', e => {
+            if(e.detail == 'toggleTroubleshoot') {
+                renderer.toggleOption('troubleshoot');
+                renderer.update(canvas);
+            }
+        });
+
         canvas.onmousedown = (e) => {
             if(e.button == 1) {
                 beginScreenPanning();
