@@ -237,13 +237,11 @@ export default {
         function beginScreenZooming(e, mode) {
             let coords = renderer.getCoords();
             if(!mode || mode == 0) {
-                if(e.deltaY < 0) coords.z *= 1.1;
-                else coords.z /= 1.1;
+                coords.z *= 1 - (e.deltaY/1000);
             } else {
                 let a = ['z', 'x', 'y']
                 let b = a[mode];
-                if(e.deltaY < 0) coords[b] -= 15/coords.z;
-                else coords[b] += 15/coords.z;
+                coords[b] += (e.deltaY/4)/coords.z;
             }
             renderer.moveTo(coords.x, coords.y, coords.z);
             renderer.update(canvas);

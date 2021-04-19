@@ -120,7 +120,18 @@ function executeAction(action) {
         case 'exit':
             confirmUnsavedChanges((t) => {
                 if(t) {
+                    window.gdext.isActuallyClosing = true;
                     let event = new CustomEvent('electronApi', { detail: 'quit' });
+                    dispatchEvent(event);
+                } else {
+                    window.gdext.isActuallyClosing = null;
+                }
+            });
+            break;
+        case 'reload':
+            confirmUnsavedChanges((t) => {
+                if(t) {
+                    let event = new CustomEvent('electronApi', { detail: 'reload' });
                     dispatchEvent(event);
                 }
             });
@@ -179,7 +190,7 @@ export default {
                     );
                 }
             }
-        })
+        });
     },
     executeAction: (action) => {
         executeAction(action);   

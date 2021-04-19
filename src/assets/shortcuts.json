@@ -26,13 +26,13 @@
     {
         "keys": [ 116 ],
         "type": "event",
-        "eventName": "electronApi",
+        "eventName": "action",
         "eventInfo": "reload"
     },
     {
         "keys": [ 17, 82 ],
         "type": "event",
-        "eventName": "electronApi",
+        "eventName": "action",
         "eventInfo": "reload"
     },
     {
