@@ -1,0 +1,17 @@
+{
+  "name": "gdext-addon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "electron-rebuild": "^2.3.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "node-gyp rebuild"
+  },
+  "author": "IliasHDZ",
+  "license": "MIT",
+  "gypfile": true
+}
