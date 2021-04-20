@@ -8,6 +8,9 @@ import icArrowDown from '../assets/ic-arrowdown.svg';
 import keyboard from './keyboard';
 import util from './util';
 
+// UiObject contains functions to create all types of UI elements
+// renderUiObject puts all these UiObjects together and returns them as DOM elements
+
 function UiObject() {
 
     this.createCheckbox = (name, id, state, options) => {

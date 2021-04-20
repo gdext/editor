@@ -2,6 +2,9 @@ import ui from './ui';
 import buildtabData from '../assets/buildtab.json';
 import buildPreview from './buildPreview';
 
+// this file contains miscellaneous functions, like calculating stuff, loading objects and 
+// creating dialogs
+
 let unsavedChanges = false;
 
 function closeDialog (id) {

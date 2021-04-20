@@ -17,6 +17,7 @@ let buildSelection = 1;
 
 export default {
     generateNavbar: (navbar) => {
+        // build navbar from DOM elements
         const navbarLeft = document.createElement('div');
         navbarLeft.classList.add('navbar-element');
         navbarLeft.classList.add('navbar-left');
@@ -49,7 +50,7 @@ export default {
         logo.height = 20;
         sectionLogo.appendChild(logo);
 
-        //add menus
+        //add menus on the left (from '../assets/navbar.json')
         let menus = navbarData.left;
         menus.forEach(m => {
             let menu = document.createElement('div');
@@ -80,7 +81,7 @@ export default {
             sectionOptions.appendChild(menu);
         });
 
-        //add actions
+        //add actions on the right (from '../assets/navbar.json')
         let actions = navbarData.right;
         actions.forEach(a => {
             let img = null;
@@ -109,7 +110,7 @@ export default {
             });
         });
 
-        //autosaving
+        //autosaving checkbox
         ui.renderUiObject({
             properties: {
                 type: 'checkbox',
@@ -143,6 +144,7 @@ export default {
         }, sectionCheckbox);
     },
     generateMain: (elem) => {
+        // create canvas element
         const navbar = document.getElementById('appNavbar');
         const bottom = document.getElementById('appBottom');
 
@@ -158,12 +160,14 @@ export default {
         canvas.id = "render";
         elem.appendChild(canvas);
 
+        // load level data of the selected level
         let l = localStorage.getItem('lvlcode');
         if(localStorage.getItem('lvlnumber') && localStorage.getItem('lvlnumber') != '-1') {
             l = actionsExec.getLevelData(localStorage.getItem('lvlnumber')).data;
             localStorage.setItem('lvlcode', l);
         }
 
+        // initialize canvas, update it every 5 seconds
         renderer.init(canvas);
         renderer.initLevel(levelparse.code2object(l));
         renderer.update(canvas);
@@ -268,6 +272,7 @@ export default {
             }
         }
 
+        // TODO: Replace the text context menu with data from menus.js
         canvas.oncontextmenu = (e) => {
             //test context menu
             ui.renderUiObject({
@@ -330,6 +335,7 @@ export default {
         window.addEventListener('resize', resizeCanvas);
         window.addEventListener('resizeCanvas', resizeCanvas);
 
+        //on viewport scroll
         canvas.onwheel = (e) => {
             let mode = 0;
             let keys = keyboard.getKeys()
@@ -346,8 +352,10 @@ export default {
         let content = document.createElement('div');
         content.classList.add('bottom-content');
         
+        // create tabs and tab contents
         let tabsContent = [{ icon: icBuild, tab: 'tabBuild' }, { icon: icEdit, tab: 'tabEdit' }, { icon: icDelete, tab: 'tabDelete' }];
         tabsContent.forEach(t => {
+            // generate tab button selector
             let tabButton = document.createElement('div');
             tabButton.classList.add('tab-selector');
             tabButton.title = t.tab.slice(3);
@@ -362,6 +370,7 @@ export default {
                 tabButton.classList.add('sel');
             }
 
+            // generate tab holder
             let tab = document.createElement('div');
             tab.classList.add('bottom-tab');
             tab.id = t.tab;
@@ -385,9 +394,11 @@ export default {
         const buildContentPrevious = document.createElement('div');
         buildContentPrevious.classList.add('tab-content-button');
 
+        // build tab vars
         let lastCategory = 'blocks';
         let page = 0;
 
+        // generate build tab
         let buildTitle = document.createElement('h4');
         buildTitle.innerText = 'Build';
         let buildContent = document.createElement('div');
@@ -419,7 +430,7 @@ export default {
             buildCategories.appendChild(buildCategory);
         });
 
-        //load objects
+        //load objects into the build tab
 
         buildContent.appendChild(buildContentPrevious);
         buildContent.appendChild(buildContentBlocks);
@@ -448,7 +459,7 @@ export default {
             buildContentBlocks.style.width = ow.parentw;
         }
 
-        //build tab
+        // append build tab
         let tab1 = document.getElementById('tabBuild');
         tab1.appendChild(buildTitle);
         tab1.appendChild(buildContent);

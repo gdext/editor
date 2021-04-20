@@ -6,12 +6,17 @@ import util from './util';
 let fs = null;
 if(window.process) fs = window.require('fs');
 
+// gbloab vars:
+// defaultLevel is the default blank level data for when a new level is created
+// gdPath is the path to GD's local levels
+// dateSaved has the last time the level was saved in gdext
 const defaultLevel = 'kS38,1_40_2_125_3_255_4_-1_6_1000_7_1|1_0_2_102_3_255_4_-1_6_1001_7_1|1_0_2_102_3_255_4_-1_6_1009_7_1|1_255_2_255_3_255_4_-1_6_1004_7_1|1_255_2_255_3_255_4_-1_6_1002_7_1|,kA13,0,kA15,0,kA16,0,kA14,,kA6,1,kA7,1,kA17,1,kA18,0,kS39,0,kA2,0,kA3,0,kA8,0,kA4,0,kA9,0,kA10,0,kA11,0';
 let gdPath = '';
 if(window.process) gdPath = window.process.env.LOCALAPPDATA + "\\GeometryDash\\CCLocalLevels.dat";
 
 let dateSaved = null;
 
+// read levels
 function readLocalLevels() {
     if(!fs) return;
     if(!fs.existsSync(gdPath)) return -1; // -1 = gd is not installed
@@ -21,6 +26,7 @@ function readLocalLevels() {
     return ccllJson;
 }
 
+// change levels
 function writeLocalLevels(ccll) {
     if(!fs) return;
     if(!fs.existsSync(gdPath)) return -1; // -1 = gd is not installed
@@ -34,6 +40,8 @@ function checkGDExists() {
     return true;
 }
 
+// this function pops up the unsaved changes dialog if the level has unsaved data
+// and calls the "onConfirm" function with the first argument set to whether the user confirms or not
 function confirmUnsavedChanges(onConfirm) {
     if(util.getUnsavedChanges()) {
         util.confirm(
@@ -46,6 +54,7 @@ function confirmUnsavedChanges(onConfirm) {
     }
 }
 
+// main function for executing actions like saving, loading, etc.
 function executeAction(action) {
     switch(action) {
         case 'load':
