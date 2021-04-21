@@ -14,6 +14,7 @@ import keyboard from './keyboard';
 import menus from './menus';
 
 let buildSelection = 1;
+let selectedTab = 0; // 0 - build, 1 - edit, 2 - delete
 
 export default {
     generateNavbar: (navbar) => {
@@ -230,20 +231,47 @@ export default {
                     window.requestAnimationFrame(update);
             }
             update();
-            top_canvas.onmousemove = (e1) => {
+            top_canvas.onpointermove = (e1) => {
                 eX = e1.offsetX;
                 eY = e1.offsetY;
             }
             
             function stop() {
-                top_canvas.onmousemove = null;
-                window.onmouseup = null;
+                top_canvas.onpointermove = null;
+                window.onpointerup = null;
                 moving = false;
-                window.onmouseout = null;
+                window.onpointerout = null;
                 renderer.update(canvas);
             }
-            window.onmouseup = stop;
-            window.onmouseout = stop;
+            window.onpointerup = stop;
+            window.onpointerout = stop;
+        }
+
+        function beginObjectSelection(e) {
+            let eX = e.offsetX;
+            let eY = e.offsetY;
+            renderer.beginSelectionBox(eX, eY);
+            let moving = true;
+            function update() {
+                renderer.selectTo(eX, eY);
+                if (moving)
+                    window.requestAnimationFrame(update);
+            }
+            update();
+            top_canvas.onpointermove = (e1) => {
+                eX = e1.offsetX;
+                eY = e1.offsetY;
+            }
+            
+            function stop() {
+                top_canvas.onpointermove = null;
+                window.onpointerup = null;
+                moving = false;
+                window.onpointerout = null;
+                renderer.closeSelectionBox();
+            }
+            window.onpointerup = stop;
+            window.onpointerout = stop;
         }
 
         function beginScreenZooming(e, mode) {
@@ -270,13 +298,17 @@ export default {
         top_canvas.onmousedown = (e) => {
             if(e.button == 1) {
                 beginScreenPanning();
-            } else if (e.button == 0) {
+            }
+        }
+
+        top_canvas.onpointerdown = (e) => {
+            if(e.button == 0) {
                 if(keyboard.getKeys().includes(32)) {
                     beginScreenPanning();
                 } else {
-                    beginObjectBuilding(e);
+                    if(selectedTab == 0) beginObjectBuilding(e);
+                    else beginObjectSelection(e);
                 }
-                
             }
         }
 
@@ -364,7 +396,7 @@ export default {
         content.classList.add('bottom-content');
         
         // create tabs and tab contents
-        let tabsContent = [{ icon: icBuild, tab: 'tabBuild' }, { icon: icEdit, tab: 'tabEdit' }, { icon: icDelete, tab: 'tabDelete' }];
+        let tabsContent = [{ icon: icBuild, tab: 'tabBuild', id: 0 }, { icon: icEdit, tab: 'tabEdit', id: 1 }, { icon: icDelete, tab: 'tabDelete', id: 2 }];
         tabsContent.forEach(t => {
             // generate tab button selector
             let tabButton = document.createElement('div');
@@ -376,6 +408,7 @@ export default {
             tabButton.onclick = () => {
                 tabsContent.forEach(nt => { document.getElementById(nt.tab).classList.remove('sel') });
                 document.getElementById(t.tab).classList.add('sel');
+                selectedTab = t.id;
                 let tabSelectors = Object.values(document.getElementsByClassName('tab-selector'));
                 tabSelectors.forEach(ts => { ts.classList.remove('sel') });
                 tabButton.classList.add('sel');
