@@ -1,3 +1,5 @@
+// all the UI menus and elements stored in a form of GDExt UI system
+
 const bottomMenus = {
     editMenu: {
         properties: {

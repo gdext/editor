@@ -22,6 +22,8 @@ export default {
                 let event = new CustomEvent(targetEvent.eventName, { detail: targetEvent.eventInfo });
                 dispatchEvent(event);
             }
+
+            return false;
         }
 
         window.onkeyup = (e) => {

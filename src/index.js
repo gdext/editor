@@ -16,7 +16,4 @@ window.onload = () => {
     appelems.generateNavbar(document.getElementById('appNavbar'));
     appelems.generateBottom(document.getElementById('appBottom'));
     appelems.generateMain(document.getElementById('appMain'));
-    if(localStorage.getItem('lvlnumber') && localStorage.getItem('lvlnumber') != '-1') {
-        actions.executeAction('load');
-    }
 }

@@ -2,6 +2,9 @@ import propids from '../assets/levelparse/propids.json';
 import settingids from '../assets/levelparse/settingids.json';
 import objects from '../assets/levelparse/objects.json';
 
+// this file contains functions to decode level data from string
+// to GDExt object format and encode it back to string
+
 export default {
     code2object: (code) => {
         //transform level data to array
@@ -15,6 +18,7 @@ export default {
                 // groups and hsv data split
                 if (propids[objSplitted[i]] == 'groups') val = objSplitted[i+1].split('.') 
                 else if (propids[objSplitted[i]] == 'copiedHSV' || propids[objSplitted[i]] == 'hsv1' || propids[objSplitted[i]] == 'hsv2') val = objSplitted[i+1].split('a');
+                console.log(propids[objSplitted[i]], objSplitted[i]);
                 data[propids[objSplitted[i]] || objSplitted[i]] = val;
             }
             //check if trigger, portal, orb, pad or pickup

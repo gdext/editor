@@ -3,6 +3,9 @@ import plist from 'plist';
 import datakeys from '../assets/levelparse/datakeys.json';
 const Buffer = require('buffer/').Buffer;
 
+// this file contains functions to decode the CCLocalLevels.dat file from encrypted xml
+// to json and to encode it back to xml
+
 function plist_parse(data) {
     let val = data.toString();
 

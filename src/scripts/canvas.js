@@ -2,6 +2,8 @@ import {GDRenderer} from './GDRenderW/main';
 import {EditorLevel} from './level';
 let gl, renderer, cvs, options, level;
 
+// this file contains all the high-levels functions to work with the renderer
+// (load level, update screen, move camera, edit stuff, etc.)
 export default {
     init: (canvas) => {
         options = {
@@ -28,6 +30,9 @@ export default {
     },
     setOption: (opt, val) => {
         options[opt] = val;
+    },
+    toggleOption: (opt) => {
+        options[opt] = !options[opt];
     },
     initLevel: (lvl) => {
         level = new EditorLevel(renderer, lvl);

@@ -26,13 +26,19 @@
     {
         "keys": [ 116 ],
         "type": "event",
-        "eventName": "electronApi",
+        "eventName": "action",
         "eventInfo": "reload"
+    },
+    {
+        "keys": [ 114 ],
+        "type": "event",
+        "eventName": "renderer",
+        "eventInfo": "toggleTroubleshoot"
     },
     {
         "keys": [ 17, 82 ],
         "type": "event",
-        "eventName": "electronApi",
+        "eventName": "action",
         "eventInfo": "reload"
     },
     {

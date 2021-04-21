@@ -6,12 +6,17 @@ import util from './util';
 let fs = null;
 if(window.process) fs = window.require('fs');
 
+// gbloab vars:
+// defaultLevel is the default blank level data for when a new level is created
+// gdPath is the path to GD's local levels
+// dateSaved has the last time the level was saved in gdext
 const defaultLevel = 'kS38,1_40_2_125_3_255_4_-1_6_1000_7_1|1_0_2_102_3_255_4_-1_6_1001_7_1|1_0_2_102_3_255_4_-1_6_1009_7_1|1_255_2_255_3_255_4_-1_6_1004_7_1|1_255_2_255_3_255_4_-1_6_1002_7_1|,kA13,0,kA15,0,kA16,0,kA14,,kA6,1,kA7,1,kA17,1,kA18,0,kS39,0,kA2,0,kA3,0,kA8,0,kA4,0,kA9,0,kA10,0,kA11,0';
 let gdPath = '';
 if(window.process) gdPath = window.process.env.LOCALAPPDATA + "\\GeometryDash\\CCLocalLevels.dat";
 
 let dateSaved = null;
 
+// read levels
 function readLocalLevels() {
     if(!fs) return;
     if(!fs.existsSync(gdPath)) return -1; // -1 = gd is not installed
@@ -21,6 +26,7 @@ function readLocalLevels() {
     return ccllJson;
 }
 
+// change levels
 function writeLocalLevels(ccll) {
     if(!fs) return;
     if(!fs.existsSync(gdPath)) return -1; // -1 = gd is not installed
@@ -34,6 +40,8 @@ function checkGDExists() {
     return true;
 }
 
+// this function pops up the unsaved changes dialog if the level has unsaved data
+// and calls the "onConfirm" function with the first argument set to whether the user confirms or not
 function confirmUnsavedChanges(onConfirm) {
     if(util.getUnsavedChanges()) {
         util.confirm(
@@ -46,6 +54,7 @@ function confirmUnsavedChanges(onConfirm) {
     }
 }
 
+// main function for executing actions like saving, loading, etc.
 function executeAction(action) {
     switch(action) {
         case 'load':
@@ -100,6 +109,7 @@ function executeAction(action) {
                 writeLocalLevels(ccll);
                 util.setUnsavedChanges(false);
                 util.showNotif('levelSavedNotif', 'Level Saved!', 4500, 'success');
+                localStorage.setItem('lvlcode', levelTxt);
 
                 dateSaved = new Date();
                 let autosaveTimeLabel = document.querySelector('#autosaveTimeLabel');
@@ -119,7 +129,18 @@ function executeAction(action) {
         case 'exit':
             confirmUnsavedChanges((t) => {
                 if(t) {
+                    window.gdext.isActuallyClosing = true;
                     let event = new CustomEvent('electronApi', { detail: 'quit' });
+                    dispatchEvent(event);
+                } else {
+                    window.gdext.isActuallyClosing = null;
+                }
+            });
+            break;
+        case 'reload':
+            confirmUnsavedChanges((t) => {
+                if(t) {
+                    let event = new CustomEvent('electronApi', { detail: 'reload' });
                     dispatchEvent(event);
                 }
             });
@@ -136,8 +157,12 @@ export default {
         //notify if gd is running
         window.addEventListener('gdRunningStateChange', e => {
             console.log('GD Running State changes to: ', e.detail);
-            if(e.detail && localStorage.getItem(`gdRunningAlertDontShowAgain`) != 'true') {
-                util.alert('gdRunningAlert', 'Seems Like You\'ve Opened GD!', 'For stability reasons, you won\'t be able to save levels in GDExt until you close Geometry Dash', 'Got It', true);     
+            if(localStorage.getItem(`gdRunningAlertDontShowAgain`) != 'true') {
+                if(e.detail) {
+                    util.alert('gdRunningAlert', 'Looks Like You\'ve Opened GD!', 'For stability reasons, you won\'t be able to save levels in GDExt until you close Geometry Dash', 'Got It', true);     
+                } else {
+                    if(document.querySelector('#gdRunningAlert')) util.closeDialog('gdRunningAlert');
+                }
             }
         });
 
@@ -155,8 +180,34 @@ export default {
             let autosaveTimeLabel = document.querySelector('#autosaveTimeLabel');
             if(autosaveTimeLabel) autosaveTimeLabel.innerText = 'Last saved ' + (dateSaved ? util.getTimeDifferenceText(dateSaved) : 'a while back');
         }, 60000);
+
+        //check if level has changed on focus
+        window.addEventListener('focus', () => {
+            if(localStorage.getItem('lvlnumber') && localStorage.getItem('lvlnumber') != '-1') {
+                let level = readLocalLevels()[localStorage.getItem('lvlnumber')];
+                if(level.data != localStorage.getItem('lvlcode')) {
+                    if(document.querySelector('#fileChangedConfirm')) return;
+                    util.confirm(
+                        'fileChangedConfirm', 'The Level Was Modified Externally', 
+                        'Would you like to reload it? (You will lose all of your unsaved data)',
+                        {
+                            buttonYes: 'Yes', buttonNo: 'No', onConfirm: (t) => {
+                                if(t) window.location.reload();
+                                else localStorage.setItem('lvlcode', level.data);
+                            } 
+                        }
+                    );
+                }
+            }
+        });
     },
     executeAction: (action) => {
         executeAction(action);   
+    },
+    getLevelData: (num) => {
+        if(checkGDExists()) { 
+            let ccll = readLocalLevels();
+            return ccll[num];
+        }
     }
 }
