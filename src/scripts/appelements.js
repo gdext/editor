@@ -158,7 +158,15 @@ export default {
         canvas.width = canvasSize.width;
         canvas.height = canvasSize.height;
         canvas.id = "render";
+
+        const top_canvas = document.createElement('canvas');
+
+        top_canvas.width = canvasSize.width;
+        top_canvas.height = canvasSize.height;
+        top_canvas.id = "top-render";
+
         elem.appendChild(canvas);
+        elem.appendChild(top_canvas);
 
         // load level data of the selected level
         let l = localStorage.getItem('lvlcode');
@@ -168,7 +176,7 @@ export default {
         }
 
         // initialize canvas, update it every 5 seconds
-        renderer.init(canvas);
+        renderer.init(canvas, top_canvas);
         renderer.initLevel(levelparse.code2object(l));
         renderer.update(canvas);
         setInterval(() => {
@@ -222,13 +230,13 @@ export default {
                     window.requestAnimationFrame(update);
             }
             update();
-            canvas.onmousemove = (e1) => {
+            top_canvas.onmousemove = (e1) => {
                 eX = e1.offsetX;
                 eY = e1.offsetY;
             }
             
             function stop() {
-                canvas.onmousemove = null;
+                top_canvas.onmousemove = null;
                 window.onmouseup = null;
                 moving = false;
                 window.onmouseout = null;
@@ -259,7 +267,7 @@ export default {
             }
         });
 
-        canvas.onmousedown = (e) => {
+        top_canvas.onmousedown = (e) => {
             if(e.button == 1) {
                 beginScreenPanning();
             } else if (e.button == 0) {
@@ -273,7 +281,7 @@ export default {
         }
 
         // TODO: Replace the text context menu with data from menus.js
-        canvas.oncontextmenu = (e) => {
+        top_canvas.oncontextmenu = (e) => {
             //test context menu
             ui.renderUiObject({
                 properties: {
@@ -329,6 +337,9 @@ export default {
             );
             canvas.width = canvasSize.width;
             canvas.height = canvasSize.height;
+            
+            top_canvas.width = canvasSize.width;
+            top_canvas.height = canvasSize.height;
             renderer.update(canvas);
         }
 
@@ -336,7 +347,7 @@ export default {
         window.addEventListener('resizeCanvas', resizeCanvas);
 
         //on viewport scroll
-        canvas.onwheel = (e) => {
+        top_canvas.onwheel = (e) => {
             let mode = 0;
             let keys = keyboard.getKeys()
             if(keys.includes(16)) mode = 1;

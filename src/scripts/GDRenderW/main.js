@@ -1796,6 +1796,10 @@ export function GDRenderer(gl) {
         }
         monitor.endCategory("Grid rendering");
 
+        /*for (let gl of this.level.info.guidelines) {
+            //this.renderLine(util., true, {r: 1, g: 1, b: 1, a: 1}, 0.7, true);
+        }*/
+
         if (!this.mainT.loaded) {
             monitor.endFrame(false);
             return;

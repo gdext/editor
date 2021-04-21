@@ -333,6 +333,11 @@
     background: #c11b23;
 }
 
+#top-render {
+    position: absolute;
+    left: 0;
+}
+
 @keyframes notifAppear {
     0% {
         transform: translateY(60px);
