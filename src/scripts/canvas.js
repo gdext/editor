@@ -1,17 +1,21 @@
 import {GDRenderer} from './GDRenderW/main';
 import {EditorLevel} from './level';
-let gl, renderer, cvs, options, level;
+import TopCanvas from './topcanvas';
+
+let gl, renderer, cvs, options, level, top, sel;
 
 // this file contains all the high-levels functions to work with the renderer
 // (load level, update screen, move camera, edit stuff, etc.)
 export default {
-    init: (canvas) => {
+    init: (canvas, top_canvas) => {
         options = {
             grid: true
         };
         gl = canvas.getContext("webgl");
         renderer = new GDRenderer(gl);
         cvs = canvas;
+
+        top = new TopCanvas(top_canvas);
     },
     getLevel: () => {
         return level.getLevel();
@@ -24,6 +28,18 @@ export default {
         renderer.camera.x = x;
         renderer.camera.y = y;
         renderer.camera.zoom = z;
+
+        if (sel) {
+            let p1 = renderer.levelToScreenPos(sel.x1, sel.y1);
+            let p2 = renderer.levelToScreenPos(sel.x2, sel.y2);
+
+            top.setSelectionBox({
+                x1: p1.x,
+                y1: p1.y,
+                x2: p2.x,
+                y2: p2.y
+            });
+        }
     },
     getCoords: () => {
         return { x: renderer.camera.x, y: renderer.camera.y, z: renderer.camera.zoom }
@@ -42,6 +58,30 @@ export default {
     },
     screen2LevelCoords: (x, y) => {
         return renderer.screenToLevelPos(x, y);
+    },
+    beginSelectionBox: (x, y) => {
+        let pos = renderer.screenToLevelPos(x, y);
+        sel = {x1: pos.x, y1: pos.y, x2: pos.x, y2: pos.y};
+    },
+    selectTo: (x, y) => {
+        let pos = renderer.screenToLevelPos(x, y);
+
+        sel.x2 = pos.x;
+        sel.y2 = pos.y;
+        
+        let p1 = renderer.levelToScreenPos(sel.x1, sel.y1);
+        let p2 = renderer.levelToScreenPos(sel.x2, sel.y2);
+
+        top.setSelectionBox({
+            x1: p1.x,
+            y1: p1.y,
+            x2: p2.x,
+            y2: p2.y
+        });
+    },
+    closeSelectionBox: () => {
+        sel = null;
+        top.setSelectionBox(sel);
     },
     placeObject: (opt) => {
         if(!level) return;
