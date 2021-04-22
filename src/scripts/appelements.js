@@ -170,15 +170,22 @@ export default {
         elem.appendChild(top_canvas);
 
         // load level data of the selected level
-        let l = localStorage.getItem('lvlcode');
-        if(localStorage.getItem('lvlnumber') && localStorage.getItem('lvlnumber') != '-1') {
-            l = actionsExec.getLevelData(localStorage.getItem('lvlnumber')).data;
-            localStorage.setItem('lvlcode', l);
+        let l = {
+            data: localStorage.getItem('lvlcode'),
+            name: localStorage.getItem('lvlname'),
+            song: localStorage.getItem('lvlsong'),
         }
+        if(localStorage.getItem('lvlnumber') && localStorage.getItem('lvlnumber') != '-1') {
+            l = actionsExec.getLevelData(localStorage.getItem('lvlnumber'));
+            localStorage.setItem('lvlcode', l.data);
+            localStorage.setItem('lvlname', l.name);
+            localStorage.setItem('lvlsong', l.song);
+        }
+        util.updateTitle();
 
         // initialize canvas, update it every 5 seconds
         renderer.init(canvas, top_canvas);
-        renderer.initLevel(levelparse.code2object(l));
+        renderer.initLevel(levelparse.code2object(l.data));
         renderer.update(canvas);
         setInterval(() => {
             renderer.update(canvas);

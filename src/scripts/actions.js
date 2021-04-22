@@ -67,6 +67,8 @@ function executeAction(action) {
                         if(localStorage.getItem('lvlcode') != ccll[0].data) {
                             localStorage.setItem('lvlcode', ccll[0].data);
                             localStorage.setItem('lvlnumber', 0);
+                            localStorage.setItem('lvlname', ccll[0].name);
+                            localStorage.setItem('lvlsong', ccll[0].song);
                             window.location.reload();
                         }
                     }
@@ -90,7 +92,8 @@ function executeAction(action) {
                 if(localStorage.getItem('lvlnumber') == -1) {
                     let newlevel = {
                         kCEK:4,
-                        name: "GDExt Level",
+                        name: localStorage.getItem('lvlname') || "GDExt Level",
+                        song: localStorage.getItem('lvlsong') || 1,
                         data: levelTxt,
                         author: ccll[0].author || '-',
                         k13: true,
@@ -105,6 +108,8 @@ function executeAction(action) {
                     localStorage.setItem('lvlnumber', 0);
                 } else {
                     ccll[parseInt(localStorage.getItem('lvlnumber'))].data = levelTxt;
+                    ccll[parseInt(localStorage.getItem('lvlnumber'))].name = localStorage.getItem('lvlname');
+                    ccll[parseInt(localStorage.getItem('lvlnumber'))].song = localStorage.getItem('lvlsong');
                 } 
                 writeLocalLevels(ccll);
                 util.setUnsavedChanges(false);
@@ -122,6 +127,8 @@ function executeAction(action) {
                 if(t) {
                     localStorage.setItem('lvlcode', defaultLevel);
                     localStorage.setItem('lvlnumber', -1);
+                    localStorage.setItem('lvlname', 'GDExt Level');
+                    localStorage.setItem('lvlsong', 1);
                     window.location.reload();
                 }
             });
@@ -152,7 +159,8 @@ function executeAction(action) {
                 onConfirm: (v) => {
                     console.log(v);
                     if(v) {
-                        alert('Coming soon');
+                        localStorage.setItem('lvlname', v);
+                        util.setUnsavedChanges(true);
                     }
                 }
             });

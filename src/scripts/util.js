@@ -36,6 +36,12 @@ function closeFunc(e) {
     return false;
 }
 
+function updateTitle() {
+    let lvlnum = parseInt(localStorage.getItem('lvlnumber'));
+    let t = `${lvlnum >= 0 ? localStorage.getItem('lvlname') : 'Untitled'}${unsavedChanges ? '*' : ''} - GDExt`
+    document.title = t;
+}
+
 export default {
 
     calcCanvasSize: (ws, ns, bms) => {
@@ -73,6 +79,7 @@ export default {
 
     setUnsavedChanges: (v) => {
         unsavedChanges = v;
+        updateTitle();
     },
 
     getUnsavedChanges: () => {
@@ -367,6 +374,10 @@ export default {
         } else {
             window.open(url);
         }
+    },
+
+    updateTitle: () => {
+       updateTitle();
     }
 
 }
