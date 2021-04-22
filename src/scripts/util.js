@@ -23,6 +23,17 @@ function closeDialog (id) {
             rootelem.parentElement.removeChild(rootelem);
         }
     }, 250);
+    window.removeEventListener('keydown', closeFunc);
+}
+
+let closeFuncId;
+function closeFunc(e) {
+    if(e.keyCode == 27) {
+        closeDialog(closeFuncId);
+        window.removeEventListener('keydown', closeFunc);
+    }
+
+    return false;
 }
 
 export default {
@@ -86,6 +97,9 @@ export default {
             },
             children: content
         }, document.body);
+
+        closeFuncId = id;
+        window.addEventListener('keydown', closeFunc);
     },
 
     closeDialog: (id) => {
@@ -120,6 +134,7 @@ export default {
                             properties: {
                                 type: 'button',
                                 id: id + 'Ok',
+                                focusIndex: 0,
                                 text: button,
                                 primary: true,
                                 onClick: () => {
@@ -148,6 +163,9 @@ export default {
                 }
             });
         ui.renderUiObject(obj, document.body);
+
+        closeFuncId = id;
+        window.addEventListener('keydown', closeFunc);
     },
 
     confirm: (id, title, description, options) => {
@@ -187,6 +205,7 @@ export default {
                                     properties: {
                                         type: 'button',
                                         id: id + 'Ok',
+                                        focusIndex: 0,
                                         text: buttons[0],
                                         primary: true,
                                         onClick: () => {
@@ -199,6 +218,7 @@ export default {
                                     properties: {
                                         type: 'button',
                                         id: id + 'Cancel',
+                                        focusIndex: 1,
                                         text: buttons[1],
                                         onClick: () => {
                                             closeDialog(id);
@@ -212,6 +232,9 @@ export default {
                 }
             ]
         }, document.body);
+
+        closeFuncId = id;
+        window.addEventListener('keydown', closeFunc);
     },
 
     prompt: (id, title, description, options) => {
@@ -223,7 +246,8 @@ export default {
             placeholder: options.placeholder || 'Enter Here',
             defaultValue: options.defaultValue,
             maxlength: options.maxlength || 32,
-            marginBottom: 10
+            marginBottom: 10,
+            focusIndex: 0
         }
         if(options.type == 'number') {
             input = {
@@ -233,7 +257,8 @@ export default {
                 defaultValue: options.defaultValue,
                 min: options.min,
                 max: options.max,
-                marginBottom: 10
+                marginBottom: 10,
+                focusIndex: 0
             }
         }
 
@@ -273,6 +298,7 @@ export default {
                                     properties: {
                                         type: 'button',
                                         id: id + 'Ok',
+                                        focusIndex: 1,
                                         text: buttons[0],
                                         primary: true,
                                         onClick: () => {
@@ -286,6 +312,7 @@ export default {
                                     properties: {
                                         type: 'button',
                                         id: id + 'Cancel',
+                                        focusIndex: 2,
                                         text: buttons[1],
                                         onClick: () => {
                                             closeDialog(id);
@@ -299,6 +326,9 @@ export default {
                 }
             ]
         }, document.body);
+
+        closeFuncId = id;
+        window.addEventListener('keydown', closeFunc);
     },
 
     showNotif: (id, text, time, type) => {
@@ -328,6 +358,15 @@ export default {
         else text = `a while back`;
 
         return text;
+    },
+
+    openUrl: (url) => {
+        if(window.process) {
+            let { shell } = window.require('electron');
+            shell.openExternal(url);
+        } else {
+            window.open(url);
+        }
     }
 
 }

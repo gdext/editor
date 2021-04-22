@@ -87,6 +87,9 @@
 .ui-button:hover {
     background: #444;
 }
+.ui-button:focus {
+    box-shadow: 0 0 0 2px #ffffff77 inset;
+}
 
 .uistretch .ui-button {
     width: 100%;
@@ -327,6 +330,7 @@
 .ui-dialog.closing {
     display: block;
     animation: popOut ease 0.25s;
+    animation-fill-mode: both;
 }
 
 .ui-dialog-bg {

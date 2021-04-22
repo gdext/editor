@@ -156,6 +156,25 @@ function executeAction(action) {
                     }
                 }
             });
+            break;
+        case 'about':
+            util.alert('aboutDialog', 'About GDExt', 'TODO: Add about screen');
+            break;
+        case 'githubissue':
+            util.openUrl('https://github.com/gdext/editor/issues/new/choose');
+            break;
+        case 'githubwiki':
+            util.openUrl('https://github.com/gdext/editor/wiki');
+            break;
+        case 'githubrepo':
+            util.openUrl('https://github.com/gdext/editor');
+            break;
+        case 'gddocs':
+            util.openUrl('http://docs.gdprogra.me/');
+            break;
+        case 'discord':
+            util.openUrl('https://discord.gg/s8hzqyxJKW');
+            break;
     }
 }
 

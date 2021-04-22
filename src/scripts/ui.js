@@ -59,6 +59,13 @@ function UiObject() {
         if(icon && name) button.classList.add('s');
         if(id) button.id = id;
 
+        setTimeout(() => {
+            if(options.focusIndex != null) button.tabIndex = options.focusIndex + 1;
+            if(options.focusIndex == 0) {
+                button.focus();
+            }
+        }, 100);
+
         if(icon) button.appendChild(buttonIcon);
         if(name) button.appendChild(buttonText);
         return button;
@@ -87,6 +94,14 @@ function UiObject() {
         if(options.min) input.min = options.min;
 
         inputContainer.appendChild(input);
+
+        setTimeout(() => {
+            if(options.focusIndex != null) input.tabIndex = options.focusIndex + 1;
+            if(options.focusIndex == 0) {
+                input.focus();
+            }
+        }, 100);
+
         input.onchange = () => {
             //handle min/max
             if(input.value > options.max) input.value = options.max;
