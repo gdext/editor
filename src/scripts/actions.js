@@ -145,6 +145,17 @@ function executeAction(action) {
                 }
             });
             break;
+        case 'renameLevel':
+            util.prompt('renameDialog', 'Rename Level', 'Enter the new name of the level:', {
+                defaultValue: () => { return 'GDExt Level' },
+                maxlength: 20,
+                onConfirm: (v) => {
+                    console.log(v);
+                    if(v) {
+                        alert('Coming soon');
+                    }
+                }
+            });
     }
 }
 

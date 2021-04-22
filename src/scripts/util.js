@@ -159,7 +159,7 @@ export default {
                 type: 'dialog',
                 id: id,
                 title: title,
-                closeButton: true
+                closeButton: false
             },
             children: [
                 {
@@ -203,6 +203,93 @@ export default {
                                         onClick: () => {
                                             closeDialog(id);
                                             if(options.onConfirm) options.onConfirm(false);
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }, document.body);
+    },
+
+    prompt: (id, title, description, options) => {
+        if(!options) return
+        let buttons = [options.buttonYes || 'OK', options.buttonNo || 'Cancel'];
+        let input = {
+            type: 'textInput',
+            id: id + 'Input',
+            placeholder: options.placeholder || 'Enter Here',
+            defaultValue: options.defaultValue,
+            maxlength: options.maxlength || 32,
+            marginBottom: 10
+        }
+        if(options.type == 'number') {
+            input = {
+                type: 'numberInput',
+                id: id + 'Input',
+                placeholder: options.placeholder || 'Enter Here',
+                defaultValue: options.defaultValue,
+                min: options.min,
+                max: options.max,
+                marginBottom: 10
+            }
+        }
+
+        ui.renderUiObject({
+            properties: {
+                type: 'dialog',
+                id: id,
+                title: title,
+                closeButton: false
+            },
+            children: [
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 15,
+                        paddingY: 10,
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                text: description,
+                                align: 'center',
+                                marginBottom: 10,
+                            }
+                        },
+                        {
+                            properties: input
+                        },
+                        {
+                            properties: {
+                                type: 'container',
+                                direction: 'row'
+                            },
+                            children: [
+                                {
+                                    properties: {
+                                        type: 'button',
+                                        id: id + 'Ok',
+                                        text: buttons[0],
+                                        primary: true,
+                                        onClick: () => {
+                                            closeDialog(id);
+                                            let inp = document.querySelector('#' + id + 'Input');
+                                            if(options.onConfirm) options.onConfirm(inp ? inp.value : null);
+                                        }
+                                    }
+                                },
+                                {
+                                    properties: {
+                                        type: 'button',
+                                        id: id + 'Cancel',
+                                        text: buttons[1],
+                                        onClick: () => {
+                                            closeDialog(id);
+                                            if(options.onConfirm) options.onConfirm(null);
                                         }
                                     }
                                 }

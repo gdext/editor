@@ -64,5 +64,11 @@
         "type": "event",
         "eventName": "action",
         "eventInfo": "load"
+    },
+    {
+        "keys": [ 113 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "renameLevel"
     }
 ]

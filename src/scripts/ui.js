@@ -67,7 +67,10 @@ function UiObject() {
     this.createInput = (type, options) => {
         let inputContainer = document.createElement('div');
         inputContainer.classList.add('ui-input');
-        if(options && options.light) checkboxContainer.classList.add('bbg');
+        if(options && options.light) inputContainer.classList.add('bbg');
+
+        if(options && options.marginTop) inputContainer.style.marginTop = options.marginTop + 'px';
+        if(options && options.marginBottom) inputContainer.style.marginBottom = options.marginBottom + 'px';
 
         let input = document.createElement('input');
         input.type = 'text';
