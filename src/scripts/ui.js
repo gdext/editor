@@ -418,6 +418,24 @@ function UiObject() {
         return container;
     }
 
+    this.createCard = (id, title, description, options) => {
+        let card = document.createElement('div');
+        card.classList.add('ui-card');
+        card.id = id;
+
+        let cardTitle = document.createElement('h4');
+        cardTitle.innerText = title;
+        card.appendChild(cardTitle);
+
+        let cardDesc = document.createElement('p');
+        cardDesc.innerText = description;
+        card.appendChild(cardDesc);
+
+        if(options.onClick) card.onclick = options.onClick;
+
+        return card;
+    }
+    
     this.createDialog = (id, title, closeButton) => {
         let dialog = document.createElement('div');
         dialog.classList.add('ui-dialog');
@@ -554,6 +572,10 @@ export default {
                     let containerElement = uiObject.createContainer(p.id, p.title, p.direction, p);
                     elementContainer.appendChild(containerElement);
                     targetElement = containerElement;
+                    break;
+                case 'card':
+                    let cardElement = uiObject.createCard(p.id, p.title, p.description, p);
+                    elementContainer.appendChild(cardElement);
                     break;
                 case 'dialog':
                     let dialogElement = uiObject.createDialog(p.id, p.title, p.closeButton);

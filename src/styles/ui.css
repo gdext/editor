@@ -248,6 +248,29 @@
     width: 100%;
 }
 
+/* card */
+.ui-card {
+    padding: 10px 20px;
+    background: #1b1b1b;
+    margin: 3px 10px;
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,.3);
+    cursor: pointer;
+}
+.ui-card:hover {
+    background: #181818;
+}
+
+.ui-card p {
+    color: #aaa;
+}
+
+.ui-card h4 {
+    font-size: 14px;
+}
+
 /* label */
 .ui-label {
     font-size: 12px;

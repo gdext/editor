@@ -2,6 +2,7 @@ import decodesave from '../scripts/decodesave';
 import levelparse from '../scripts/levelparse';
 import canvas from './canvas';
 import util from './util';
+import songsData from '../assets/levelparse/songs.json';
 
 let fs = null;
 if(window.process) fs = window.require('fs');
@@ -40,6 +41,20 @@ function checkGDExists() {
     return true;
 }
 
+function loadLevel(n, cclll) {
+    let ccll;
+    if(cclll) ccll = cclll;
+    else ccll = readLocalLevels();
+
+    if(localStorage.getItem('lvlcode') != ccll[n].data && n < ccll.length) {
+        localStorage.setItem('lvlcode', ccll[n].data);
+        localStorage.setItem('lvlnumber', n);
+        localStorage.setItem('lvlname', ccll[n].name);
+        localStorage.setItem('lvlsong', ccll[n].song);
+        window.location.reload();
+    }
+}
+
 // this function pops up the unsaved changes dialog if the level has unsaved data
 // and calls the "onConfirm" function with the first argument set to whether the user confirms or not
 function confirmUnsavedChanges(onConfirm) {
@@ -61,16 +76,48 @@ function executeAction(action) {
             confirmUnsavedChanges((t) => {
                 if(t) {
                     if(fs) {
-                        if(!checkGDExists()) util.alert('loadDialog', 'Couldn\'t load!', 'Geometry Dash is not detected on your computer! Make sure you install GD before saving/loading levels.', "OK");
+                        if(!checkGDExists()) {
+                            util.alert('loadDialog', 'Couldn\'t load!', 'Geometry Dash is not detected on your computer! Make sure you install GD before saving/loading levels.', "OK");
+                            return;
+                        }
                         
                         let ccll = readLocalLevels();
-                        if(localStorage.getItem('lvlcode') != ccll[0].data) {
-                            localStorage.setItem('lvlcode', ccll[0].data);
-                            localStorage.setItem('lvlnumber', 0);
-                            localStorage.setItem('lvlname', ccll[0].name);
-                            localStorage.setItem('lvlsong', ccll[0].song);
-                            window.location.reload();
-                        }
+                        let obj = {
+                            properties: {
+                                type: 'container',
+                                id: 'loadDialogLevels',
+                                direction: 'column',
+                                scroll: 'vertical'
+                            },
+                            children: [
+                                
+                            ]
+                        };
+                        let lnum = -1;
+                        ccll.forEach(l => {
+                            lnum++;
+                            let locallnum = lnum;
+                            let song = l.customsong;
+                            if(!song) song = songsData[l.song || 1];
+
+                            let lengths = ['Tiny', 'Short', 'Medium', 'Long', 'XL'];
+                            
+                            let description = `♫ ${song} | ${lengths[l.length || 0]} | ${l.verified ? 'Verified' : 'Unverified'}`;
+
+                            obj.children.push({
+                                properties: {
+                                    type: 'card',
+                                    id: 'loadDialogLevel'+locallnum,
+                                    title: l.name,
+                                    description: description,
+                                    onClick: () => {
+                                        loadLevel(locallnum, ccll);
+                                    }
+                                }
+                            });
+                        });
+
+                        util.createDialog('loadDialog', 'Select a Level to Load', true, [obj]);
                     }
                     else util.alert('loadDialog', 'Couldn\'t load!', 'Reading files is only supported on GDExt desktop!', "OK");
                 } 
@@ -154,7 +201,7 @@ function executeAction(action) {
             break;
         case 'renameLevel':
             util.prompt('renameDialog', 'Rename Level', 'Enter the new name of the level:', {
-                defaultValue: () => { return 'GDExt Level' },
+                defaultValue: () => { return localStorage.getItem('lvlname') },
                 maxlength: 20,
                 onConfirm: (v) => {
                     console.log(v);

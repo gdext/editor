@@ -47,7 +47,6 @@ export default {
     calcCanvasSize: (ws, ns, bms) => {
         let w = ws.width;
         let h = ws.height - ns.height - bms.height;
-        console.log(h);
         return { width: w, height: h }
     },
 
@@ -104,6 +103,11 @@ export default {
             },
             children: content
         }, document.body);
+        let elemContent = document.querySelector('#'+id).querySelector('.ui-element');
+        let maxheight = document.querySelector('#app').getBoundingClientRect().height * 0.6;
+        elemContent.style.marginTop = '10px';
+        if(elemContent.getBoundingClientRect().height > maxheight)
+            elemContent.style.height = maxheight + 'px';
 
         closeFuncId = id;
         window.addEventListener('keydown', closeFunc);

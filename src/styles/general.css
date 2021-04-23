@@ -24,6 +24,16 @@ img {
     user-select: none;
 }
 
+*::-webkit-scrollbar-thumb {
+    width: 100%;
+    background: #676767;
+    border-radius: 5px;
+}
+
+*::-webkit-scrollbar {
+    width: 4px;
+}
+
 /* #3081CC #3C94E4 #1f5f9a - blue */
 /* #1d9a2d - green */
 /* #c1680d - orange */
