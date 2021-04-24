@@ -15,6 +15,7 @@
     height: 100%;
     flex-shrink: 1;
     margin-bottom: -5px;
+    position: relative;
     background: #2b2b2b;
 }
 
@@ -114,6 +115,62 @@
 }
 .menu-options separator:last-child {
     display: none;
+}
+
+.main-canvas-ui {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.canvas-ui-element {
+    pointer-events: all;
+    position: absolute;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.5));
+}
+.canvas-ui-element.t {
+    top: 20px;
+}
+.canvas-ui-element.l {
+    left: 20px;
+}
+.canvas-ui-element.b {
+    bottom: 20px;
+}
+.canvas-ui-element.r {
+    right: 20px;
+}
+.canvas-ui-element.hid {
+    display: none;
+}
+
+.canvas-ui-element .ui-button {
+    margin-right: 5px;
+}
+.canvas-ui-element.r .ui-button {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+
+.canvas-ui-element span {
+    text-align: right;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.canvas-ui-element span img {
+    height: 12px;
+    opacity: 0.5;
+    cursor: pointer;
+    margin-left: 5px;
+}
+.canvas-ui-element span img:hover {
+    opacity: 1;
 }
 
 .navbar-action {
@@ -243,6 +300,7 @@
     display: flex;
     justify-content: space-between;
 }
+
 
 .bottom-tab .tab-categories {
     user-select: none;

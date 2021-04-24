@@ -1,5 +1,8 @@
 // all the UI menus and elements stored in a form of GDExt UI system
 
+import util from './util';
+import quicktoolsData from '../assets/quicktools.json';
+
 const bottomMenus = {
     editMenu: {
         properties: {
@@ -153,10 +156,123 @@ const bottomMenus = {
     }
 }
 
+const canvasMenus = {
+    canvasOptions: {
+        properties: {
+            type: 'container',
+            direction: 'row'
+        },
+        children: [
+            {
+                properties: {
+                    type: 'button',
+                    id: 'levelSettingsBtn',
+                    icon: 'ic-settings.svg',
+                    hint: 'Level Settings',
+                    iconHeight: 20,
+                    width: 40,
+                    height: 40,
+                    primary: true,
+                    onClick: () => {
+                        util.alert('levelSettingsDialog', 'Level Settings', 'are empty rn, sorry :/', 'Æ');
+                    }
+                }
+            },
+            {
+                properties: {
+                    type: 'button',
+                    id: 'levelZoomIn',
+                    icon: 'ic-zoomin.svg',
+                    hint: 'Zoom In',
+                    iconHeight: 20,
+                    width: 40,
+                    height: 40,
+                    primary: false
+                }
+            },
+            {
+                properties: {
+                    type: 'button',
+                    id: 'levelZoomOut',
+                    icon: 'ic-zoomout.svg',
+                    hint: 'Zoom Out',
+                    iconHeight: 20,
+                    width: 40,
+                    height: 40,
+                    primary: false
+                }
+            },
+            {
+                properties: {
+                    type: 'button',
+                    id: 'levelPlaytestBtn',
+                    icon: 'ic-play.svg',
+                    iconHeight: 20,
+                    hint: 'Playtest Level (in Geometry Dash)',
+                    width: 40,
+                    height: 40,
+                    primary: false,
+                    onClick: () => {
+                        alert('not now, MOM');
+                    }
+                }
+            }
+        ]
+    },
+    quickTools: {
+        properties: {
+            type: 'container',
+            isGrid: true,
+            columns: 3
+        },
+        children: [
+            
+        ]
+    }
+}
+
 export default {
 
     getBottomMenus: () => {
         return bottomMenus;
+    },
+
+    getCanvasMenus: () => {
+        return canvasMenus;
+    },
+    
+    getQuickToolsMenu: () => {
+        let obj = canvasMenus.quickTools;
+
+        quicktoolsData.default.forEach(id => {
+            let f = quicktoolsData.actions.filter(a => a.id == id);
+            let props = {};
+            if(id.startsWith('*')) {
+                f = quicktoolsData.actions.filter(a => a.id == id.slice(1));
+                props.locked = true;
+            }
+            let btn = f;
+            if(btn.length > 0) btn = btn[0];
+            else return;
+
+            obj.children.push({
+                properties: {
+                    type: 'button',
+                    icon: btn.icon,
+                    hint: btn.hint,
+                    iconHeight: 20,
+                    width: 40,
+                    height: 40,
+                    primary: false,
+                    onClick: () => {
+                        let event = new CustomEvent(btn.event, { detail: event.detail });
+                        dispatchEvent(event);
+                    }
+                }
+            });
+        });
+
+        return obj;
     }
 
 }

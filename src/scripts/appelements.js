@@ -1,10 +1,14 @@
 import navbarData from '../assets/navbar.json';
 import buildtabData from '../assets/buildtab.json';
+
 import logoSrc from '../assets/logo-mono.svg';
 import icBuild from '../assets/ic-build.svg';
 import icEdit from '../assets/ic-edit.svg';
 import icDelete from '../assets/ic-delete.svg';
 import icMinimize from '../assets/ic-minimize.svg';
+import icInfo from '../assets/ic-info.svg';
+import icClose from '../assets/ic-close.svg';
+
 import ui from './ui';
 import util from './util';
 import renderer from './canvas';
@@ -161,13 +165,64 @@ export default {
         canvas.id = "render";
 
         const top_canvas = document.createElement('canvas');
-
         top_canvas.width = canvasSize.width;
         top_canvas.height = canvasSize.height;
         top_canvas.id = "top-render";
 
+        const canvasUi = document.createElement('div');
+        canvasUi.style.width = canvasSize.width + 'px';
+        canvasUi.style.height = canvasSize.height + 'px';
+        canvasUi.classList.add('main-canvas-ui');
+
+        let canvasUiOptions = document.createElement('div');
+        canvasUiOptions.className = 'canvas-ui-element t l';
+        ui.renderUiObject(menus.getCanvasMenus().canvasOptions, canvasUiOptions);
+        canvasUi.appendChild(canvasUiOptions);
+
+        let canvasUiQuicktools = document.createElement('div');
+        canvasUiQuicktools.className = 'canvas-ui-element t r';
+        if(localStorage.getItem('settings.showQuickTools') == '1') {
+            canvasUiQuicktools.classList.add('hid');
+        }
+
+        let quicktoolsContent = document.createElement('div');
+        ui.renderUiObject(menus.getQuickToolsMenu(), quicktoolsContent);
+        canvasUiQuicktools.appendChild(quicktoolsContent);
+
+        let quicktoolsInfo = document.createElement('span');
+        quicktoolsInfo.innerText = 'Quick Tools |';
+        let quicktoolsIcInfo = document.createElement('img');
+        quicktoolsIcInfo.src = icInfo;
+        quicktoolsIcInfo.onclick = () => {
+            util.alert(
+                'quickToolsInfoDialog', 
+                'Quick Tools', 
+                'Quick Tools provides an easy way to access most used functions.\n' + 
+                'You can organize the quick tools buttons and change their functions.\n' +
+                'You can also close the quick tools panel (can be re-opened in Settings > Editor)\n',
+                'OK'
+            );
+        }
+        let quicktoolsIcClose = document.createElement('img');
+        quicktoolsIcClose.src = icClose;
+        quicktoolsIcClose.onclick = () => {
+            localStorage.setItem('settings.showQuickTools', '1');
+            util.showNotif(
+                'quickToolsCloseNotif',
+                'Quick Tools were closed. If you want to re-open them, go to Settings > Editor',
+                5000
+            )
+            canvasUiQuicktools.classList.add('hid');
+        }
+        quicktoolsInfo.appendChild(quicktoolsIcInfo);
+        quicktoolsInfo.appendChild(quicktoolsIcClose);
+        canvasUiQuicktools.appendChild(quicktoolsInfo);
+        
+        canvasUi.appendChild(canvasUiQuicktools);
+
         elem.appendChild(canvas);
         elem.appendChild(top_canvas);
+        elem.appendChild(canvasUi);
 
         // load level data of the selected level
         let l = {
@@ -284,7 +339,11 @@ export default {
         function beginScreenZooming(e, mode) {
             let coords = renderer.getCoords();
             if(!mode || mode == 0) {
-                coords.z *= 1 - (e.deltaY/1000);
+                if(e.deltaY >= 0) coords.z *= 1 - (e.deltaY/1000);
+                else coords.z /= 1 - (e.deltaY/-1000);
+
+                if(coords.z > 10) coords.z = 10;
+                else if(coords.z < 0.2) coords.z = 0.2;
             } else {
                 let a = ['z', 'x', 'y']
                 let b = a[mode];
@@ -318,6 +377,16 @@ export default {
                 }
             }
         }
+
+        // zoom canvas buttons
+        setTimeout(() => {
+            document.querySelector('#levelZoomIn').onclick = () => {
+                beginScreenZooming({deltaY: -200}, 0);
+            }
+            document.querySelector('#levelZoomOut').onclick = () => {
+                beginScreenZooming({deltaY: 200}, 0);
+            }
+        }, 100);
 
         // TODO: Replace the text context menu with data from menus.js
         top_canvas.oncontextmenu = (e) => {
@@ -379,6 +448,9 @@ export default {
             
             top_canvas.width = canvasSize.width;
             top_canvas.height = canvasSize.height;
+
+            canvasUi.style.width = canvasSize.width + 'px';
+            canvasUi.style.height = canvasSize.height + 'px';
             renderer.update(canvas);
         }
 

@@ -40,14 +40,20 @@ function UiObject() {
 
         let buttonText = document.createElement('span');
         buttonText.innerText = name;
+        if(options.hint) button.title = options.hint;
         let buttonIcon = document.createElement('img');
+        let isize = {w: 0, h: 0}
         import(`../assets/${icon}`).then(({default: i}) => {
             buttonIcon.src = i;
+            let iimg = new Image();
+            iimg.src = i;
+            isize.w = iimg.width;
+            isize.h = iimg.height;
         }).catch(() => {
             console.error('Cannot load asset');
         });
-        buttonIcon.height = options.iconHeight;
-        
+        if(isize.h < isize.w) buttonIcon.width = options.iconHeight;   
+        else buttonIcon.height = options.iconHeight; 
 
         if(options && options.light) button.classList.add('bbg');
         if(options && options.primary) button.classList.add('primary');
@@ -400,8 +406,20 @@ function UiObject() {
         let container = document.createElement('div');
         container.classList.add('ui-container');
         if(id) container.id = id;
-        let directions = {row: 'r', column: 'c', inline: 'i'};
-        container.classList.add(directions[direction] || 'c');
+        if(options.isGrid) {
+            container.classList.add('grid');
+            if(options.columns) {
+                container.style.columnCount = options.columns;
+                let s = '';
+                for(let i = 0; i < parseInt(options.columns); i++) {
+                    s+='auto ';
+                }
+                container.style.gridTemplateColumns = s;
+            }
+        } else {
+            let directions = {row: 'r', column: 'c', inline: 'i'};
+            container.classList.add(directions[direction] || 'c');
+        }
         container.style.padding = `${options.paddingY}px ${options.paddingX}px`;
         let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
         if(options.scroll) container.classList.add(scrolls[options.scroll]);
