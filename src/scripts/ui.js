@@ -40,6 +40,10 @@ function UiObject() {
 
         let buttonText = document.createElement('span');
         buttonText.innerText = name;
+        if(options.textStyle) {
+            if(options.textStyle == 'bold') buttonText.style.fontWeight = 600;
+            else if(options.textStyle == 'italic') buttonText.style.fontStyle = 'italic';
+        }
         if(options.hint) button.title = options.hint;
         let buttonIcon = document.createElement('img');
         let isize = {w: 0, h: 0}

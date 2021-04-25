@@ -1,6 +1,8 @@
 // all the UI menus and elements stored in a form of GDExt UI system
 
 import util from './util';
+import canvas from './canvas';
+import levelparse from './levelparse';
 import quicktoolsData from '../assets/quicktools.json';
 
 const bottomMenus = {
@@ -149,6 +151,167 @@ const bottomMenus = {
                                 }
                             },
                         ]
+                    },
+                    {
+                        properties: {
+                            type: 'container',
+                            isGrid: true,
+                            id: 'editTransformTools',
+                            columns: 3,
+                        },
+                        children: [
+                            {
+                                properties: {
+                                    type: 'button',
+                                    id: 'editRotate90CCW',
+                                    icon: 'ic-rotateccw.svg',
+                                    hint: 'Rotate 90 CCW',
+                                    iconHeight: 20,
+                                    width: 40,
+                                    height: 40,
+                                    primary: false,
+                                    onClick: () => {
+                                        alert('test');
+                                        //let event = new CustomEvent('ed', { detail: event.detail });
+                                        //dispatchEvent(event);
+                                    }
+                                }
+                            },
+                            {
+                                properties: {
+                                    type: 'button',
+                                    id: 'editMoveUp',
+                                    icon: 'ic-moveup.svg',
+                                    hint: 'Move Up',
+                                    iconHeight: 20,
+                                    width: 40,
+                                    height: 40,
+                                    primary: false,
+                                    onClick: () => {
+                                        alert('test');
+                                        //let event = new CustomEvent('ed', { detail: event.detail });
+                                        //dispatchEvent(event);
+                                    }
+                                }
+                            },
+                            {
+                                properties: {
+                                    type: 'button',
+                                    id: 'editRotate90CW',
+                                    icon: 'ic-rotatecw.svg',
+                                    hint: 'Rotate 90 CW',
+                                    iconHeight: 20,
+                                    width: 40,
+                                    height: 40,
+                                    primary: false,
+                                    onClick: () => {
+                                        alert('test');
+                                        //let event = new CustomEvent('ed', { detail: event.detail });
+                                        //dispatchEvent(event);
+                                    }
+                                }
+                            },
+                            {
+                                properties: {
+                                    type: 'button',
+                                    id: 'editMoveLeft',
+                                    icon: 'ic-moveleft.svg',
+                                    hint: 'Move Left',
+                                    iconHeight: 20,
+                                    width: 40,
+                                    height: 40,
+                                    primary: false,
+                                    onClick: () => {
+                                        alert('test');
+                                        //let event = new CustomEvent('ed', { detail: event.detail });
+                                        //dispatchEvent(event);
+                                    }
+                                }
+                            },
+                            {
+                                properties: {
+                                    type: 'button',
+                                    id: 'editChangeScale',
+                                    text: '1/15',
+                                    textStyle: 'bold',
+                                    hint: 'Change Move Scale',
+                                    width: 40,
+                                    height: 40,
+                                    primary: false,
+                                    onClick: () => {
+                                        document.querySelector('#editChangeScale').querySelector('span').innerText = '1/30';
+                                    }
+                                }
+                            },
+                            {
+                                properties: {
+                                    type: 'button',
+                                    id: 'editMoveRight',
+                                    icon: 'ic-moveright.svg',
+                                    hint: 'Move Right',
+                                    iconHeight: 20,
+                                    width: 40,
+                                    height: 40,
+                                    primary: false,
+                                    onClick: () => {
+                                        alert('test');
+                                        //let event = new CustomEvent('ed', { detail: event.detail });
+                                        //dispatchEvent(event);
+                                    }
+                                }
+                            },
+                            {
+                                properties: {
+                                    type: 'button',
+                                    id: 'editFlipV',
+                                    icon: 'ic-flipv.svg',
+                                    hint: 'Move Vertically',
+                                    iconHeight: 20,
+                                    width: 40,
+                                    height: 40,
+                                    primary: false,
+                                    onClick: () => {
+                                        alert('test');
+                                        //let event = new CustomEvent('ed', { detail: event.detail });
+                                        //dispatchEvent(event);
+                                    }
+                                }
+                            },
+                            {
+                                properties: {
+                                    type: 'button',
+                                    id: 'editMoveDown',
+                                    icon: 'ic-movedown.svg',
+                                    hint: 'Move Down',
+                                    iconHeight: 20,
+                                    width: 40,
+                                    height: 40,
+                                    primary: false,
+                                    onClick: () => {
+                                        alert('test');
+                                        //let event = new CustomEvent('ed', { detail: event.detail });
+                                        //dispatchEvent(event);
+                                    }
+                                }
+                            },
+                            {
+                                properties: {
+                                    type: 'button',
+                                    id: 'editFlipH',
+                                    icon: 'ic-fliph.svg',
+                                    hint: 'Flip Horizontally',
+                                    iconHeight: 20,
+                                    width: 40,
+                                    height: 40,
+                                    primary: false,
+                                    onClick: () => {
+                                        alert('test');
+                                        //let event = new CustomEvent('ed', { detail: event.detail });
+                                        //dispatchEvent(event);
+                                    }
+                                }
+                            },
+                        ]
                     }
                 ]
             }
@@ -213,7 +376,16 @@ const canvasMenus = {
                     height: 40,
                     primary: false,
                     onClick: () => {
-                        alert('not now, MOM');
+                        let levelObj = canvas.getLevel();
+                        let levelTxt = levelparse.object2code(levelObj);
+                        let event = new CustomEvent('electronApi', { 
+                            detail: {
+                                detail: 'loadLevel',
+                                name: localStorage.getItem('lvlname'),
+                                data: levelTxt
+                            }
+                        });
+                        dispatchEvent(event);
                     }
                 }
             }

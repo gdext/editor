@@ -3,6 +3,7 @@
     position: relative;
     font-size: 12px;
     display: flex;
+    align-items: flex-end;
 }
 .uistretch .ui-element {
     width: 100%;
@@ -12,6 +13,9 @@
 }
 .ui-container.r .ui-element:last-child {
     margin-right: 0;
+}
+.ui-dialog .ui-element {
+    align-items: unset;
 }
 
 /* checkbox */
