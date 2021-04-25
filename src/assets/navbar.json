@@ -26,11 +26,8 @@
                     { "name": "Redo", "id": "redo" }
                 ],
                 [
-                    { "name": "Rename Level", "id": "rename" },
+                    { "name": "Rename Level", "id": "renameLevel" },
                     { "name": "Level Settings", "id": "lvlsettings" }
-                ],
-                [
-                    { "name": "About", "id": "about" }
                 ]
             ]
         },
@@ -62,6 +59,23 @@
                     { "name": "Editor", "id": "settings3" },
                     { "name": "Flags", "id": "settings4" },
                     { "name": "Shortcuts", "id": "settings5" }
+                ]
+            ]
+        },
+        {
+            "title": "Help",
+            "options": [
+                [
+                    { "name": "About", "id": "about" }
+                ],
+                [
+                    { "name": "Report a Bug", "id": "githubissue" },
+                    { "name": "GDExt Wiki", "id": "githubwiki" },
+                    { "name": "Contribute!", "id": "githubrepo" }
+                ],
+                [
+                    { "name": "GD Docs", "id": "gddocs" },
+                    { "name": "Discord Server", "id": "discord" }
                 ]
             ]
         }

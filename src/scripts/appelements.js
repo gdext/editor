@@ -1,10 +1,14 @@
 import navbarData from '../assets/navbar.json';
 import buildtabData from '../assets/buildtab.json';
+
 import logoSrc from '../assets/logo-mono.svg';
 import icBuild from '../assets/ic-build.svg';
 import icEdit from '../assets/ic-edit.svg';
 import icDelete from '../assets/ic-delete.svg';
 import icMinimize from '../assets/ic-minimize.svg';
+import icInfo from '../assets/ic-info.svg';
+import icClose from '../assets/ic-close.svg';
+
 import ui from './ui';
 import util from './util';
 import renderer from './canvas';
@@ -14,6 +18,7 @@ import keyboard from './keyboard';
 import menus from './menus';
 
 let buildSelection = 1;
+let selectedTab = 0; // 0 - build, 1 - edit, 2 - delete
 
 export default {
     generateNavbar: (navbar) => {
@@ -160,24 +165,82 @@ export default {
         canvas.id = "render";
 
         const top_canvas = document.createElement('canvas');
-
         top_canvas.width = canvasSize.width;
         top_canvas.height = canvasSize.height;
         top_canvas.id = "top-render";
 
+        const canvasUi = document.createElement('div');
+        canvasUi.style.width = canvasSize.width + 'px';
+        canvasUi.style.height = canvasSize.height + 'px';
+        canvasUi.classList.add('main-canvas-ui');
+
+        let canvasUiOptions = document.createElement('div');
+        canvasUiOptions.className = 'canvas-ui-element t l';
+        ui.renderUiObject(menus.getCanvasMenus().canvasOptions, canvasUiOptions);
+        canvasUi.appendChild(canvasUiOptions);
+
+        let canvasUiQuicktools = document.createElement('div');
+        canvasUiQuicktools.className = 'canvas-ui-element t r';
+        if(localStorage.getItem('settings.showQuickTools') == '1') {
+            canvasUiQuicktools.classList.add('hid');
+        }
+
+        let quicktoolsContent = document.createElement('div');
+        ui.renderUiObject(menus.getQuickToolsMenu(), quicktoolsContent);
+        canvasUiQuicktools.appendChild(quicktoolsContent);
+
+        let quicktoolsInfo = document.createElement('span');
+        quicktoolsInfo.innerText = 'Quick Tools |';
+        let quicktoolsIcInfo = document.createElement('img');
+        quicktoolsIcInfo.src = icInfo;
+        quicktoolsIcInfo.onclick = () => {
+            util.alert(
+                'quickToolsInfoDialog', 
+                'Quick Tools', 
+                'Quick Tools provides an easy way to access most used functions.\n' + 
+                'You can organize the quick tools buttons and change their functions.\n' +
+                'You can also close the quick tools panel (can be re-opened in Settings > Editor)\n',
+                'OK'
+            );
+        }
+        let quicktoolsIcClose = document.createElement('img');
+        quicktoolsIcClose.src = icClose;
+        quicktoolsIcClose.onclick = () => {
+            localStorage.setItem('settings.showQuickTools', '1');
+            util.showNotif(
+                'quickToolsCloseNotif',
+                'Quick Tools were closed. If you want to re-open them, go to Settings > Editor',
+                5000
+            )
+            canvasUiQuicktools.classList.add('hid');
+        }
+        quicktoolsInfo.appendChild(quicktoolsIcInfo);
+        quicktoolsInfo.appendChild(quicktoolsIcClose);
+        canvasUiQuicktools.appendChild(quicktoolsInfo);
+        
+        canvasUi.appendChild(canvasUiQuicktools);
+
         elem.appendChild(canvas);
         elem.appendChild(top_canvas);
+        elem.appendChild(canvasUi);
 
         // load level data of the selected level
-        let l = localStorage.getItem('lvlcode');
-        if(localStorage.getItem('lvlnumber') && localStorage.getItem('lvlnumber') != '-1') {
-            l = actionsExec.getLevelData(localStorage.getItem('lvlnumber')).data;
-            localStorage.setItem('lvlcode', l);
+        let l = {
+            data: localStorage.getItem('lvlcode'),
+            name: localStorage.getItem('lvlname'),
+            song: localStorage.getItem('lvlsong'),
         }
+        if(localStorage.getItem('lvlnumber') && localStorage.getItem('lvlnumber') != '-1') {
+            l = actionsExec.getLevelData(localStorage.getItem('lvlnumber'));
+            localStorage.setItem('lvlcode', l.data);
+            localStorage.setItem('lvlname', l.name);
+            localStorage.setItem('lvlsong', l.song);
+        }
+        util.updateTitle();
 
         // initialize canvas, update it every 5 seconds
         renderer.init(canvas, top_canvas);
-        renderer.initLevel(levelparse.code2object(l));
+        renderer.initLevel(levelparse.code2object(l.data));
         renderer.update(canvas);
         setInterval(() => {
             renderer.update(canvas);
@@ -230,26 +293,57 @@ export default {
                     window.requestAnimationFrame(update);
             }
             update();
-            top_canvas.onmousemove = (e1) => {
+            top_canvas.onpointermove = (e1) => {
                 eX = e1.offsetX;
                 eY = e1.offsetY;
             }
             
             function stop() {
-                top_canvas.onmousemove = null;
-                window.onmouseup = null;
+                top_canvas.onpointermove = null;
+                window.onpointerup = null;
                 moving = false;
-                window.onmouseout = null;
+                window.onpointerout = null;
                 renderer.update(canvas);
             }
-            window.onmouseup = stop;
-            window.onmouseout = stop;
+            window.onpointerup = stop;
+            window.onpointerout = stop;
+        }
+
+        function beginObjectSelection(e) {
+            let eX = e.offsetX;
+            let eY = e.offsetY;
+            renderer.beginSelectionBox(eX, eY);
+            let moving = true;
+            function update() {
+                renderer.selectTo(eX, eY);
+                if (moving)
+                    window.requestAnimationFrame(update);
+            }
+            update();
+            top_canvas.onpointermove = (e1) => {
+                eX = e1.offsetX;
+                eY = e1.offsetY;
+            }
+            
+            function stop() {
+                top_canvas.onpointermove = null;
+                window.onpointerup = null;
+                moving = false;
+                window.onpointerout = null;
+                renderer.closeSelectionBox();
+            }
+            window.onpointerup = stop;
+            window.onpointerout = stop;
         }
 
         function beginScreenZooming(e, mode) {
             let coords = renderer.getCoords();
             if(!mode || mode == 0) {
-                coords.z *= 1 - (e.deltaY/1000);
+                if(e.deltaY >= 0) coords.z *= 1 - (e.deltaY/1000);
+                else coords.z /= 1 - (e.deltaY/-1000);
+
+                if(coords.z > 10) coords.z = 10;
+                else if(coords.z < 0.2) coords.z = 0.2;
             } else {
                 let a = ['z', 'x', 'y']
                 let b = a[mode];
@@ -270,15 +364,29 @@ export default {
         top_canvas.onmousedown = (e) => {
             if(e.button == 1) {
                 beginScreenPanning();
-            } else if (e.button == 0) {
+            }
+        }
+
+        top_canvas.onpointerdown = (e) => {
+            if(e.button == 0) {
                 if(keyboard.getKeys().includes(32)) {
                     beginScreenPanning();
                 } else {
-                    beginObjectBuilding(e);
+                    if(selectedTab == 0) beginObjectBuilding(e);
+                    else beginObjectSelection(e);
                 }
-                
             }
         }
+
+        // zoom canvas buttons
+        setTimeout(() => {
+            document.querySelector('#levelZoomIn').onclick = () => {
+                beginScreenZooming({deltaY: -200}, 0);
+            }
+            document.querySelector('#levelZoomOut').onclick = () => {
+                beginScreenZooming({deltaY: 200}, 0);
+            }
+        }, 100);
 
         // TODO: Replace the text context menu with data from menus.js
         top_canvas.oncontextmenu = (e) => {
@@ -340,6 +448,9 @@ export default {
             
             top_canvas.width = canvasSize.width;
             top_canvas.height = canvasSize.height;
+
+            canvasUi.style.width = canvasSize.width + 'px';
+            canvasUi.style.height = canvasSize.height + 'px';
             renderer.update(canvas);
         }
 
@@ -364,7 +475,7 @@ export default {
         content.classList.add('bottom-content');
         
         // create tabs and tab contents
-        let tabsContent = [{ icon: icBuild, tab: 'tabBuild' }, { icon: icEdit, tab: 'tabEdit' }, { icon: icDelete, tab: 'tabDelete' }];
+        let tabsContent = [{ icon: icBuild, tab: 'tabBuild', id: 0 }, { icon: icEdit, tab: 'tabEdit', id: 1 }, { icon: icDelete, tab: 'tabDelete', id: 2 }];
         tabsContent.forEach(t => {
             // generate tab button selector
             let tabButton = document.createElement('div');
@@ -376,6 +487,7 @@ export default {
             tabButton.onclick = () => {
                 tabsContent.forEach(nt => { document.getElementById(nt.tab).classList.remove('sel') });
                 document.getElementById(t.tab).classList.add('sel');
+                selectedTab = t.id;
                 let tabSelectors = Object.values(document.getElementsByClassName('tab-selector'));
                 tabSelectors.forEach(ts => { ts.classList.remove('sel') });
                 tabButton.classList.add('sel');

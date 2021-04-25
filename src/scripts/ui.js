@@ -40,14 +40,24 @@ function UiObject() {
 
         let buttonText = document.createElement('span');
         buttonText.innerText = name;
+        if(options.textStyle) {
+            if(options.textStyle == 'bold') buttonText.style.fontWeight = 600;
+            else if(options.textStyle == 'italic') buttonText.style.fontStyle = 'italic';
+        }
+        if(options.hint) button.title = options.hint;
         let buttonIcon = document.createElement('img');
+        let isize = {w: 0, h: 0}
         import(`../assets/${icon}`).then(({default: i}) => {
             buttonIcon.src = i;
+            let iimg = new Image();
+            iimg.src = i;
+            isize.w = iimg.width;
+            isize.h = iimg.height;
         }).catch(() => {
             console.error('Cannot load asset');
         });
-        buttonIcon.height = options.iconHeight;
-        
+        if(isize.h < isize.w) buttonIcon.width = options.iconHeight;   
+        else buttonIcon.height = options.iconHeight; 
 
         if(options && options.light) button.classList.add('bbg');
         if(options && options.primary) button.classList.add('primary');
@@ -59,6 +69,13 @@ function UiObject() {
         if(icon && name) button.classList.add('s');
         if(id) button.id = id;
 
+        setTimeout(() => {
+            if(options.focusIndex != null) button.tabIndex = options.focusIndex + 1;
+            if(options.focusIndex == 0) {
+                button.focus();
+            }
+        }, 100);
+
         if(icon) button.appendChild(buttonIcon);
         if(name) button.appendChild(buttonText);
         return button;
@@ -67,7 +84,10 @@ function UiObject() {
     this.createInput = (type, options) => {
         let inputContainer = document.createElement('div');
         inputContainer.classList.add('ui-input');
-        if(options && options.light) checkboxContainer.classList.add('bbg');
+        if(options && options.light) inputContainer.classList.add('bbg');
+
+        if(options && options.marginTop) inputContainer.style.marginTop = options.marginTop + 'px';
+        if(options && options.marginBottom) inputContainer.style.marginBottom = options.marginBottom + 'px';
 
         let input = document.createElement('input');
         input.type = 'text';
@@ -84,6 +104,14 @@ function UiObject() {
         if(options.min) input.min = options.min;
 
         inputContainer.appendChild(input);
+
+        setTimeout(() => {
+            if(options.focusIndex != null) input.tabIndex = options.focusIndex + 1;
+            if(options.focusIndex == 0) {
+                input.focus();
+            }
+        }, 100);
+
         input.onchange = () => {
             //handle min/max
             if(input.value > options.max) input.value = options.max;
@@ -382,8 +410,20 @@ function UiObject() {
         let container = document.createElement('div');
         container.classList.add('ui-container');
         if(id) container.id = id;
-        let directions = {row: 'r', column: 'c', inline: 'i'};
-        container.classList.add(directions[direction] || 'c');
+        if(options.isGrid) {
+            container.classList.add('grid');
+            if(options.columns) {
+                container.style.columnCount = options.columns;
+                let s = '';
+                for(let i = 0; i < parseInt(options.columns); i++) {
+                    s+='auto ';
+                }
+                container.style.gridTemplateColumns = s;
+            }
+        } else {
+            let directions = {row: 'r', column: 'c', inline: 'i'};
+            container.classList.add(directions[direction] || 'c');
+        }
         container.style.padding = `${options.paddingY}px ${options.paddingX}px`;
         let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
         if(options.scroll) container.classList.add(scrolls[options.scroll]);
@@ -400,6 +440,24 @@ function UiObject() {
         return container;
     }
 
+    this.createCard = (id, title, description, options) => {
+        let card = document.createElement('div');
+        card.classList.add('ui-card');
+        card.id = id;
+
+        let cardTitle = document.createElement('h4');
+        cardTitle.innerText = title;
+        card.appendChild(cardTitle);
+
+        let cardDesc = document.createElement('p');
+        cardDesc.innerText = description;
+        card.appendChild(cardDesc);
+
+        if(options.onClick) card.onclick = options.onClick;
+
+        return card;
+    }
+    
     this.createDialog = (id, title, closeButton) => {
         let dialog = document.createElement('div');
         dialog.classList.add('ui-dialog');
@@ -536,6 +594,10 @@ export default {
                     let containerElement = uiObject.createContainer(p.id, p.title, p.direction, p);
                     elementContainer.appendChild(containerElement);
                     targetElement = containerElement;
+                    break;
+                case 'card':
+                    let cardElement = uiObject.createCard(p.id, p.title, p.description, p);
+                    elementContainer.appendChild(cardElement);
                     break;
                 case 'dialog':
                     let dialogElement = uiObject.createDialog(p.id, p.title, p.closeButton);

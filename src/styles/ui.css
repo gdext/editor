@@ -3,6 +3,7 @@
     position: relative;
     font-size: 12px;
     display: flex;
+    align-items: flex-end;
 }
 .uistretch .ui-element {
     width: 100%;
@@ -12,6 +13,9 @@
 }
 .ui-container.r .ui-element:last-child {
     margin-right: 0;
+}
+.ui-dialog .ui-element {
+    align-items: unset;
 }
 
 /* checkbox */
@@ -86,6 +90,9 @@
 }
 .ui-button:hover {
     background: #444;
+}
+.ui-button:focus {
+    box-shadow: 0 0 0 2px #ffffff77 inset;
 }
 
 .uistretch .ui-button {
@@ -245,6 +252,29 @@
     width: 100%;
 }
 
+/* card */
+.ui-card {
+    padding: 10px 20px;
+    background: #1b1b1b;
+    margin: 3px 10px;
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,.3);
+    cursor: pointer;
+}
+.ui-card:hover {
+    background: #181818;
+}
+
+.ui-card p {
+    color: #aaa;
+}
+
+.ui-card h4 {
+    font-size: 14px;
+}
+
 /* label */
 .ui-label {
     font-size: 12px;
@@ -292,6 +322,12 @@
     display: block;
 }
 
+.ui-container.grid {
+    display: grid;
+    row-gap: 10px;
+    column-gap: 5px;
+}
+
 .ui-container.sh {
     overflow-x: auto;
 }
@@ -327,6 +363,7 @@
 .ui-dialog.closing {
     display: block;
     animation: popOut ease 0.25s;
+    animation-fill-mode: both;
 }
 
 .ui-dialog-bg {

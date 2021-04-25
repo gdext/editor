@@ -23,6 +23,23 @@ function closeDialog (id) {
             rootelem.parentElement.removeChild(rootelem);
         }
     }, 250);
+    window.removeEventListener('keydown', closeFunc);
+}
+
+let closeFuncId;
+function closeFunc(e) {
+    if(e.keyCode == 27) {
+        closeDialog(closeFuncId);
+        window.removeEventListener('keydown', closeFunc);
+    }
+
+    return false;
+}
+
+function updateTitle() {
+    let lvlnum = parseInt(localStorage.getItem('lvlnumber'));
+    let t = `${lvlnum >= 0 ? localStorage.getItem('lvlname') : 'Untitled'}${unsavedChanges ? '*' : ''} - GDExt`
+    document.title = t;
 }
 
 export default {
@@ -30,7 +47,6 @@ export default {
     calcCanvasSize: (ws, ns, bms) => {
         let w = ws.width;
         let h = ws.height - ns.height - bms.height;
-        console.log(h);
         return { width: w, height: h }
     },
 
@@ -62,6 +78,7 @@ export default {
 
     setUnsavedChanges: (v) => {
         unsavedChanges = v;
+        updateTitle();
     },
 
     getUnsavedChanges: () => {
@@ -86,6 +103,14 @@ export default {
             },
             children: content
         }, document.body);
+        let elemContent = document.querySelector('#'+id).querySelector('.ui-element');
+        let maxheight = document.querySelector('#app').getBoundingClientRect().height * 0.6;
+        elemContent.style.marginTop = '10px';
+        if(elemContent.getBoundingClientRect().height > maxheight)
+            elemContent.style.height = maxheight + 'px';
+
+        closeFuncId = id;
+        window.addEventListener('keydown', closeFunc);
     },
 
     closeDialog: (id) => {
@@ -120,6 +145,7 @@ export default {
                             properties: {
                                 type: 'button',
                                 id: id + 'Ok',
+                                focusIndex: 0,
                                 text: button,
                                 primary: true,
                                 onClick: () => {
@@ -148,6 +174,9 @@ export default {
                 }
             });
         ui.renderUiObject(obj, document.body);
+
+        closeFuncId = id;
+        window.addEventListener('keydown', closeFunc);
     },
 
     confirm: (id, title, description, options) => {
@@ -159,7 +188,7 @@ export default {
                 type: 'dialog',
                 id: id,
                 title: title,
-                closeButton: true
+                closeButton: false
             },
             children: [
                 {
@@ -187,6 +216,7 @@ export default {
                                     properties: {
                                         type: 'button',
                                         id: id + 'Ok',
+                                        focusIndex: 0,
                                         text: buttons[0],
                                         primary: true,
                                         onClick: () => {
@@ -199,6 +229,7 @@ export default {
                                     properties: {
                                         type: 'button',
                                         id: id + 'Cancel',
+                                        focusIndex: 1,
                                         text: buttons[1],
                                         onClick: () => {
                                             closeDialog(id);
@@ -212,6 +243,103 @@ export default {
                 }
             ]
         }, document.body);
+
+        closeFuncId = id;
+        window.addEventListener('keydown', closeFunc);
+    },
+
+    prompt: (id, title, description, options) => {
+        if(!options) return
+        let buttons = [options.buttonYes || 'OK', options.buttonNo || 'Cancel'];
+        let input = {
+            type: 'textInput',
+            id: id + 'Input',
+            placeholder: options.placeholder || 'Enter Here',
+            defaultValue: options.defaultValue,
+            maxlength: options.maxlength || 32,
+            marginBottom: 10,
+            focusIndex: 0
+        }
+        if(options.type == 'number') {
+            input = {
+                type: 'numberInput',
+                id: id + 'Input',
+                placeholder: options.placeholder || 'Enter Here',
+                defaultValue: options.defaultValue,
+                min: options.min,
+                max: options.max,
+                marginBottom: 10,
+                focusIndex: 0
+            }
+        }
+
+        ui.renderUiObject({
+            properties: {
+                type: 'dialog',
+                id: id,
+                title: title,
+                closeButton: false
+            },
+            children: [
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 15,
+                        paddingY: 10,
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                text: description,
+                                align: 'center',
+                                marginBottom: 10,
+                            }
+                        },
+                        {
+                            properties: input
+                        },
+                        {
+                            properties: {
+                                type: 'container',
+                                direction: 'row'
+                            },
+                            children: [
+                                {
+                                    properties: {
+                                        type: 'button',
+                                        id: id + 'Ok',
+                                        focusIndex: 1,
+                                        text: buttons[0],
+                                        primary: true,
+                                        onClick: () => {
+                                            closeDialog(id);
+                                            let inp = document.querySelector('#' + id + 'Input');
+                                            if(options.onConfirm) options.onConfirm(inp ? inp.value : null);
+                                        }
+                                    }
+                                },
+                                {
+                                    properties: {
+                                        type: 'button',
+                                        id: id + 'Cancel',
+                                        focusIndex: 2,
+                                        text: buttons[1],
+                                        onClick: () => {
+                                            closeDialog(id);
+                                            if(options.onConfirm) options.onConfirm(null);
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }, document.body);
+
+        closeFuncId = id;
+        window.addEventListener('keydown', closeFunc);
     },
 
     showNotif: (id, text, time, type) => {
@@ -241,6 +369,19 @@ export default {
         else text = `a while back`;
 
         return text;
+    },
+
+    openUrl: (url) => {
+        if(window.process) {
+            let { shell } = window.require('electron');
+            shell.openExternal(url);
+        } else {
+            window.open(url);
+        }
+    },
+
+    updateTitle: () => {
+       updateTitle();
     }
 
 }

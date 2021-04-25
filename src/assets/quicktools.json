@@ -1,0 +1,130 @@
+{
+    "default": [
+        "copy", "paste", "cut",
+        "duplicate", "delete", "deselect",
+        "editobj", "editgrp", "editspc",
+        "link", "unlink", "*organize"
+    ],
+    "actions": [
+        {
+            "id": "copy",
+            "icon": "ic-copy.svg",
+            "hint": "Copy Selected to Clipboard",
+            "event": "editor",
+            "detail": "copy",
+            "enabledCondition": [
+                "objSelected"
+            ]
+        },
+        {
+            "id": "paste",
+            "icon": "ic-paste.svg",
+            "hint": "Paste from Clipboard",
+            "event": "editor",
+            "detail": "paste",
+            "enabledCondition": [
+                "clipboard"
+            ]
+        },
+        {
+            "id": "cut",
+            "icon": "ic-cut.svg",
+            "hint": "Cut Selected (Copy & Delete)",
+            "event": "editor",
+            "detail": "cut",
+            "enabledCondition": [
+                "objSelected"
+            ]
+        },
+        {
+            "id": "duplicate",
+            "icon": "ic-duplicate.svg",
+            "hint": "Duplicate Selected",
+            "event": "editor",
+            "detail": "duplicate",
+            "enabledCondition": [
+                "objSelected"
+            ]
+        },
+        {
+            "id": "delete",
+            "icon": "ic-delete2.svg",
+            "hint": "Delete Selected",
+            "event": "editor",
+            "detail": "delete",
+            "enabledCondition": [
+                "objSelected"
+            ]
+        },
+        {
+            "id": "deselect",
+            "icon": "ic-deselect.svg",
+            "hint": "Deselect",
+            "event": "editor",
+            "detail": "deselect",
+            "enabledCondition": [
+                "objSelected"
+            ]
+        },
+        {
+            "id": "editobj",
+            "icon": "ic-editobj.svg",
+            "hint": "Edit Object",
+            "event": "editor",
+            "detail": "editobj",
+            "enabledCondition": [
+                "objSelected"
+            ]
+        },
+        {
+            "id": "editgrp",
+            "icon": "ic-editgrp.svg",
+            "hint": "Edit Group",
+            "event": "editor",
+            "detail": "editgrp",
+            "enabledCondition": [
+                "objSelected"
+            ]
+        },
+        {
+            "id": "editspc",
+            "icon": "ic-editspc.svg",
+            "hint": "Edit Special",
+            "event": "editor",
+            "detail": "editspc",
+            "enabledCondition": [
+                "objSelected", "&&", "isInGroup", "spcobjs"
+            ]
+        },
+        {
+            "id": "link",
+            "icon": "ic-link.svg",
+            "hint": "Link Selected",
+            "event": "editor",
+            "detail": "link",
+            "enabledCondition": [
+                "objSelected", "&&", "hasUnlinkedObjs"
+            ]
+        },
+        {
+            "id": "unlink",
+            "icon": "ic-unlink.svg",
+            "hint": "Unlink Selected",
+            "event": "editor",
+            "detail": "unlink",
+            "enabledCondition": [
+                "objSelected", "&&", "hasLinkedObjs"
+            ]
+        },
+        {
+            "id": "organize",
+            "icon": "ic-organize.svg",
+            "hint": "Organize Quick Tools",
+            "event": "action",
+            "detail": "organizeQuickTools",
+            "enabledCondition": [
+                true
+            ]
+        }
+    ]
+}
