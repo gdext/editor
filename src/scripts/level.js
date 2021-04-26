@@ -195,9 +195,8 @@ export function EditorLevel(renderer, level) {
         utilscript.setUnsavedChanges(true);
     }
 
-    this.isInObject = function(key, x, y) {
-        let obj = this.getObject(key);
-        let def = renderer.objectDefs[obj.id];
+    this.getObjectRect = function(id, scale) {
+        let def = renderer.objectDefs[id];
 
         if (!def)
             return;
@@ -216,42 +215,68 @@ export function EditorLevel(renderer, level) {
         if (!texture)
             return;
 
-        let width  = texture.w / 62 * 30;
-        let height = texture.h / 62 * 30;
+        let width  = texture.w / 62 * 30 * scale;
+        let height = texture.h / 62 * 30 * scale;
 
-        let left  = parseFloat(obj.x) - width/2;
-        let right = parseFloat(obj.x) + width/2;
-        let top   = parseFloat(obj.y) + height/2;
-        let bot   = parseFloat(obj.y) - height/2;
+        return {
+            left:   parseFloat(obj.x) - width/2,
+            right:  parseFloat(obj.x) + width/2,
+            top:    parseFloat(obj.y) + height/2,
+            bottom: parseFloat(obj.y) - height/2
+        };
+    }
 
-        let bool = (x >= left && x <= right && y <= top && y >= bot);
+    this.isInObject = function(key, x, y) {
+        let obj = this.getObject(key);
+        let r = this.getObjectRect(obj.id, +obj.scale || 1);
 
-        return bool;
+        /* TODO: Support for rotated objects */
+
+        return x >= r.left && x <= r.right && y <= r.top && y >= r.bottom;
+    }
+
+    this.collidesWithObject = function(key, box) {
+        let obj = this.getObject(key);
+        let r = this.getObjectRect(obj.id, +obj.scale || 1);
+
+        return box.right >= r.left && box.left <= r.right &&
+               box.top >= r.bottom && box.bottom <= r.top;
     }
 
     this.getObjectsAt = function(x, y) {
-        let currChunk = getChunk(x);
-        let extChunk;
-
         let objs = [];
 
-        if (currChunk * 992 + 496 > x)
-            extChunk = getChunk(x) - 1;
-        else
-            extChunk = getChunk(x) + 1;
+        let camB = Math.floor( this.cache.camX1 / 992 );
+        let camE = Math.floor( this.cache.camX2 / 992 );
 
-        if (this.level.lchunks[currChunk])
+        for(let c = camB; c < camE; i++)
             for (let i = -4; i < 5; i++)
-                if (i != 0 && this.level.lchunks[currChunk][i])
-                    for (let key of this.level.lchunks[currChunk][i])
+                if (i != 0 && this.level.lchunks[c][i])
+                    for (let key of this.level.lchunks[c][i])
                         if (this.isInObject(key, x, y))
                             objs.push(key);
 
-        if (this.level.lchunks[extChunk])
+        return objs;
+    }
+
+    this.getObjectsIn = function(rect) {
+        let objs = [];
+
+        let camB = Math.floor( this.cache.camX1 / 992 );
+        let camE = Math.floor( this.cache.camX2 / 992 );
+
+        let r = {
+            left:   rect.x,
+            right:  rect.x + rect.w,
+            top:    rect.y,
+            bottom: rect.y + rect.h
+        };
+
+        for(let c = camB; c < camE; i++)
             for (let i = -4; i < 5; i++)
-                if (i != 0 && this.level.lchunks[extChunk][i])
-                    for (let key of this.level.lchunks[extChunk][i])
-                        if (this.isInObject(key, x, y))
+                if (i != 0 && this.level.lchunks[c][i])
+                    for (let key of this.level.lchunks[c][i])
+                        if (this.collidesWithObject(key, r))
                             objs.push(key);
 
         return objs;
