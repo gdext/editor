@@ -54,6 +54,12 @@
         "eventInfo": "save"
     },
     {
+        "keys": [ 16, 17, 83 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "saveas"
+    },
+    {
         "keys": [ 17, 78 ],
         "type": "event",
         "eventName": "action",
