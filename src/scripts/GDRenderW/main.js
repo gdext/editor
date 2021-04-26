@@ -650,6 +650,12 @@ export function GDRenderer(gl) {
         getColor: function(renderer, color) {
             monitor.startCategory("Color calculation");
 
+            if (renderer.current_options.custom_colors) {
+                let cst = renderer.current_options.custom_colors;
+                if (cst[color])
+                    return cst[color];
+            }
+
             if (color == 1005 || color == 1006 || color == 1007) // P1, P2, LBG
                 return {r: 1, g: 1, b: 1, a: 1};
             
@@ -729,6 +735,8 @@ export function GDRenderer(gl) {
 
     // This is the texture of the spritesheet
     this.mainT = new Texture(this.gl, spritesheet);
+
+    this.current_options = {};
 
     /**
      * This takes the data json and creates all the object definitions and also
@@ -948,9 +956,10 @@ export function GDRenderer(gl) {
     /**
      * This will render the given object
      * @param {{}} obj object to be rendered
+     * @param {number} key the key of the object in the object array
      * @returns 
      */
-    this.renderObject = (obj) => {
+    this.renderObject = (obj, key = -1) => {
         var def = this.objectDefs[obj.id];
 
         if (!def && obj.type != "text")
@@ -974,6 +983,14 @@ export function GDRenderer(gl) {
         var slc      = obj.scale || 1;
 
         if (obj._MICHIGUN) maincol = {r: 1, g: 1, b: 1, a: 0.5};
+
+        if (this.current_options.colored_objects) {
+            let cld = this.current_options.colored_objects;
+            if (cld[key]) {
+                maincol = this.cache.getColor(cld[key].base)  || maincol;
+                seccol  = this.cache.getColor(cld[key].decor) || seccol;
+            }
+        }
 
         monitor.startCategory("Object rendering");
         if (obj.type == "text") {
@@ -1189,6 +1206,8 @@ export function GDRenderer(gl) {
         if (!level.level)
             return;
 
+        this.current_options = options || {};
+
         this.level = level.level;
 
         // Starts the monitor
@@ -1275,7 +1294,7 @@ export function GDRenderer(gl) {
                 for (let i = -4; i <= 3; i++)
                     if (i != 0 && chunk[i]) {
                         for (let obj of chunk[i])
-                            this.renderObject(this.level.data[obj]);
+                            this.renderObject(this.level.data[obj], obj);
                     }
             }
 
