@@ -71,6 +71,8 @@ function confirmUnsavedChanges(onConfirm) {
 
 // main function for executing actions like saving, loading, etc.
 function executeAction(action) {
+    let levelObj;
+    let levelTxt;
     switch(action) {
         case 'load':
             confirmUnsavedChanges((t) => {
@@ -80,6 +82,9 @@ function executeAction(action) {
                             util.alert('loadDialog', 'Couldn\'t load!', 'Geometry Dash is not detected on your computer! Make sure you install GD before saving/loading levels.', "OK");
                             return;
                         }
+
+                        let prevdialog = document.querySelector('#loadDialog');
+                        if(prevdialog) return;
                         
                         let ccll = readLocalLevels();
                         let obj = {
@@ -124,8 +129,8 @@ function executeAction(action) {
             });
             break;
         case 'save':
-            let levelObj = canvas.getLevel();
-            let levelTxt = levelparse.object2code(levelObj);
+            levelObj = canvas.getLevel();
+            levelTxt = levelparse.object2code(levelObj);
 
             if(window.gdext && window.gdext.isGdRunning) {
                 util.alert('saveDialog', 'Couldn\'t save!', 'Geometry Dash is currently running! Please close it and try again.', "OK")
@@ -133,7 +138,10 @@ function executeAction(action) {
             }
 
             if(fs) {
-                if(!checkGDExists()) util.alert('saveDialog', 'Couldn\'t save!', 'Geometry Dash is not detected on your computer! Make sure you install GD before saving/loading levels.', "OK");
+                if(!checkGDExists()) {
+                    util.alert('saveDialog', 'Couldn\'t save!', 'Geometry Dash is not detected on your computer! Make sure you install GD before saving/loading levels.', "OK");
+                    return;
+                }
 
                 let ccll = readLocalLevels();
                 if(localStorage.getItem('lvlnumber') == -1) {
@@ -168,6 +176,60 @@ function executeAction(action) {
                 if(autosaveTimeLabel) autosaveTimeLabel.innerText = 'Last saved just now';
             } 
             else util.alert('saveDialog', 'Couldn\'t save!', 'Saving is only supported on GDExt desktop!', "OK");
+            break;
+        case 'saveas':
+            levelObj = canvas.getLevel();
+            levelTxt = levelparse.object2code(levelObj);
+
+            if(window.gdext && window.gdext.isGdRunning) {
+                util.alert('saveDialog', 'Couldn\'t save!', 'Geometry Dash is currently running! Please close it and try again.', "OK")
+                return;
+            }
+
+            if(fs) {
+                if(!checkGDExists()) {
+                    util.alert('saveDialog', 'Couldn\'t save!', 'Geometry Dash is not detected on your computer! Make sure you install GD before saving/loading levels.', "OK");
+                    return;
+                }
+                util.prompt('saveasDialog', 'New Level Name', 'Enter the new name of the copied level:', {
+                    defaultValue: () => { return localStorage.getItem('lvlname') },
+                    maxlength: 20,
+                    onConfirm: (v) => {
+                        if(!v) return;
+                        let levelObj = canvas.getLevel();
+                        let levelTxt = levelparse.object2code(levelObj);
+                        if(v) {
+                            localStorage.setItem('lvlname', v);
+                        }
+                        let ccll = readLocalLevels();
+                        let newlevel = {
+                            kCEK:4,
+                            name: localStorage.getItem('lvlname') || "GDExt Level",
+                            song: localStorage.getItem('lvlsong') || 1,
+                            data: levelTxt,
+                            author: ccll[0].author || '-',
+                            k13: true,
+                            k21: 2,
+                            version: 1,
+                            gameversion: 35,
+                            editorcamx: 0,
+                            editorcamy: 0,
+                            editorcamz: 0
+                        }
+                        ccll.unshift(newlevel);
+                        localStorage.setItem('lvlnumber', 0);
+
+                        writeLocalLevels(ccll);
+                        util.setUnsavedChanges(false);
+                        util.showNotif('levelSavedNotif', 'Level Saved as New!', 4500, 'success');
+                        localStorage.setItem('lvlcode', levelTxt);
+
+                        dateSaved = new Date();
+                        let autosaveTimeLabel = document.querySelector('#autosaveTimeLabel');
+                        if(autosaveTimeLabel) autosaveTimeLabel.innerText = 'Last saved just now';
+                    }
+                });
+            } else util.alert('saveDialog', 'Couldn\'t save!', 'Saving is only supported on GDExt desktop!', "OK");
             break;
         case 'new':
             confirmUnsavedChanges((t) => {

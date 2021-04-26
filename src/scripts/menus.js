@@ -5,6 +5,18 @@ import canvas from './canvas';
 import levelparse from './levelparse';
 import quicktoolsData from '../assets/quicktools.json';
 
+function loadLevel(levelTxt, lvlName) {
+    let event = new CustomEvent('electronApi', { 
+        detail: {
+            detail: 'loadLevel',
+            name: lvlName,
+            data: levelTxt
+        }
+    });
+    dispatchEvent(event);
+}
+
+
 const bottomMenus = {
     editMenu: {
         properties: {
@@ -319,6 +331,7 @@ const bottomMenus = {
     }
 }
 
+
 const canvasMenus = {
     canvasOptions: {
         properties: {
@@ -376,16 +389,31 @@ const canvasMenus = {
                     height: 40,
                     primary: false,
                     onClick: () => {
+                        let gdPath = localStorage.getItem('settings.gdpath');
                         let levelObj = canvas.getLevel();
                         let levelTxt = levelparse.object2code(levelObj);
-                        let event = new CustomEvent('electronApi', { 
-                            detail: {
-                                detail: 'loadLevel',
-                                name: localStorage.getItem('lvlname'),
-                                data: levelTxt
-                            }
-                        });
-                        dispatchEvent(event);
+                        if(!window.process) {
+                            util.alert('gdPathFailDialog', 'Playtesting is not supported\nin GDExt Web', 'Please use the desktop version', 'OK');
+                        } else if(gdPath == 'steam') {
+                            loadLevel(levelTxt, localStorage.getItem('lvlname'));
+                        } else {
+                            util.confirm(
+                                'gdPathDialog', 'GD Playtesting',
+                                'Before playtesting, please specify the location of your Geometry Dash app',
+                                {
+                                    buttonYes: 'I use Steam version',
+                                    buttonNo: 'I use pirated version',
+                                    onConfirm: (t) => {
+                                        if(t) {
+                                            localStorage.setItem('settings.gdpath', 'steam');
+                                            loadLevel(levelTxt, localStorage.getItem('lvlname'));
+                                        } else {
+                                            util.alert('gdPathFailDialog', 'Pirated GD is not yet supported', 'So yeah... get $2 and buy official GD, nerd', 'OK');
+                                        }
+                                    }
+                                }    
+                            )
+                        }
                     }
                 }
             }
