@@ -226,7 +226,7 @@
     "18": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "18l.png",
@@ -240,7 +240,7 @@
     "19": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "19l.png",
@@ -254,7 +254,7 @@
     "20": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "20l.png",
@@ -268,7 +268,7 @@
     "21": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "21l.png",
@@ -528,7 +528,7 @@
     "41": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "41l.png",
@@ -584,7 +584,7 @@
     "48": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "48l.png",
@@ -598,7 +598,7 @@
     "49": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "49l.png",
@@ -612,7 +612,7 @@
     "50": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "50l.png",
@@ -626,7 +626,7 @@
     "51": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "51l.png",
@@ -640,7 +640,7 @@
     "52": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "52l.png",
@@ -654,7 +654,7 @@
     "53": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "53l.png",
@@ -668,7 +668,7 @@
     "54": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "54l.png",
@@ -752,7 +752,7 @@
     "60": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "60l.png",
@@ -1136,7 +1136,7 @@
     "85": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "85l.png",
@@ -1150,7 +1150,7 @@
     "86": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "86l.png",
@@ -1164,7 +1164,7 @@
     "87": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "87l.png",
@@ -1352,7 +1352,7 @@
     "97": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "97l.png",
@@ -1458,7 +1458,7 @@
     "106": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "106l.png",
@@ -1472,7 +1472,7 @@
     "107": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "107l.png",
@@ -1486,7 +1486,7 @@
     "110": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "110l.png",
@@ -1514,7 +1514,7 @@
     "113": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "113l.png",
@@ -1528,7 +1528,7 @@
     "114": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "114l.png",
@@ -1542,7 +1542,7 @@
     "115": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "115l.png",
@@ -1702,7 +1702,7 @@
     "123": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "123l.png",
@@ -1716,7 +1716,7 @@
     "124": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "124l.png",
@@ -1730,7 +1730,7 @@
     "125": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "125l.png",
@@ -1744,7 +1744,7 @@
     "126": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "126l.png",
@@ -1758,7 +1758,7 @@
     "127": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "127l.png",
@@ -1772,7 +1772,7 @@
     "128": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "128l.png",
@@ -1786,7 +1786,7 @@
     "129": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "129l.png",
@@ -1800,7 +1800,7 @@
     "130": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "130l.png",
@@ -1814,7 +1814,7 @@
     "131": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "131l.png",
@@ -1828,7 +1828,7 @@
     "132": {
         "zorder": 10,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "132l.png",
@@ -1842,7 +1842,7 @@
     "133": {
         "zorder": 10,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "133l.png",
@@ -1856,7 +1856,7 @@
     "134": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "134l.png",
@@ -1884,7 +1884,7 @@
     "136": {
         "zorder": 10,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "136l.png",
@@ -1898,7 +1898,7 @@
     "137": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "137l.png",
@@ -1912,7 +1912,7 @@
     "138": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "138l.png",
@@ -1926,7 +1926,7 @@
     "139": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "139l.png",
@@ -2046,7 +2046,7 @@
     "148": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "148l.png",
@@ -2060,7 +2060,7 @@
     "149": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "149l.png",
@@ -2074,7 +2074,7 @@
     "150": {
         "zorder": 10,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "150l.png",
@@ -2088,7 +2088,7 @@
     "151": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "151l.png",
@@ -2102,7 +2102,7 @@
     "152": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "152l.png",
@@ -2116,7 +2116,7 @@
     "153": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "153l.png",
@@ -2130,7 +2130,7 @@
     "154": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "154l.png",
@@ -2144,7 +2144,7 @@
     "155": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "155l.png",
@@ -2158,7 +2158,7 @@
     "156": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "156l.png",
@@ -2172,7 +2172,7 @@
     "157": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "157l.png",
@@ -2186,7 +2186,7 @@
     "158": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "158l.png",
@@ -2200,7 +2200,7 @@
     "159": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "159l.png",
@@ -2566,7 +2566,7 @@
     "180": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "180l.png",
@@ -2580,7 +2580,7 @@
     "181": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "181l.png",
@@ -2594,7 +2594,7 @@
     "182": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "182l.png",
@@ -2692,7 +2692,7 @@
     "190": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "190l.png",
@@ -3426,7 +3426,7 @@
     "237": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "237l.png",
@@ -3440,7 +3440,7 @@
     "238": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "238l.png",
@@ -3454,7 +3454,7 @@
     "239": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "239l.png",
@@ -3468,7 +3468,7 @@
     "240": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "240l.png",
@@ -3482,7 +3482,7 @@
     "241": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "241l.png",
@@ -4170,7 +4170,7 @@
     "279": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "279l.png",
@@ -4184,7 +4184,7 @@
     "280": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "280l.png",
@@ -4198,7 +4198,7 @@
     "281": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "281l.png",
@@ -4212,7 +4212,7 @@
     "282": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "282l.png",
@@ -4226,7 +4226,7 @@
     "283": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "283l.png",
@@ -4240,7 +4240,7 @@
     "284": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "284l.png",
@@ -4254,7 +4254,7 @@
     "285": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "285l.png",
@@ -5116,7 +5116,7 @@
     "375": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "375l.png",
@@ -5130,7 +5130,7 @@
     "376": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "376l.png",
@@ -5144,7 +5144,7 @@
     "377": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "377l.png",
@@ -5158,7 +5158,7 @@
     "378": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "378l.png",
@@ -5208,7 +5208,7 @@
     "394": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "394l.png",
@@ -5222,7 +5222,7 @@
     "395": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "395l.png",
@@ -5236,7 +5236,7 @@
     "396": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "396l.png",
@@ -5316,7 +5316,7 @@
     "405": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "405l.png",
@@ -5330,7 +5330,7 @@
     "406": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "406l.png",
@@ -5344,7 +5344,7 @@
     "407": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "407l.png",
@@ -5358,7 +5358,7 @@
     "408": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "408l.png",
@@ -5372,7 +5372,7 @@
     "409": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 1,
         "sprite_a": {
             "name": "409a.png",
@@ -5394,7 +5394,7 @@
     "410": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 1,
         "sprite_a": {
             "name": "410a.png",
@@ -5416,7 +5416,7 @@
     "411": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 1,
         "sprite_a": {
             "name": "411a.png",
@@ -5438,7 +5438,7 @@
     "412": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 1,
         "sprite_a": {
             "name": "412a.png",
@@ -5460,7 +5460,7 @@
     "413": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 1,
         "sprite_a": {
             "name": "413a.png",
@@ -5482,7 +5482,7 @@
     "414": {
         "zorder": 1,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "414l.png",
@@ -5496,7 +5496,7 @@
     "419": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "419l.png",
@@ -5510,7 +5510,7 @@
     "420": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "420l.png",
@@ -5580,7 +5580,7 @@
     "448": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "448l.png",
@@ -5594,7 +5594,7 @@
     "449": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "449l.png",
@@ -5608,7 +5608,7 @@
     "450": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "450l.png",
@@ -5622,7 +5622,7 @@
     "451": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "451l.png",
@@ -5636,7 +5636,7 @@
     "452": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "452l.png",
@@ -5774,7 +5774,7 @@
     "460": {
         "zorder": 10,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "460l.png",
@@ -6405,7 +6405,7 @@
     "494": {
         "zorder": 10,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "494l.png",
@@ -6419,7 +6419,7 @@
     "495": {
         "zorder": 10,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "495l.png",
@@ -6433,7 +6433,7 @@
     "496": {
         "zorder": 10,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "496l.png",
@@ -6447,7 +6447,7 @@
     "497": {
         "zorder": 10,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "497l.png",
@@ -9750,7 +9750,7 @@
     "767": {
         "zorder": 9,
         "zlayer": -1,
-        "mainCol": 1010,
+        "mainCol": 1007,
         "secCol": 0,
         "sprite_l": {
             "name": "767l.png",
