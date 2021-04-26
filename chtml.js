@@ -1,7 +1,7 @@
 const fs = require("fs");
 
-const html = `
-<!DOCTYPE html>
+const html = 
+`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,7 @@ const html = `
 </head>
 <body>
     <script src="bundle.js"></script>
+    <script src="electron.js"></script>
 </body>
 </html>`;
 

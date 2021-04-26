@@ -216,7 +216,7 @@ export function EditorLevel(renderer, level) {
         if (!texture)
             return;
 
-        let width =  texture.w / 62 * 30;
+        let width  = texture.w / 62 * 30;
         let height = texture.h / 62 * 30;
 
         let left  = parseFloat(obj.x) - width/2;
@@ -286,27 +286,22 @@ export function EditorLevel(renderer, level) {
         if (grid_align) {
             let alg = aligns[id];
             if (alg) {
-                if (alg.alignX == "left") {
+                if (alg.alignX == "left")
                     x = x - 15 + def.width / 2;
-                } else if (alg.alignX == "right") {
+                else if (alg.alignX == "right")
                     x = x + 15 - def.width / 2;
-                } else if (alg.alignX != "center") {
+                else if (alg.alignX != "center")
                     x = x + alg.alignX;
-                }
 
-                if (alg.alignY == "bottom") {
+                if (alg.alignY == "bottom")
                     y = y - 15 + def.height / 2;
-                } else if (alg.alignY == "top") {
+                else if (alg.alignY == "top")
                     y = y + 15 - def.height / 2;
-                } else if (alg.alignY != "center") {
+                else if (alg.alignY != "center")
                     y = y + alg.alignY;
-                }
             }
         }
-        let ret = {id: id, baseCol: def.maincol, x: x, y: y, z: def.zlayer, zorder: def.zorder};
-
-        if (def.seccol != null)
-            ret.decorCol = def.seccol;
+        let ret = {id: id, x: x, y: y, z: def.zlayer, zorder: def.zorder};
 
         return ret;
     }
@@ -346,37 +341,16 @@ export function EditorLevel(renderer, level) {
         this.loadCTriggers(i);
 
     for (var obj of this.level.data) {
-        if (!obj.z) {
-            if (renderer.objectDefs[obj.id] != undefined)
-                obj.z = renderer.objectDefs[obj.id].zlayer;
-            else
-                obj.z = -1;
-        } else {
-            obj.z = util.zorder[obj.z];
-            if (!obj.z)
-                obj.z = renderer.objectDefs[obj.id].zlayer;
-        }
+        const def = renderer.objectDefs[obj.id];
 
-        if (!obj.order) {
-            if (renderer.objectDefs[obj.id] != undefined)
-                obj.order = renderer.objectDefs[obj.id].zorder;
-            else
-                obj.order = 5;
-        }
+        if (!obj.z)
+            obj.z = ( def ? def.zlayer : null ) || -1;
+        else
+            obj.z = util.zorder[obj.z] ||
+                    ( def ? def.zlayer : null ) || -1;
 
-        if (obj.baseCol == undefined)
-            if (renderer.objectDefs[obj.id] != undefined)
-                obj.baseCol = renderer.objectDefs[obj.id].maincol
-            else
-                obj.baseCol = 1004;
-        
-        if (obj.decorCol == undefined)
-            if (renderer.objectDefs[obj.id] != undefined)
-                if (renderer.objectDefs[obj.id].seccol != 0)
-                    obj.decorCol = renderer.objectDefs[obj.id].seccol;
+        obj.order = obj.order || ( def ? def.zorder : null ) || 5;
     }
-
-    var zlayers = {};
 
     var lchunks = {};
 
