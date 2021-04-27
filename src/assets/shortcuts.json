@@ -76,5 +76,17 @@
         "type": "event",
         "eventName": "action",
         "eventInfo": "renameLevel"
+    },
+    {
+        "keys": [ 46 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": "delete"
+    },
+    {
+        "keys": [ 88 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": "delete"
     }
 ]
