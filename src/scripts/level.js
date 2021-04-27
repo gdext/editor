@@ -249,9 +249,6 @@ export function EditorLevel(renderer, level) {
         let obj = this.getObject(key);
         let r = this.getObjectRect(obj, +obj.scale || 1);
 
-        let bool = box.right >= r.left && box.left <= r.right &&
-                   box.top >= r.bottom && box.bottom <= r.top;
-
         return box.right >= r.left && box.left <= r.right &&
                box.top >= r.bottom && box.bottom <= r.top;
     }
@@ -259,15 +256,9 @@ export function EditorLevel(renderer, level) {
     this.getObjectsAt = function(x, y) {
         let objs = [];
 
-        let camB = Math.floor( this.cache.camX1 / 992 );
-        let camE = Math.floor( this.cache.camX2 / 992 );
-
-        for(let c = camB; c < camE; i++)
-            for (let i = -4; i < 5; i++)
-                if (i != 0 && this.level.lchunks[c][i])
-                    for (let key of this.level.lchunks[c][i])
-                        if (this.isInObject(key, x, y))
-                            objs.push(key);
+        for (let i = 0; i < this.level.data.length; i++)
+             if (this.level.data[i] && this.collidesWithObject(i, r))
+                  objs.push(i);
 
         return objs;
     }
