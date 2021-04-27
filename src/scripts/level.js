@@ -257,7 +257,7 @@ export function EditorLevel(renderer, level) {
         let objs = [];
 
         for (let i = 0; i < this.level.data.length; i++)
-             if (this.level.data[i] && this.collidesWithObject(i, r))
+             if (this.level.data[i] && this.isInObject(i, x, y))
                   objs.push(i);
 
         return objs;
