@@ -330,7 +330,12 @@ export default {
                 window.onpointerup = null;
                 moving = false;
                 window.onpointerout = null;
+
+                let selection = renderer.getSelection();
+                console.log(selection);
+                renderer.selectObjectInSel(selection);
                 renderer.closeSelectionBox();
+                console.log(renderer.getSelectedObjects());
             }
             window.onpointerup = stop;
             window.onpointerout = stop;

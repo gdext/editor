@@ -195,11 +195,16 @@ export function EditorLevel(renderer, level) {
         utilscript.setUnsavedChanges(true);
     }
 
-    this.getObjectRect = function(id, scale) {
-        let def = renderer.objectDefs[id];
+    this.getObjectRect = function(obj, scale) {
+        let def = renderer.objectDefs[obj.id];
 
         if (!def)
-            return;
+            return {
+                left: parseFloat(obj.x),
+                right: parseFloat(obj.x),
+                top: parseFloat(obj.y),
+                bottom: parseFloat(obj.y)
+            };
 
         let texture;
 
@@ -213,7 +218,12 @@ export function EditorLevel(renderer, level) {
             texture = def.texture_l;
 
         if (!texture)
-            return;
+            return {
+                left: parseFloat(obj.x),
+                right: parseFloat(obj.x),
+                top: parseFloat(obj.y),
+                bottom: parseFloat(obj.y)
+            };
 
         let width  = texture.w / 62 * 30 * scale;
         let height = texture.h / 62 * 30 * scale;
@@ -228,7 +238,7 @@ export function EditorLevel(renderer, level) {
 
     this.isInObject = function(key, x, y) {
         let obj = this.getObject(key);
-        let r = this.getObjectRect(obj.id, +obj.scale || 1);
+        let r = this.getObjectRect(obj, +obj.scale || 1);
 
         /* TODO: Support for rotated objects */
 
@@ -238,6 +248,7 @@ export function EditorLevel(renderer, level) {
     this.collidesWithObject = function(key, box) {
         let obj = this.getObject(key);
         let r = this.getObjectRect(obj.id, +obj.scale || 1);
+        console.log(r);
 
         return box.right >= r.left && box.left <= r.right &&
                box.top >= r.bottom && box.bottom <= r.top;
@@ -262,8 +273,8 @@ export function EditorLevel(renderer, level) {
     this.getObjectsIn = function(rect) {
         let objs = [];
 
-        let camB = Math.floor( this.cache.camX1 / 992 );
-        let camE = Math.floor( this.cache.camX2 / 992 );
+        let camB = Math.floor( rect.x / 992 );
+        let camE = Math.floor( (rect.x + rect.w) / 992 );
 
         let r = {
             left:   rect.x,
@@ -272,12 +283,9 @@ export function EditorLevel(renderer, level) {
             bottom: rect.y + rect.h
         };
 
-        for(let c = camB; c < camE; i++)
-            for (let i = -4; i < 5; i++)
-                if (i != 0 && this.level.lchunks[c][i])
-                    for (let key of this.level.lchunks[c][i])
-                        if (this.collidesWithObject(key, r))
-                            objs.push(key);
+        for (let i = 0; i < this.level.data.length; i++)
+             if (this.level.data[i] && this.collidesWithObject(i, r))
+                  objs.push(i);
 
         return objs;
     }

@@ -4,6 +4,8 @@ import TopCanvas from './topcanvas';
 
 let gl, renderer, cvs, options, level, top, sel;
 
+let selectedObjs = [];
+
 // this file contains all the high-levels functions to work with the renderer
 // (load level, update screen, move camera, edit stuff, etc.)
 export default {
@@ -56,6 +58,9 @@ export default {
     getObjects: (x, y) => {
         return level.getObjectsAt(x, y);
     },
+    getObjectsFromRect: (rect) => {
+        return level.getObjectsIn(rect);
+    },
     screen2LevelCoords: (x, y) => {
         return renderer.screenToLevelPos(x, y);
     },
@@ -65,6 +70,8 @@ export default {
     },
     selectTo: (x, y) => {
         let pos = renderer.screenToLevelPos(x, y);
+
+        if(!sel) return;
 
         sel.x2 = pos.x;
         sel.y2 = pos.y;
@@ -79,9 +86,27 @@ export default {
             y2: p2.y
         });
     },
+    selectObjectInSel: (sel) => {
+        let x = Math.min(sel.x1, sel.x2);
+        let y = Math.min(sel.y1, sel.y2);
+        let w = Math.max(sel.x1, sel.x2) - x;
+        let h = Math.max(sel.y1, sel.y2) - y;
+
+        let rect = { x: x, y: y, w: w, h: h };
+
+        let objids = level.getObjectsIn(rect);
+        selectedObjs = objids;
+        console.log(objids);
+    },
     closeSelectionBox: () => {
         sel = null;
         top.setSelectionBox(sel);
+    },
+    getSelection: () => {
+        return sel;
+    },
+    getSelectedObjects: () => {
+        return selectedObjs;
     },
     placeObject: (opt) => {
         if(!level) return;
