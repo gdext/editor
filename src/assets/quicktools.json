@@ -51,7 +51,9 @@
             "icon": "ic-delete2.svg",
             "hint": "Delete Selected",
             "event": "editor",
-            "detail": "delete",
+            "detail": {
+                "action": "delete"
+            },
             "enabledCondition": [
                 "objSelected"
             ]

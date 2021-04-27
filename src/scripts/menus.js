@@ -199,7 +199,10 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: 'moveup' });
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'move',
+                                            y: 30 
+                                        }});
                                         dispatchEvent(event);
                                     }
                                 }
@@ -231,9 +234,11 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        alert('test');
-                                        //let event = new CustomEvent('ed', { detail: event.detail });
-                                        //dispatchEvent(event);
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'move',
+                                            x: -30 
+                                        }});
+                                        dispatchEvent(event);
                                     }
                                 }
                             },
@@ -263,9 +268,11 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        alert('test');
-                                        //let event = new CustomEvent('ed', { detail: event.detail });
-                                        //dispatchEvent(event);
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'move',
+                                            x: 30 
+                                        }});
+                                        dispatchEvent(event);
                                     }
                                 }
                             },
@@ -297,9 +304,11 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        alert('test');
-                                        //let event = new CustomEvent('ed', { detail: event.detail });
-                                        //dispatchEvent(event);
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'move',
+                                            y: -30 
+                                        }});
+                                        dispatchEvent(event);
                                     }
                                 }
                             },

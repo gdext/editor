@@ -77,16 +77,57 @@
         "eventName": "action",
         "eventInfo": "renameLevel"
     },
+
     {
         "keys": [ 46 ],
         "type": "event",
         "eventName": "editor",
-        "eventInfo": "delete"
+        "eventInfo": {
+            "action": "delete"
+        }
     },
     {
         "keys": [ 88 ],
         "type": "event",
         "eventName": "editor",
-        "eventInfo": "delete"
+        "eventInfo": {
+            "action": "delete"
+        }
+    },
+    {
+        "keys": [ 87 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "move",
+            "y": 30
+        }
+    },
+    {
+        "keys": [ 65 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "move",
+            "x": -30
+        }
+    },
+    {
+        "keys": [ 83 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "move",
+            "y": -30
+        }
+    },
+    {
+        "keys": [ 68 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "move",
+            "x": 30
+        }
     }
 ]

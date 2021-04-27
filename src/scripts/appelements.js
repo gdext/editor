@@ -313,7 +313,6 @@ export default {
         function beginObjectSelection(e) {
             let eX = e.offsetX;
             let eY = e.offsetY;
-            renderer.clearSelected();
             renderer.beginSelectionBox(eX, eY);
             let moving = true;
             function update() {
@@ -479,14 +478,29 @@ export default {
         //editor events
         window.addEventListener('editor', (e) => {
             let detail = e.detail;
-            switch(detail) {
+            if(typeof detail != 'object') return;
+            let data = [];
+            switch(detail.action) {
                 case 'delete':
-                    let data = [];
+                    data = [];
                     renderer.getSelectedObjects().forEach(k => {
                         data.push({ id: k });
                     });
                     renderer.placeObject({
                         mode: 'remove',
+                        data: data
+                    });
+                    break;
+                case 'move':
+                    data = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        let props = renderer.getObjectByKey(k);
+                        props.x += detail.x || 0;
+                        props.y += detail.y || 0;
+                        data.push({ id: k, props: props });
+                    });
+                    renderer.placeObject({
+                        mode: 'edit',
                         data: data
                     });
                     break;

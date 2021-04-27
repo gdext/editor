@@ -58,6 +58,9 @@ export default {
     initLevel: (lvl) => {
         level = new EditorLevel(renderer, lvl);
     },
+    getObjectByKey: (key) => {
+        return level.getObject(key);
+    },
     getObjects: (x, y) => {
         return level.getObjectsAt(x, y);
     },
@@ -113,9 +116,17 @@ export default {
     selectObjectAt: (x, y) => {
         let p = renderer.screenToLevelPos(x, y);
         console.log(p);
-        level.getObjectsAt(p.x, p.y);
-        let objid = top.setSelectionBox(sel);
-        selectedObjs = [objid];
+
+        let objid = level.getObjectsAt(p.x, p.y);
+        selectedObjs = objid;
+        console.log(selectedObjs)
+        
+        options.colored_objects = {};
+        options.colored_objects[objid] = {
+            base: -1,
+            decor: -1
+        }
+        renderer.renderLevel(level, cvs.width, cvs.height, options);
     },
     clearSelected: () => {
         selectedObjs = [];
@@ -160,7 +171,7 @@ export default {
             case 'edit':
                 if(Array.isArray(opt.data)) {
                     opt.data.forEach(d => {
-                        level.editObject(d.id, opt.props);
+                        level.editObject(d.id, d.props || opt.props);
                     });
                 } else {
                     level.editObject(opt.data.id, opt.props);
