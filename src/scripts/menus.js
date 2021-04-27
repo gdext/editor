@@ -183,9 +183,8 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        alert('test');
-                                        //let event = new CustomEvent('ed', { detail: event.detail });
-                                        //dispatchEvent(event);
+                                        let event = new CustomEvent('editor', { detail: 'rotate90ccw' });
+                                        dispatchEvent(event);
                                     }
                                 }
                             },
@@ -200,9 +199,8 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        alert('test');
-                                        //let event = new CustomEvent('ed', { detail: event.detail });
-                                        //dispatchEvent(event);
+                                        let event = new CustomEvent('editor', { detail: 'moveup' });
+                                        dispatchEvent(event);
                                     }
                                 }
                             },
@@ -217,9 +215,8 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        alert('test');
-                                        //let event = new CustomEvent('ed', { detail: event.detail });
-                                        //dispatchEvent(event);
+                                        let event = new CustomEvent('editor', { detail: 'rotate90cw' });
+                                        dispatchEvent(event);
                                     }
                                 }
                             },
@@ -465,7 +462,7 @@ export default {
                     height: 40,
                     primary: false,
                     onClick: () => {
-                        let event = new CustomEvent(btn.event, { detail: event.detail });
+                        let event = new CustomEvent(btn.event, { detail: btn.detail });
                         dispatchEvent(event);
                     }
                 }

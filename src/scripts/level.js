@@ -196,7 +196,7 @@ export function EditorLevel(renderer, level) {
     }
 
     this.getObjectRect = function(obj, scale) {
-        let def = renderer.objectDefs[obj.id];
+        let def = this.renderer.objectDefs[obj.id];
 
         if (!def)
             return {
@@ -247,8 +247,10 @@ export function EditorLevel(renderer, level) {
 
     this.collidesWithObject = function(key, box) {
         let obj = this.getObject(key);
-        let r = this.getObjectRect(obj.id, +obj.scale || 1);
-        console.log(r);
+        let r = this.getObjectRect(obj, +obj.scale || 1);
+
+        let bool = box.right >= r.left && box.left <= r.right &&
+                   box.top >= r.bottom && box.bottom <= r.top;
 
         return box.right >= r.left && box.left <= r.right &&
                box.top >= r.bottom && box.bottom <= r.top;
@@ -279,8 +281,8 @@ export function EditorLevel(renderer, level) {
         let r = {
             left:   rect.x,
             right:  rect.x + rect.w,
-            top:    rect.y,
-            bottom: rect.y + rect.h
+            top:    rect.y + rect.h,
+            bottom: rect.y
         };
 
         for (let i = 0; i < this.level.data.length; i++)

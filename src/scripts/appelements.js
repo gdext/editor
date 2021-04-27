@@ -279,6 +279,7 @@ export default {
             let eY = e.offsetY;
             let coordsArray = [];
             let moving = true;
+            renderer.clearSelected();
             function update() {
                 let coords = renderer.screen2LevelCoords(eX, eY);
                 let tx = Math.floor(coords.x/30)*30 + 15;
@@ -312,6 +313,7 @@ export default {
         function beginObjectSelection(e) {
             let eX = e.offsetX;
             let eY = e.offsetY;
+            renderer.clearSelected();
             renderer.beginSelectionBox(eX, eY);
             let moving = true;
             function update() {
@@ -332,10 +334,10 @@ export default {
                 window.onpointerout = null;
 
                 let selection = renderer.getSelection();
-                console.log(selection);
-                renderer.selectObjectInSel(selection);
+                let selectionSize = Math.max(Math.abs(selection.x1 - selection.x2), Math.abs(selection.y1 - selection.y2))
+                if(selectionSize > 0) renderer.selectObjectInSel(selection);
+                else renderer.selectObjectAt(eX, eY);
                 renderer.closeSelectionBox();
-                console.log(renderer.getSelectedObjects());
             }
             window.onpointerup = stop;
             window.onpointerout = stop;
@@ -471,6 +473,25 @@ export default {
             beginScreenZooming(e, mode);
             return false;
         }  
+
+
+        
+        //editor events
+        window.addEventListener('editor', (e) => {
+            let detail = e.detail;
+            switch(detail) {
+                case 'delete':
+                    let data = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        data.push({ id: k });
+                    });
+                    renderer.placeObject({
+                        mode: 'remove',
+                        data: data
+                    });
+                    break;
+            }
+        });
     },
     generateBottom: (elem) => {
         //tabs selector

@@ -987,8 +987,8 @@ export function GDRenderer(gl) {
         if (this.current_options.colored_objects) {
             let cld = this.current_options.colored_objects;
             if (cld[key]) {
-                maincol = this.cache.getColor(cld[key].base)  || maincol;
-                seccol  = this.cache.getColor(cld[key].decor) || seccol;
+                maincol = this.cache.getColor(this, cld[key].base || maincol);
+                seccol  = this.cache.getColor(this, cld[key].decor || seccol);
             }
         }
 

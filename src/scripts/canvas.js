@@ -11,7 +11,10 @@ let selectedObjs = [];
 export default {
     init: (canvas, top_canvas) => {
         options = {
-            grid: true
+            grid: true,
+            custom_colors: {
+                "-1": {r: 0, g: 0.7, b: 1, a: 1}
+            }
         };
         gl = canvas.getContext("webgl");
         renderer = new GDRenderer(gl);
@@ -97,6 +100,27 @@ export default {
         let objids = level.getObjectsIn(rect);
         selectedObjs = objids;
         console.log(objids);
+
+        options.colored_objects = {};
+        objids.forEach(o => {
+            options.colored_objects[o] = {
+                base: -1,
+                decor: -1
+            }
+        });
+        renderer.renderLevel(level, cvs.width, cvs.height, options);
+    },
+    selectObjectAt: (x, y) => {
+        let p = renderer.screenToLevelPos(x, y);
+        console.log(p);
+        level.getObjectsAt(p.x, p.y);
+        let objid = top.setSelectionBox(sel);
+        selectedObjs = [objid];
+    },
+    clearSelected: () => {
+        selectedObjs = [];
+        options.colored_objects = {};
+        renderer.renderLevel(level, cvs.width, cvs.height, options);
     },
     closeSelectionBox: () => {
         sel = null;
@@ -143,6 +167,7 @@ export default {
                 }
                 level.confirmEdit();
                 break;
-        }
+            }
+        renderer.renderLevel(level, cvs.width, cvs.height, options);
     }
 }
