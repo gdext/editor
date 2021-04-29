@@ -50,5 +50,8 @@
             "key", "heart", "flask", "skull", "coin"
         ]
     },
-    "text": 914
+    "text": 914,
+    "solids": [
+        1
+    ]
 }

@@ -124,8 +124,9 @@ const bottomMenus = {
                                     type: 'numberInput',
                                     id: 'editRot',
                                     placeholder: 'Degree',
-                                    max: 360,
+                                    max: 359,
                                     min: 0,
+                                    wrapAround: true,
                                     unit: '°',
                                     defaultValue: () => { return '0' },
                                     onValueChange: (v) => {
@@ -158,9 +159,9 @@ const bottomMenus = {
                                         });
                                     },
                                     icon: 'slide',
-                                    min: 0.02,
-                                    max: 32,
-                                    scale: 0.02
+                                    min: 0.1,
+                                    max: 8,
+                                    scale: 0.01
                                 }
                             },
                             //z order

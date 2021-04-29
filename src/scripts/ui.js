@@ -95,7 +95,10 @@ function UiObject() {
         if(options.placeholder) input.placeholder = options.placeholder;
 
         if(options.defaultValue) input.value = options.defaultValue();
-        if(type == 'number' && options.unit) input.value += options.unit;
+        if(type == 'number' && options.unit) {
+            input.setAttribute('unit', options.unit);
+            input.value += options.unit;
+        }
 
         if(options.maxlength) input.maxLength = options.maxlength;
         if(options.minlength) input.minLength = options.minlength;
@@ -119,7 +122,7 @@ function UiObject() {
 
             input.type = 'text'; 
 
-            if(options.unit && !input.value.endsWith(options.unit)) {  input.value += options.unit; input.blur() }
+            if(input.getAttribute('unit') && !input.value.endsWith(input.getAttribute('unit'))) {  input.value += input.getAttribute('unit'); input.blur() }
 
             options.onValueChange(input.value);
         }
@@ -175,8 +178,14 @@ function UiObject() {
                     if(options.defaultToInteger && !isInteger()) scale = scale/10;
                     v += e.movementX * scale;
                     //handle min/max
-                    if(v > options.max) v = options.max;
-                    else if(v < options.min) v = options.min;
+                    if(v > options.max) {
+                        if(options.wrapAround) v = options.min || 0;
+                        else v = options.max;
+                    }
+                    else if(v < options.min) {
+                        if(options.wrapAround) v = options.max || 0;
+                        else v = options.min;
+                    }
 
                     let pv = isInteger() ? Math.round(v) : Math.round(v*100)/100;
                     //handle numbers after the decimal point
@@ -186,14 +195,14 @@ function UiObject() {
                         else if(afterDecimal.length < 2) pv += '0';
                     }
 
-                    if(options.unit) pv += options.unit;
+                    if(input.getAttribute('unit')) pv += input.getAttribute('unit');
                     p.value = pv;
                     options.onValueChange(pv);
                 }
                 function stopFunction() {
                     util.setCursor();
                     p.value = isInteger() ? Math.round(v) : Math.round(v*100)/100;
-                    if(options.unit) p.value += options.unit;
+                    if(input.getAttribute('unit')) p.value += input.getAttribute('unit');
                     document.removeEventListener('pointermove', moveFunction);
                     document.removeEventListener('pointerup', stopFunction);
                 }
