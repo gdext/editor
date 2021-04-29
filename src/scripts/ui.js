@@ -188,6 +188,7 @@ function UiObject() {
 
                     if(options.unit) pv += options.unit;
                     p.value = pv;
+                    options.onValueChange(pv);
                 }
                 function stopFunction() {
                     util.setCursor();

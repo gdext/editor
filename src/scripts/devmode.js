@@ -1,4 +1,5 @@
 import levelparse from './levelparse';
+import canvas from './canvas';
 import util from './util';
 import pako from 'pako';
 const Buffer = require('buffer/').Buffer;
@@ -59,6 +60,9 @@ export default {
                                         window.location.reload();
                                     });
                                 break;*/
+                            case 'testRelativeTransform':
+                                canvas.setRelativeTransform({ scale: 2 });
+                                break;
                             case 'help':
                                 console.log(`lvlcode - show level's raw code
             lvlobject - show level code decoded to js object

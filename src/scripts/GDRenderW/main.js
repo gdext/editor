@@ -459,14 +459,17 @@ export const util = {
 
 /**
  * This is a texture class that automatically creates a texture.
- * @param {WebGLRenderingContext} gl gl context
+ * @param {GDRenderer} renderer renderer
  * @param {string} url url of the texture
  */
-function Texture(gl, url) {
+function Texture(renderer, url) {
     this.width = null;
     this.height = null;
 
     this.loaded = false;
+    renderer.loading.tasks++;
+
+    let gl = renderer.gl;
 
     this.texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -487,17 +490,18 @@ function Texture(gl, url) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
+        renderer.loading.complete();
         tex.loaded = true;
     }
 
     this.image.src = url;
 }
 
-function Font(gl, json, img) {
+function Font(renderer, json, img) {
     this.json = json;
     this.img  = img;
 
-    this.tex  = new Texture(gl, this.img);
+    this.tex  = new Texture(renderer, this.img);
 
     this.getChar = function(char) {
         for (let c of this.json.chars)
@@ -589,9 +593,10 @@ function Camera(x, y, zoom) {
 
 /**
  * The core of GDRenderW. The GDRenderer class contains (almost) everything for rendering a level.
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl the webgl context to draw on
+ * @param {Function} loaded_callback callback every time progress changed in loading
  */
-export function GDRenderer(gl) {
+export function GDRenderer(gl, loaded_callback = null) {
     this.gl    = gl;
     this.gProg = null;
     this.pBuff = null;
@@ -613,7 +618,10 @@ export function GDRenderer(gl) {
     this.width = null;
     this.height = null;
 
-    this.level = null;
+    this.level = {
+        info: {},
+        data: {}
+    };
 
     this.objectDefs = {};
 
@@ -622,6 +630,20 @@ export function GDRenderer(gl) {
     this.bgs = {};
 
     this.current_texture = null;
+
+    this.loading = {
+        tasks:     0,
+        completed: 0,
+        callback:  loaded_callback,
+        complete:  () => {
+            this.loading.completed++;
+            if (this.loading.callback)
+                this.loading.callback({
+                    progress: this.loading.completed / this.loading.tasks,
+                    loaded:   this.loading.completed >= this.loading.tasks
+                });
+        }
+    }
 
     /**
      * This cache caches simple variables and current color value
@@ -655,6 +677,9 @@ export function GDRenderer(gl) {
                 if (cst[color])
                     return cst[color];
             }
+
+            if (!renderer.level.info.colors)
+                return {r: 1, g: 1, b: 1, a: 1};
 
             if (color == 1005 || color == 1006 || color == 1007) // P1, P2, LBG
                 return {r: 1, g: 1, b: 1, a: 1};
@@ -709,7 +734,7 @@ export function GDRenderer(gl) {
     ];
     
     // This creates the 2 buffers for the vertices and texture coordinates so they can be used
-    // be the shaders.
+    // in the shaders.
     this.pBuff = util.createBuffer(gl, vertices);
     this.tBuff = util.createBuffer(gl, texCoords);
 
@@ -734,7 +759,7 @@ export function GDRenderer(gl) {
     this.camera = new Camera(0, 0, 1);
 
     // This is the texture of the spritesheet
-    this.mainT = new Texture(this.gl, spritesheet);
+    this.mainT = new Texture(this, spritesheet);
 
     this.current_options = {};
 
@@ -749,30 +774,29 @@ export function GDRenderer(gl) {
                 this.objectDefs[i] = new ObjectDef(this.gl, obj);
         }
 
-        this.bgs[1] = new Texture(this.gl, bg1); // I know it's not beatiful but shut up.
-        this.bgs[2] = new Texture(this.gl, bg2);
-        this.bgs[3] = new Texture(this.gl, bg3);
-        this.bgs[4] = new Texture(this.gl, bg4);
-        this.bgs[5] = new Texture(this.gl, bg5);
-        this.bgs[6] = new Texture(this.gl, bg6);
-        this.bgs[7] = new Texture(this.gl, bg7);
-        this.bgs[8] = new Texture(this.gl, bg8);
-        this.bgs[9] = new Texture(this.gl, bg9);
-        this.bgs[10] = new Texture(this.gl, bg10);
-        this.bgs[11] = new Texture(this.gl, bg11);
-        this.bgs[12] = new Texture(this.gl, bg12);
-        this.bgs[13] = new Texture(this.gl, bg13);
-        this.bgs[14] = new Texture(this.gl, bg14);
-        this.bgs[15] = new Texture(this.gl, bg15);
-        this.bgs[16] = new Texture(this.gl, bg16);
-        this.bgs[17] = new Texture(this.gl, bg17);
-        this.bgs[18] = new Texture(this.gl, bg18);
-        this.bgs[19] = new Texture(this.gl, bg19);
-        this.bgs[20] = new Texture(this.gl, bg20);
+        this.bgs[1] = new Texture(this, bg1); // I know it's not beatiful but shut up.
+        this.bgs[2] = new Texture(this, bg2);
+        this.bgs[3] = new Texture(this, bg3);
+        this.bgs[4] = new Texture(this, bg4);
+        this.bgs[5] = new Texture(this, bg5);
+        this.bgs[6] = new Texture(this, bg6);
+        this.bgs[7] = new Texture(this, bg7);
+        this.bgs[8] = new Texture(this, bg8);
+        this.bgs[9] = new Texture(this, bg9);
+        this.bgs[10] = new Texture(this, bg10);
+        this.bgs[11] = new Texture(this, bg11);
+        this.bgs[12] = new Texture(this, bg12);
+        this.bgs[13] = new Texture(this, bg13);
+        this.bgs[14] = new Texture(this, bg14);
+        this.bgs[15] = new Texture(this, bg15);
+        this.bgs[16] = new Texture(this, bg16);
+        this.bgs[17] = new Texture(this, bg17);
+        this.bgs[18] = new Texture(this, bg18);
+        this.bgs[19] = new Texture(this, bg19);
+        this.bgs[20] = new Texture(this, bg20);
 
-        this.font = new Font(this.gl, font1_json, font1_img);
-
-        this.chat_font = new Font(this.gl, chatfont_json, chatfont_img);
+        this.font      = new Font(this, font1_json, font1_img);
+        this.chat_font = new Font(this, chatfont_json, chatfont_img);
     }
     
     // Then runs it lol
@@ -1289,7 +1313,7 @@ export function GDRenderer(gl) {
 
         // This renders each object in each z layer in each level chunk
         for (let c = camB; c <= camE; c++)
-            if (this.level.lchunks[c]) {
+            if (this.level.lchunks && this.level.lchunks[c]) {
                 let chunk = this.level.lchunks[c];
                 for (let i = -4; i <= 3; i++)
                     if (i != 0 && chunk[i]) {
