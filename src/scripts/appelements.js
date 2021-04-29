@@ -337,6 +337,7 @@ export default {
                 if(selectionSize > 0) renderer.selectObjectInSel(selection);
                 else renderer.selectObjectAt(eX, eY);
                 renderer.closeSelectionBox();
+                updateEditInputs();
             }
             window.onpointerup = stop;
             window.onpointerout = stop;
@@ -357,6 +358,32 @@ export default {
             }
             renderer.moveTo(coords.x, coords.y, coords.z);
             renderer.update(canvas);
+        }
+
+        function updateEditInputs() {
+            let relativeTransform = renderer.getRelativeTransform();
+
+            // position
+            let xposinput = document.querySelector('#editXPos');
+            let yposinput = document.querySelector('#editYPos');
+            if(relativeTransform.x != undefined && relativeTransform.y != undefined) {
+                xposinput.value = relativeTransform.x/3;
+                yposinput.value = relativeTransform.y/3;
+            } else {
+                xposinput.value = '';
+                yposinput.value = '';
+            }
+
+            // rotation & scale
+            let rotinput = document.querySelector('#editRot');
+            let scaleinput = document.querySelector('#editScale');
+            if(relativeTransform.rotation != undefined && relativeTransform.scale != undefined) {
+                rotinput.value = relativeTransform.rotation;
+                scaleinput.value = relativeTransform.scale;
+            } else {
+                rotinput.value = '';
+                scaleinput.value = '';
+            }
         }
 
         //renderer events
@@ -491,18 +518,19 @@ export default {
                         data: data
                     });
                     break;
-                case 'move':
+                case 'transform':
                     data = [];
-                    renderer.getSelectedObjects().forEach(k => {
-                        let props = renderer.getObjectByKey(k);
-                        props.x += detail.x || 0;
-                        props.y += detail.y || 0;
-                        data.push({ id: k, props: props });
-                    });
-                    renderer.placeObject({
-                        mode: 'edit',
-                        data: data
-                    });
+                    if(detail.mode == 'add') {
+                        let relativeTransform = renderer.getRelativeTransform();
+                        Object.keys(detail.data).forEach(k => {
+                            let v = detail.data[k];
+                            relativeTransform[k] += v;
+                        });
+                        renderer.setRelativeTransform(relativeTransform);
+                    } else {
+                        renderer.setRelativeTransform(detail.data);
+                    }
+                    updateEditInputs();
                     break;
             }
         });

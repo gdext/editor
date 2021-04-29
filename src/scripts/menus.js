@@ -53,6 +53,11 @@ const bottomMenus = {
                                     id: 'editXPos',
                                     placeholder: 'Number',
                                     defaultValue: () => { return '0' },
+                                    onValueChange: (v) => {
+                                        canvas.setRelativeTransform({
+                                            x: parseFloat(v)*3,
+                                        });
+                                    },
                                     icon: 'slide',
                                     defaultToInteger: true,
                                     scale: 0.33
@@ -72,6 +77,11 @@ const bottomMenus = {
                                     id: 'editYPos',
                                     placeholder: 'Number',
                                     defaultValue: () => { return '0' },
+                                    onValueChange: (v) => {
+                                        canvas.setRelativeTransform({
+                                            y: parseFloat(v)*3,
+                                        });
+                                    },
                                     icon: 'slide',
                                     defaultToInteger: true,
                                     scale: 0.33
@@ -118,6 +128,11 @@ const bottomMenus = {
                                     min: 0,
                                     unit: '°',
                                     defaultValue: () => { return '0' },
+                                    onValueChange: (v) => {
+                                        canvas.setRelativeTransform({
+                                            rotation: parseFloat(v),
+                                        });
+                                    },
                                     icon: 'slide',
                                     defaultToInteger: true,
                                     scale: 1.33
@@ -137,10 +152,15 @@ const bottomMenus = {
                                     id: 'editScale',
                                     placeholder: 'Number',
                                     defaultValue: () => { return '1' },
+                                    onValueChange: (v) => {
+                                        canvas.setRelativeTransform({
+                                            scale: parseFloat(v),
+                                        });
+                                    },
                                     icon: 'slide',
-                                    min: 0.01,
+                                    min: 0.02,
                                     max: 32,
-                                    scale: 0.1
+                                    scale: 0.02
                                 }
                             },
                             //z order
@@ -183,7 +203,13 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: 'rotate90ccw' });
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'transform',
+                                            mode: 'add',
+                                            data: {
+                                                rotation: -90
+                                            } 
+                                        }});
                                         dispatchEvent(event);
                                     }
                                 }
@@ -200,8 +226,11 @@ const bottomMenus = {
                                     primary: false,
                                     onClick: () => {
                                         let event = new CustomEvent('editor', { detail: {
-                                            action: 'move',
-                                            y: 30 
+                                            action: 'transform',
+                                            mode: 'add',
+                                            data: {
+                                                y: 30
+                                            }
                                         }});
                                         dispatchEvent(event);
                                     }
@@ -218,7 +247,13 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: 'rotate90cw' });
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'transform',
+                                            mode: 'add',
+                                            data: {
+                                                rotation: 90
+                                            } 
+                                        }});
                                         dispatchEvent(event);
                                     }
                                 }
@@ -235,8 +270,11 @@ const bottomMenus = {
                                     primary: false,
                                     onClick: () => {
                                         let event = new CustomEvent('editor', { detail: {
-                                            action: 'move',
-                                            x: -30 
+                                            action: 'transform',
+                                            mode: 'add',
+                                            data: {
+                                                x: -30
+                                            }
                                         }});
                                         dispatchEvent(event);
                                     }
@@ -269,8 +307,11 @@ const bottomMenus = {
                                     primary: false,
                                     onClick: () => {
                                         let event = new CustomEvent('editor', { detail: {
-                                            action: 'move',
-                                            x: 30 
+                                            action: 'transform',
+                                            mode: 'add',
+                                            data: {
+                                                x: 30
+                                            }
                                         }});
                                         dispatchEvent(event);
                                     }
@@ -305,8 +346,11 @@ const bottomMenus = {
                                     primary: false,
                                     onClick: () => {
                                         let event = new CustomEvent('editor', { detail: {
-                                            action: 'move',
-                                            y: -30 
+                                            action: 'transform',
+                                            mode: 'add',
+                                            data: {
+                                                y: -30
+                                            } 
                                         }});
                                         dispatchEvent(event);
                                     }

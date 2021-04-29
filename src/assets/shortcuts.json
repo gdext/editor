@@ -99,8 +99,11 @@
         "type": "event",
         "eventName": "editor",
         "eventInfo": {
-            "action": "move",
-            "y": 30
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "y": 30
+            } 
         }
     },
     {
@@ -108,8 +111,11 @@
         "type": "event",
         "eventName": "editor",
         "eventInfo": {
-            "action": "move",
-            "x": -30
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "x": -30
+            } 
         }
     },
     {
@@ -117,8 +123,11 @@
         "type": "event",
         "eventName": "editor",
         "eventInfo": {
-            "action": "move",
-            "y": -30
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "y": -30
+            } 
         }
     },
     {
@@ -126,8 +135,11 @@
         "type": "event",
         "eventName": "editor",
         "eventInfo": {
-            "action": "move",
-            "x": 30
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "x": 30
+            } 
         }
     }
 ]

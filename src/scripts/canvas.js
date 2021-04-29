@@ -5,6 +5,125 @@ import TopCanvas from './topcanvas';
 let gl, renderer, cvs, options, level, top, sel;
 
 let selectedObjs = [];
+let relativeTransform = {
+    x: 0,
+    y: 0,
+    scale: 1,
+    rotation: 0,
+    center: {},
+    objdata: {}
+}
+
+function selectObjects() {
+    // color selected objects
+    options.colored_objects = {};
+    selectedObjs.forEach(k => {
+        options.colored_objects[k] = {
+            base: -1,
+            decor: -1
+        }
+    });
+    renderer.renderLevel(level, cvs.width, cvs.height, options);
+
+    //rel transform
+    if(selectedObjs.length < 1) return;
+    relativeTransform = {
+        x: 0,
+        y: 0,
+        scale: 1,
+        rotation: 0
+    }
+
+    // calculate selection center
+    let positions = {
+        x: [],
+        y: []
+    }
+    selectedObjs.forEach(o => {
+        let od = level.getObject(o);
+        if(!od) return
+        if(od.x) positions.x.push(od.x);
+        if(od.y) positions.y.push(od.y);
+    });
+
+    let posBounds = { 
+        minx: Math.min(...positions.x), 
+        maxx: Math.max(...positions.x), 
+        miny: Math.min(...positions.y), 
+        maxy: Math.max(...positions.y)
+    }
+
+    relativeTransform.center = {
+        x: (posBounds.minx + posBounds.maxx)/2,
+        y: (posBounds.miny + posBounds.maxy)/2
+    }
+
+    // object local variables
+    relativeTransform.objdata = {};
+    selectedObjs.forEach(o => {
+        let od = level.getObject(o);
+        relativeTransform.objdata[o] = {
+            xFromCenter: od.x - relativeTransform.center.x,
+            yFromCenter: od.y - relativeTransform.center.y, 
+            scale: od.scale || 1,
+            rotation: od.r || 0
+        }
+    });
+}
+
+function updateRelativeTransform(obj) {
+    if(!relativeTransform.objdata) return;
+    Object.assign(relativeTransform, obj);
+    if(relativeTransform.rotation < 0) relativeTransform.rotation += 360;
+    else if(relativeTransform.rotation >= 360) relativeTransform.rotation -= 360;
+    
+    Object.keys(relativeTransform.objdata).forEach(k => {
+        let v = relativeTransform.objdata[k];
+        let od = level.getObject(k);
+
+        //relative transform init
+        let targetX, targetY;
+        targetX = v.xFromCenter;
+        targetY = v.yFromCenter;
+
+        //relative transform scale
+        targetX *= relativeTransform.scale || 1;
+        targetY *= relativeTransform.scale || 1;
+
+        //relative transofrm rotate
+        function toRadians (angle) {
+            return angle * (Math.PI / 180);
+        }
+
+        let newTargetX = (targetX * Math.cos(toRadians(relativeTransform.rotation))) + (targetY * Math.sin(toRadians(relativeTransform.rotation)))
+        let newTargetY = (targetY * Math.cos(toRadians(relativeTransform.rotation))) - (targetX * Math.sin(toRadians(relativeTransform.rotation)))
+        targetX = newTargetX;
+        targetY = newTargetY;
+
+        //relative transform x,y
+        targetX += relativeTransform.x;
+        targetY += relativeTransform.y;
+
+        //relative transform finish
+        targetX += relativeTransform.center.x;
+        targetY += relativeTransform.center.y;
+
+        //relative transform apply
+        let targetScale = v.scale * relativeTransform.scale;
+        let targetRot = v.rotation + relativeTransform.rotation;
+        if(targetRot < 0) targetRot += 360;
+        else if(targetRot >= 360) targetRot -= 360;
+
+        od.x = targetX;
+        od.y = targetY;
+        od.scale = targetScale;
+        od.r = targetRot;
+
+        level.editObject(k, od);
+    });
+    level.confirmEdit();
+    renderer.renderLevel(level, cvs.width, cvs.height, options);
+}
 
 // this file contains all the high-levels functions to work with the renderer
 // (load level, update screen, move camera, edit stuff, etc.)
@@ -102,36 +221,26 @@ export default {
 
         let objids = level.getObjectsIn(rect);
         selectedObjs = objids;
-        console.log(objids);
-
-        options.colored_objects = {};
-        objids.forEach(o => {
-            options.colored_objects[o] = {
-                base: -1,
-                decor: -1
-            }
-        });
-        renderer.renderLevel(level, cvs.width, cvs.height, options);
+        selectObjects();
     },
     selectObjectAt: (x, y) => {
         let p = renderer.screenToLevelPos(x, y);
-        console.log(p);
 
         let objid = level.getObjectsAt(p.x, p.y);
         selectedObjs = objid;
         console.log(selectedObjs)
         
-        options.colored_objects = {};
-        options.colored_objects[objid] = {
-            base: -1,
-            decor: -1
-        }
-        renderer.renderLevel(level, cvs.width, cvs.height, options);
+        selectObjects();
     },
     clearSelected: () => {
         selectedObjs = [];
-        options.colored_objects = {};
-        renderer.renderLevel(level, cvs.width, cvs.height, options);
+        selectObjects();
+        relativeTransform = {
+            x: undefined,
+            y: undefined,
+            scale: undefined,
+            rotation: undefined
+        }
     },
     closeSelectionBox: () => {
         sel = null;
@@ -142,6 +251,12 @@ export default {
     },
     getSelectedObjects: () => {
         return selectedObjs;
+    },
+    getRelativeTransform: () => {
+        return relativeTransform;
+    },
+    setRelativeTransform: (obj) => {
+        updateRelativeTransform(obj);
     },
     placeObject: (opt) => {
         if(!level) return;
