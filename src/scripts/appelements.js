@@ -366,9 +366,15 @@ export default {
             // position
             let xposinput = document.querySelector('#editXPos');
             let yposinput = document.querySelector('#editYPos');
+            xposinput.setAttribute('unit', '');
+            yposinput.setAttribute('unit', '');
             if(relativeTransform.x != undefined && relativeTransform.y != undefined) {
-                xposinput.value = relativeTransform.x/3;
-                yposinput.value = relativeTransform.y/3;
+                if(!relativeTransform.absolute) {
+                    xposinput.setAttribute('unit', ' (relative)');
+                    yposinput.setAttribute('unit', ' (relative)');
+                }
+                xposinput.value = relativeTransform.x/3 + xposinput.getAttribute('unit');
+                yposinput.value = relativeTransform.y/3 + yposinput.getAttribute('unit');
             } else {
                 xposinput.value = '';
                 yposinput.value = '';
@@ -377,9 +383,15 @@ export default {
             // rotation & scale
             let rotinput = document.querySelector('#editRot');
             let scaleinput = document.querySelector('#editScale');
+            rotinput.setAttribute('unit', '°');
+            scaleinput.setAttribute('unit', '');
             if(relativeTransform.rotation != undefined && relativeTransform.scale != undefined) {
-                rotinput.value = relativeTransform.rotation;
-                scaleinput.value = relativeTransform.scale;
+                if(!relativeTransform.absolute) {
+                    rotinput.setAttribute('unit', '° (relative)');
+                    scaleinput.setAttribute('unit', ' (relative)');
+                }
+                rotinput.value = relativeTransform.rotation + rotinput.getAttribute('unit');
+                scaleinput.value = relativeTransform.scale + scaleinput.getAttribute('unit');
             } else {
                 rotinput.value = '';
                 scaleinput.value = '';

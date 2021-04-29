@@ -26,49 +26,73 @@ function selectObjects() {
     renderer.renderLevel(level, cvs.width, cvs.height, options);
 
     //rel transform
+    relativeTransform = {}
     if(selectedObjs.length < 1) return;
     relativeTransform = {
         x: 0,
         y: 0,
         scale: 1,
-        rotation: 0
+        rotation: 0,
+        absolute: false
     }
 
-    // calculate selection center
-    let positions = {
-        x: [],
-        y: []
-    }
-    selectedObjs.forEach(o => {
-        let od = level.getObject(o);
-        if(!od) return
-        if(od.x) positions.x.push(od.x);
-        if(od.y) positions.y.push(od.y);
-    });
-
-    let posBounds = { 
-        minx: Math.min(...positions.x), 
-        maxx: Math.max(...positions.x), 
-        miny: Math.min(...positions.y), 
-        maxy: Math.max(...positions.y)
-    }
-
-    relativeTransform.center = {
-        x: (posBounds.minx + posBounds.maxx)/2,
-        y: (posBounds.miny + posBounds.maxy)/2
-    }
-
-    // object local variables
-    relativeTransform.objdata = {};
-    selectedObjs.forEach(o => {
-        let od = level.getObject(o);
-        relativeTransform.objdata[o] = {
-            xFromCenter: od.x - relativeTransform.center.x,
-            yFromCenter: od.y - relativeTransform.center.y, 
-            scale: od.scale || 1,
-            rotation: od.r || 0
+    if (selectedObjs.length == 1) {
+        // absolute transform
+        let obj = level.getObject(selectedObjs[0]);
+        relativeTransform.center = {
+            x: obj.x,
+            y: obj.y
         }
-    });
+        relativeTransform.x = obj.x;
+        relativeTransform.y = obj.y;
+        relativeTransform.rotation = obj.r || 0;
+        relativeTransform.scale = obj.scale || 0;
+        relativeTransform.absolute = true;
+
+        relativeTransform.objdata = {};
+        relativeTransform.objdata[selectedObjs[0]] = {
+            xFromCenter: 0,
+            yFromCenter: 0, 
+            scale: 1,
+            rotation: 0
+        }
+    } else {
+        // calculate selection center
+        let positions = {
+            x: [],
+            y: []
+        }
+        selectedObjs.forEach(o => {
+            let od = level.getObject(o);
+            if(!od) return
+            if(od.x) positions.x.push(od.x);
+            if(od.y) positions.y.push(od.y);
+        });
+
+        let posBounds = { 
+            minx: Math.min(...positions.x), 
+            maxx: Math.max(...positions.x), 
+            miny: Math.min(...positions.y), 
+            maxy: Math.max(...positions.y)
+        }
+
+        relativeTransform.center = {
+            x: (posBounds.minx + posBounds.maxx)/2,
+            y: (posBounds.miny + posBounds.maxy)/2
+        }
+
+        // object local variables
+        relativeTransform.objdata = {};
+        selectedObjs.forEach(o => {
+            let od = level.getObject(o);
+            relativeTransform.objdata[o] = {
+                xFromCenter: od.x - relativeTransform.center.x,
+                yFromCenter: od.y - relativeTransform.center.y, 
+                scale: od.scale || 1,
+                rotation: od.r || 0
+            }
+        });
+    }
 }
 
 function updateRelativeTransform(obj) {
@@ -81,43 +105,52 @@ function updateRelativeTransform(obj) {
         let v = relativeTransform.objdata[k];
         let od = level.getObject(k);
 
-        //relative transform init
-        let targetX, targetY;
-        targetX = v.xFromCenter;
-        targetY = v.yFromCenter;
+        if(relativeTransform.absolute) {
+            od.x = relativeTransform.x;
+            od.y = relativeTransform.y;
+            od.scale = relativeTransform.scale;
+            od.r = relativeTransform.rotation;
+        } else {
+            //relative transform init
+            let targetX, targetY;
+            targetX = v.xFromCenter;
+            targetY = v.yFromCenter;
 
-        //relative transform scale
-        targetX *= relativeTransform.scale || 1;
-        targetY *= relativeTransform.scale || 1;
+            //relative transform scale
+            targetX *= relativeTransform.scale || 1;
+            targetY *= relativeTransform.scale || 1;
 
-        //relative transofrm rotate
-        function toRadians (angle) {
-            return angle * (Math.PI / 180);
+            //relative transofrm rotate
+            function toRadians (angle) {
+                return angle * (Math.PI / 180);
+            }
+
+            let newTargetX = (targetX * Math.cos(toRadians(relativeTransform.rotation))) + (targetY * Math.sin(toRadians(relativeTransform.rotation)))
+            let newTargetY = (targetY * Math.cos(toRadians(relativeTransform.rotation))) - (targetX * Math.sin(toRadians(relativeTransform.rotation)))
+            targetX = newTargetX;
+            targetY = newTargetY;
+
+            //relative transform x,y
+            targetX += relativeTransform.x;
+            targetY += relativeTransform.y;
+
+            //relative transform finish
+            targetX += relativeTransform.center.x;
+            targetY += relativeTransform.center.y;
+            targetX = Math.round(targetX*1000/30)/1000*30;
+            targetY = Math.round(targetY*1000/30)/1000*30;
+
+            //relative transform apply
+            let targetScale = v.scale * relativeTransform.scale;
+            let targetRot = v.rotation + relativeTransform.rotation;
+            if(targetRot < 0) targetRot += 360;
+            else if(targetRot >= 360) targetRot -= 360;
+
+            od.x = targetX;
+            od.y = targetY;
+            od.scale = targetScale;
+            od.r = targetRot;
         }
-
-        let newTargetX = (targetX * Math.cos(toRadians(relativeTransform.rotation))) + (targetY * Math.sin(toRadians(relativeTransform.rotation)))
-        let newTargetY = (targetY * Math.cos(toRadians(relativeTransform.rotation))) - (targetX * Math.sin(toRadians(relativeTransform.rotation)))
-        targetX = newTargetX;
-        targetY = newTargetY;
-
-        //relative transform x,y
-        targetX += relativeTransform.x;
-        targetY += relativeTransform.y;
-
-        //relative transform finish
-        targetX += relativeTransform.center.x;
-        targetY += relativeTransform.center.y;
-
-        //relative transform apply
-        let targetScale = v.scale * relativeTransform.scale;
-        let targetRot = v.rotation + relativeTransform.rotation;
-        if(targetRot < 0) targetRot += 360;
-        else if(targetRot >= 360) targetRot -= 360;
-
-        od.x = targetX;
-        od.y = targetY;
-        od.scale = targetScale;
-        od.r = targetRot;
 
         level.editObject(k, od);
     });
