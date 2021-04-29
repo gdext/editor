@@ -1,6 +1,7 @@
 import {GDRenderer} from './GDRenderW/main';
 import {EditorLevel} from './level';
 import TopCanvas from './topcanvas';
+import objectsData from '../assets/levelparse/objects.json';
 
 let gl, renderer, cvs, options, level, top, sel;
 
@@ -109,7 +110,8 @@ function updateRelativeTransform(obj) {
             od.x = relativeTransform.x;
             od.y = relativeTransform.y;
             od.scale = relativeTransform.scale;
-            od.r = relativeTransform.rotation;
+            if(od && objectsData.solids.includes(od.id)) od.r = Math.round(relativeTransform.rotation/90)*90;
+            else od.r = relativeTransform.rotation;
         } else {
             //relative transform init
             let targetX, targetY;
@@ -149,7 +151,8 @@ function updateRelativeTransform(obj) {
             od.x = targetX;
             od.y = targetY;
             od.scale = targetScale;
-            od.r = targetRot;
+            if(od && objectsData.solids.includes(od.id)) od.r = Math.round(targetRot/90)*90;
+            else od.r = targetRot;
         }
 
         level.editObject(k, od);
