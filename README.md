@@ -7,7 +7,7 @@
 This is an external Geometry Dash editor built using electron and webpack. This repo contains the code for the editor's page itself. However, it doesn't include the `/dist` directory and any of the code related to electron.
 > **Note:** This is still a work in progress.
 
-![GDExt](https://i.imgur.com/YRC7zHz.png)
+![GDExt](https://camo.githubusercontent.com/c745ac36f87b4676570d1dec9ff4bd1c60d60cabeec05e01f3677662de250244/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f457a5f2d4d71375751414d6d4a6a773f666f726d61743d6a7067266e616d653d6c61726765)
 
 ## Getting Started
 After you've cloned the repository, type `npm install` (Node.js is required, obviously) to install all the modules. All the code is located in the `/src` directory. Here's more info:
