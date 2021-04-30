@@ -994,7 +994,7 @@ export function GDRenderer(gl, loaded_callback = null) {
 
         var rot   = obj.r;
         var xflip = ( obj.flipx ? -1 : 1 ) || 1;
-        var yflip = ( obj.flipx ? -1 : 1 ) || 1;
+        var yflip = ( obj.flipy ? -1 : 1 ) || 1;
         var mainc = obj.baseCol  || ( def ? def.maincol : null ) || 1004;
         var secc  = obj.decorCol || ( def ? def.seccol : null )  || 1;
 
@@ -1264,6 +1264,9 @@ export function GDRenderer(gl, loaded_callback = null) {
         this.cache.camX1 = this.camera.x - this.width / this.camera.zoom / 2 - 60;
         this.cache.camX2 = this.camera.x + this.width / this.camera.zoom / 2 + 60;
 
+        let WIDTH = 0.7;
+        if (options.antialias == false) WIDTH = 1;
+
         // This will render the grid
         if (options.grid) {
             let cw = this.width / this.camera.zoom;
@@ -1279,9 +1282,9 @@ export function GDRenderer(gl, loaded_callback = null) {
             const BLOCK = 30;
 
             for (let x = Math.floor(x1/BLOCK) * BLOCK; x <= Math.floor(x2/BLOCK) * BLOCK; x+=BLOCK)
-                this.renderLine(x, true, BLACK, 0.7, true);
+                this.renderLine(x, true, BLACK, WIDTH, true);
             for (let y = Math.floor(y1/BLOCK) * BLOCK; y <= Math.floor(y2/BLOCK) * BLOCK; y+=BLOCK)
-                this.renderLine(y, false, BLACK, 0.7, true);
+                this.renderLine(y, false, BLACK, WIDTH, true);
 
             this.renderLine(0, true, {r: 0, g: 0.6, b: 0, a: 1}, 1.5, true);
 
