@@ -536,7 +536,8 @@ export default {
                         let relativeTransform = renderer.getRelativeTransform();
                         Object.keys(detail.data).forEach(k => {
                             let v = detail.data[k];
-                            relativeTransform[k] += v;
+                            if(v == '$invert') relativeTransform[k] = !relativeTransform[k];
+                            else relativeTransform[k] += v;
                         });
                         renderer.setRelativeTransform(relativeTransform);
                     } else {

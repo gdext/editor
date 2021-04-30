@@ -11,6 +11,8 @@ let relativeTransform = {
     y: 0,
     scale: 1,
     rotation: 0,
+    hflip: false,
+    vflip: false,
     center: {},
     objdata: {}
 }
@@ -34,6 +36,8 @@ function selectObjects() {
         y: 0,
         scale: 1,
         rotation: 0,
+        hflip: false,
+        vflip: false,
         absolute: false
     }
 
@@ -48,6 +52,8 @@ function selectObjects() {
         relativeTransform.y = obj.y;
         relativeTransform.rotation = obj.r || 0;
         relativeTransform.scale = obj.scale || 0;
+        relativeTransform.hflip = obj.flipx == true;
+        relativeTransform.vflip = obj.flipx == true;
         relativeTransform.absolute = true;
 
         relativeTransform.objdata = {};
@@ -55,7 +61,9 @@ function selectObjects() {
             xFromCenter: 0,
             yFromCenter: 0, 
             scale: 1,
-            rotation: 0
+            rotation: 0,
+            flipx: false,
+            flipy: false,
         }
     } else {
         // calculate selection center
@@ -90,7 +98,9 @@ function selectObjects() {
                 xFromCenter: od.x - relativeTransform.center.x,
                 yFromCenter: od.y - relativeTransform.center.y, 
                 scale: od.scale || 1,
-                rotation: od.r || 0
+                rotation: od.r || 0,
+                flipx: od.flipx || false,
+                flipy: od.flipy || false
             }
         });
     }
@@ -110,8 +120,15 @@ function updateRelativeTransform(obj) {
             od.x = relativeTransform.x;
             od.y = relativeTransform.y;
             od.scale = relativeTransform.scale;
-            if(od && objectsData.solids.includes(od.id)) od.r = Math.round(relativeTransform.rotation/90)*90;
-            else od.r = relativeTransform.rotation;
+            od.flipx = relativeTransform.hflip ? 1 : null;
+            od.flipy = relativeTransform.vflip ? 1 : null;
+
+            let targetRot = relativeTransform.rotation;
+            if(od && objectsData.solids.includes(od.id)) targetRot = Math.round(targetRot/90)*90;
+            if(targetRot < 0) targetRot += 360;
+            else if(targetRot >= 360) targetRot -= 360;
+            //relativeTransform.rotation = targetRot;
+            od.r = targetRot;
         } else {
             //relative transform init
             let targetX, targetY;
@@ -132,6 +149,10 @@ function updateRelativeTransform(obj) {
             targetX = newTargetX;
             targetY = newTargetY;
 
+            //relative transform flip
+            if(relativeTransform.hflip) targetX *= -1;
+            if(relativeTransform.vflip) targetY *= -1;
+
             //relative transform x,y
             targetX += relativeTransform.x;
             targetY += relativeTransform.y;
@@ -145,12 +166,20 @@ function updateRelativeTransform(obj) {
             //relative transform apply
             let targetScale = v.scale * relativeTransform.scale;
             let targetRot = v.rotation + relativeTransform.rotation;
+            targetRot *= relativeTransform.hflip ? -1 : 1;
+            targetRot *= relativeTransform.vflip ? -1 : 1;
             if(targetRot < 0) targetRot += 360;
             else if(targetRot >= 360) targetRot -= 360;
 
             od.x = targetX;
             od.y = targetY;
             od.scale = targetScale;
+
+            if(relativeTransform.hflip ^ v.flipx) od.flipx = 1;
+            else od.flipx = null;
+            if(relativeTransform.vflip ^ v.flipy) od.flipy = 1;
+            else od.flipy = null;
+
             if(od && objectsData.solids.includes(od.id)) od.r = Math.round(targetRot/90)*90;
             else od.r = targetRot;
         }
@@ -271,12 +300,7 @@ export default {
     clearSelected: () => {
         selectedObjs = [];
         selectObjects();
-        relativeTransform = {
-            x: undefined,
-            y: undefined,
-            scale: undefined,
-            rotation: undefined
-        }
+        relativeTransform = {}
     },
     closeSelectionBox: () => {
         sel = null;
