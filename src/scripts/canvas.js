@@ -51,7 +51,7 @@ function selectObjects() {
         relativeTransform.x = obj.x;
         relativeTransform.y = obj.y;
         relativeTransform.rotation = obj.r || 0;
-        relativeTransform.scale = obj.scale || 0;
+        relativeTransform.scale = obj.scale || 1;
         relativeTransform.hflip = obj.flipx == true;
         relativeTransform.vflip = obj.flipx == true;
         relativeTransform.absolute = true;
@@ -165,6 +165,7 @@ function updateRelativeTransform(obj) {
 
             //relative transform apply
             let targetScale = v.scale * relativeTransform.scale;
+            if(targetScale > 16) targetScale = 16;
             let targetRot = v.rotation + relativeTransform.rotation;
             targetRot *= relativeTransform.hflip ? -1 : 1;
             targetRot *= relativeTransform.vflip ? -1 : 1;
