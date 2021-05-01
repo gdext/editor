@@ -23,7 +23,7 @@ export function EditorLevel(renderer, level) {
     this.reloadSpeedPortals = function() {
         let sps = [];
         this.level.data.forEach((obj, i) => {
-            if (util.getSpeedPortal(obj))
+            if (util.getSpeedPortal(obj) != null)
                 sps.push(i);
         });
 
@@ -163,7 +163,7 @@ export function EditorLevel(renderer, level) {
             } else
                 this.addColorT(obj.color);
         }
-        if (util.getSpeedPortal(obj))
+        if (util.getSpeedPortal(obj) != null)
             this.reloadSpeeds = true;
 
         for (var prop in props) {
@@ -298,6 +298,9 @@ export function EditorLevel(renderer, level) {
             chunk = {};
         }
 
+        if (util.getSpeedPortal(obj) != null)
+            this.reloadSpeeds = true;
+
         let layer = chunk[obj.z];
 
         if (layer) {
@@ -356,7 +359,7 @@ export function EditorLevel(renderer, level) {
         if (obj.type == "trigger" && obj.info == "color")
             this.loadCTriggers(parseInt(obj.color));
 
-        if (util.getSpeedPortal(obj))
+        if (util.getSpeedPortal(obj) != null)
             this.reloadSpeeds = true;
     }
 
