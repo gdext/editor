@@ -10,7 +10,7 @@ const html =
 </head>
 <body>
     <script src="bundle.js"></script>
-    <script src="electron.js"></script>
+    <script src="../modules/gdext-electron.js"></script>
 </body>
 </html>`;
 
