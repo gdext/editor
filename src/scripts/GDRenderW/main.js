@@ -279,6 +279,31 @@ export const util = {
             return parseFloat(x) / parseFloat(this.ups[lspd]);
     },
     /**
+     * This function takes in a level and time in seconds and returns the x position
+     * where the amount of time passed is the same as the input given you went through each speed portal
+     * @param {GDExtLevel} level the level in GDExt JSON format. though it also needs the `sps` property.
+     * @param {number} x the time in seconds
+     * @returns {number} the returned x position
+     */
+    secToX: function(level, sec) {
+        let lastX   = 0;
+        let lastSec = 0;
+        let lastSpd = +(level.info.speed || 0) + 1;
+
+        for (let key of level.sps) {
+            let sp = level.data[key];
+
+            if (sec < sp.secx)
+                break;
+
+            lastX   = +sp.x;
+            lastSec = +sp.secx;
+            lastSpd = this.getSpeedPortal(sp);
+        }
+
+        return lastX + (sec - lastSec) * this.ups[lastSpd];
+    },
+    /**
      * forgot what this does
      * @param {*} level 
      * @param {*} x 
@@ -445,6 +470,14 @@ export const util = {
             lastCOL = obj;
         }
         return listCOLs;
+    },
+    guidelineColor: function(color) {
+        if (color >= 1.0) return {r: 0, g: 1, b: 0, a: 1};
+
+        if (color == 0.8 || color == 0) return {r: 1, g: 0.5, b: 0, a: 1};
+        else if (color == 0.9)          return {r: 1, g: 1, b: 0, a: 1};
+
+        return {r: 0, b: 0, g: 0, a: 0};
     },
     zorder: {
         '-3': -4,
@@ -1090,7 +1123,7 @@ export function GDRenderer(gl, loaded_callback = null) {
         // Loads all the indexes of each speed portal to a seperate table for preformance
         let listSPs = [];
         for (const obj of this.level.data) {
-            if (util.getSpeedPortal(obj))
+            if (util.getSpeedPortal(obj) != null)
                 listSPs.push(obj);
         }
         listSPs.sort((a, b) => a.x - b.x);
@@ -1295,9 +1328,9 @@ export function GDRenderer(gl, loaded_callback = null) {
         }
         monitor.endCategory("Grid rendering");
 
-        /*for (let gl of this.level.info.guidelines) {
-            //this.renderLine(util., true, {r: 1, g: 1, b: 1, a: 1}, 0.7, true);
-        }*/
+        if (this.level.info.guidelines)
+            for (let gl of this.level.info.guidelines)
+                this.renderLine(util.secToX(this.level, gl.timestamp), true, util.guidelineColor(gl.color), 1, true);
 
         if (!this.mainT.loaded) {
             monitor.endFrame(false);
