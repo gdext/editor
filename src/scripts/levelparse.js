@@ -15,6 +15,7 @@ export default {
             for(let i = 0; i < objSplitted.length; i+=2){
                 if(!objSplitted[i] || !objSplitted[i+1]) break;
                 let val = objSplitted[i+1];
+                if(parseFloat(val) == val) val = parseFloat(val);
                 // groups and hsv data split
                 if (propids[objSplitted[i]] == 'groups') val = objSplitted[i+1].split('.') 
                 else if (propids[objSplitted[i]] == 'copiedHSV' || propids[objSplitted[i]] == 'hsv1' || propids[objSplitted[i]] == 'hsv2') val = objSplitted[i+1].split('a');
