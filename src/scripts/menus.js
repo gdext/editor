@@ -329,9 +329,14 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        alert('test');
-                                        //let event = new CustomEvent('ed', { detail: event.detail });
-                                        //dispatchEvent(event);
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'transform',
+                                            mode: 'add',
+                                            data: {
+                                                vflip: '$invert'
+                                            } 
+                                        }});
+                                        dispatchEvent(event);
                                     }
                                 }
                             },
@@ -368,9 +373,14 @@ const bottomMenus = {
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        alert('test');
-                                        //let event = new CustomEvent('ed', { detail: event.detail });
-                                        //dispatchEvent(event);
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'transform',
+                                            mode: 'add',
+                                            data: {
+                                                hflip: '$invert'
+                                            } 
+                                        }});
+                                        dispatchEvent(event);
                                     }
                                 }
                             },

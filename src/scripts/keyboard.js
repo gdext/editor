@@ -19,6 +19,10 @@ export default {
             if(!targetEvent) return;
 
             if(targetEvent.type == 'event') {
+                if(targetEvent.focus) {
+                    if(document.activeElement && document.activeElement.id != targetEvent.focus) return;
+                    else if(!document.activeElement) return;
+                }
                 let event = new CustomEvent(targetEvent.eventName, { detail: targetEvent.eventInfo });
                 dispatchEvent(event);
             }

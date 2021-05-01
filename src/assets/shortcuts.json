@@ -84,7 +84,8 @@
         "eventName": "editor",
         "eventInfo": {
             "action": "delete"
-        }
+        },
+        "focus": "appMain"
     },
     {
         "keys": [ 88 ],
@@ -92,7 +93,8 @@
         "eventName": "editor",
         "eventInfo": {
             "action": "delete"
-        }
+        },
+        "focus": "appMain"
     },
     {
         "keys": [ 87 ],
@@ -104,7 +106,8 @@
             "data": {
                 "y": 30
             } 
-        }
+        },
+        "focus": "appMain"
     },
     {
         "keys": [ 65 ],
@@ -116,7 +119,8 @@
             "data": {
                 "x": -30
             } 
-        }
+        },
+        "focus": "appMain"
     },
     {
         "keys": [ 83 ],
@@ -128,7 +132,8 @@
             "data": {
                 "y": -30
             } 
-        }
+        },
+        "focus": "appMain"
     },
     {
         "keys": [ 68 ],
@@ -140,6 +145,33 @@
             "data": {
                 "x": 30
             } 
-        }
+        },
+        "focus": "appMain"
+    },
+    {
+        "keys": [ 81 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "rotation": -90
+            } 
+        },
+        "focus": "appMain"
+    },
+    {
+        "keys": [ 69 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "rotation": 90
+            } 
+        },
+        "focus": "appMain"
     }
 ]
