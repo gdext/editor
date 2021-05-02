@@ -17,6 +17,14 @@ let relativeTransform = {
     objdata: {}
 }
 
+let currentUndoGroup = null;
+
+function addUndoGroupAction(obj) {
+    if(typeof obj != 'object') return;
+    if(!currentUndoGroup) currentUndoGroup = [];
+    currentUndoGroup.push(obj);
+}
+
 function selectObjects() {
     // color selected objects
     options.colored_objects = {};
@@ -321,40 +329,49 @@ export default {
     },
     placeObject: (opt) => {
         if(!level) return;
+
+        let optdata = [];
+        if(Array.isArray(opt.data)) {
+            optdata = opt.data;
+        } else {
+            optdata = [opt.data];
+        }
+        console.log(optdata);
+
         switch (opt.mode) {
             case 'add':
-                if(Array.isArray(opt.data)) {
-                    opt.data.forEach(d => {
-                        let obj = level.createObject(d.id, d.x, d.y, true);
-                        level.addObject(obj);
+                optdata.forEach(d => {
+                    let obj = level.createObject(d.id, d.x, d.y, true);
+                    let objkey = level.addObject(obj);
+                    addUndoGroupAction({
+                        type: 'addObject',
+                        key: objkey,
+                        props: {
+                            id: d.id,
+                            x: d.x,
+                            y: d.y
+                        }
                     });
-                } else {
-                    let obj = level.createObject(opt.data.id, opt.data.x, opt.data.y, true);
-                    level.addObject(obj);
-                }
-                level.confirmEdit();
+                });
                 break;
             case 'remove':
-                if(Array.isArray(opt.data)) {
-                    opt.data.forEach(d => {
-                        level.removeObject(d.id);
+                optdata.forEach(d => {
+                    let obj = level.getObject(d.id);
+                    level.removeObject(d.id);
+                    addUndoGroupAction({
+                        type: 'removeObject',
+                        key: d.id,
+                        props: obj
                     });
-                } else {
-                    level.removeObject(opt.data.id);
-                }
-                level.confirmEdit();
+                });
                 break;
             case 'edit':
-                if(Array.isArray(opt.data)) {
-                    opt.data.forEach(d => {
-                        level.editObject(d.id, d.props || opt.props);
-                    });
-                } else {
-                    level.editObject(opt.data.id, opt.props);
-                }
-                level.confirmEdit();
+                optdata.forEach(d => {
+                    level.editObject(d.id, d.props || opt.props);
+                });
                 break;
-            }
+        }
+        level.confirmEdit();
         renderer.renderLevel(level, cvs.width, cvs.height, options);
     }
 }

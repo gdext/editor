@@ -308,6 +308,8 @@ export function EditorLevel(renderer, level) {
             this.addZSort(getChunk(obj.x), obj.z);
         } else
             this.level.lchunks[Math.floor(obj.x / 992)][obj.z] = [key];
+
+        return key;
     }
 
     this.createObject = function(id, x = 0, y = 0, grid_align = false) {
