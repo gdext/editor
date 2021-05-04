@@ -72,6 +72,24 @@
         "eventInfo": "load"
     },
     {
+        "keys": [ 17, 90 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "undo"
+    },
+    {
+        "keys": [ 16, 17, 90 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "redo"
+    },
+    {
+        "keys": [ 17, 89 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "redo"
+    },
+    {
         "keys": [ 113 ],
         "type": "event",
         "eventName": "action",

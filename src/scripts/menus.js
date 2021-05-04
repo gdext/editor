@@ -58,6 +58,12 @@ const bottomMenus = {
                                             x: parseFloat(v)*3,
                                         });
                                     },
+                                    onIconDragEnd: () => {
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'update'
+                                        }});
+                                        dispatchEvent(event);
+                                    },
                                     icon: 'slide',
                                     defaultToInteger: true,
                                     scale: 0.33
@@ -81,6 +87,12 @@ const bottomMenus = {
                                         canvas.setRelativeTransform({
                                             y: parseFloat(v)*3,
                                         });
+                                    },
+                                    onIconDragEnd: () => {
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'update'
+                                        }});
+                                        dispatchEvent(event);
                                     },
                                     icon: 'slide',
                                     defaultToInteger: true,
@@ -134,6 +146,12 @@ const bottomMenus = {
                                             rotation: parseFloat(v),
                                         });
                                     },
+                                    onIconDragEnd: () => {
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'update'
+                                        }});
+                                        dispatchEvent(event);
+                                    },
                                     icon: 'slide',
                                     defaultToInteger: true,
                                     scale: 1.33
@@ -157,6 +175,12 @@ const bottomMenus = {
                                         canvas.setRelativeTransform({
                                             scale: parseFloat(v),
                                         });
+                                    },
+                                    onIconDragEnd: () => {
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'update'
+                                        }});
+                                        dispatchEvent(event);
                                     },
                                     icon: 'slide',
                                     min: 0.1,

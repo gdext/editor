@@ -16,13 +16,80 @@ let relativeTransform = {
     center: {},
     objdata: {}
 }
+let globalPrevProps = {};
 
+let undoHistory = [];
+let currentHistoryPosition = 0;
 let currentUndoGroup = null;
 
 function addUndoGroupAction(obj) {
     if(typeof obj != 'object') return;
     if(!currentUndoGroup) currentUndoGroup = [];
     currentUndoGroup.push(obj);
+}
+
+function submitUndoGroup() {
+    if(currentHistoryPosition > 0) {
+        for(let i = 0; i < currentHistoryPosition; i++) {
+            undoHistory.shift();
+        }
+    }
+    currentHistoryPosition = 0;
+
+    if(currentUndoGroup) undoHistory.unshift(currentUndoGroup);
+    currentUndoGroup = null;
+    console.log(undoHistory);
+}
+
+function moveInHistory(backward) {
+    if(backward) {
+        if(!undoHistory[currentHistoryPosition]) {
+            console.log('Nothing to undo!');
+            return;
+        }
+        let targetUndoGroup = undoHistory[currentHistoryPosition].slice();
+        currentHistoryPosition++;
+        targetUndoGroup.reverse();
+        targetUndoGroup.forEach(action => {
+            switch(action.type) {
+                case 'addObject':
+                    level.removeObject(action.key);
+                    break;
+                case 'editObject':
+                    level.editObject(action.key, action.propsBefore);
+                    break;
+                case 'removeObject':
+                    level.addObject(action.props);
+                    break;
+            }
+        });
+    } else {
+        if(currentHistoryPosition <= 0) {
+            console.log('Nothing to redo!');
+            currentHistoryPosition = 0;
+            return;
+        }
+        currentHistoryPosition--;
+        let targetUndoGroup = undoHistory[currentHistoryPosition].slice();
+        targetUndoGroup.forEach(action => {
+            switch(action.type) {
+                case 'addObject':
+                    console.log('AAAABFBHGF', action.props);
+                    let obj = level.createObject(action.props.id, action.props.x, action.props.y, true);
+                    level.addObject(obj);
+                    break;
+                case 'editObject':
+                    console.log(action.propsAfter);
+                    level.editObject(action.key, action.propsAfter);
+                    break;
+                case 'removeObject':
+                    level.removeObject(action.key);
+                    break;
+            }
+        });
+    }
+    level.confirmEdit();
+    renderer.renderLevel(level, cvs.width, cvs.height, options);
 }
 
 function selectObjects() {
@@ -33,6 +100,8 @@ function selectObjects() {
             base: -1,
             decor: -1
         }
+        globalPrevProps[k] = JSON.parse(JSON.stringify(level.getObject(k)));
+        console.log(globalPrevProps[k]);
     });
     renderer.renderLevel(level, cvs.width, cvs.height, options);
 
@@ -309,7 +378,8 @@ export default {
     clearSelected: () => {
         selectedObjs = [];
         selectObjects();
-        relativeTransform = {}
+        relativeTransform = {};
+        globalPrevProps = {};
     },
     closeSelectionBox: () => {
         sel = null;
@@ -367,11 +437,31 @@ export default {
                 break;
             case 'edit':
                 optdata.forEach(d => {
+                    let prevPropsAll = globalPrevProps[d.id] || level.getObject(d.id);
+                    let props = d.props || opt.props;
+                    let prevProps = {};
+                    Object.keys(props).forEach(k => {
+                        if(props[k]) prevProps[k] = prevPropsAll[k] || 0;
+                    });
                     level.editObject(d.id, d.props || opt.props);
+                    globalPrevProps[d.id] = JSON.parse(JSON.stringify(level.getObject(d.id)));
+                    addUndoGroupAction({
+                        type: 'editObject',
+                        key: d.id,
+                        propsBefore: prevProps,
+                        propsAfter: JSON.parse(JSON.stringify(props))
+                    });
                 });
                 break;
         }
         level.confirmEdit();
         renderer.renderLevel(level, cvs.width, cvs.height, options);
+        if(!opt.dontSubmitUndo) submitUndoGroup();
+    },
+    submitUndoGroup: () => {
+        submitUndoGroup();
+    },
+    moveInHistory: (t) => {
+        moveInHistory(t);
     }
 }

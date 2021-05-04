@@ -286,7 +286,7 @@ export default {
                 let ty = Math.floor(coords.y/30)*30 + 15;
                 let ta = tx + '|' + ty;
                 if(!coordsArray.includes(ta)) {
-                    renderer.placeObject({ mode: 'add', data: { id: buildSelection, x: tx, y: ty }});
+                    renderer.placeObject({ mode: 'add', data: { id: buildSelection, x: tx, y: ty }, dontSubmitUndo: true });
                     renderer.update(canvas);
                     coordsArray.push(ta);
                 }
@@ -305,6 +305,7 @@ export default {
                 moving = false;
                 window.onpointerout = null;
                 renderer.update(canvas);
+                renderer.submitUndoGroup();
             }
             window.onpointerup = stop;
             window.onpointerout = stop;
@@ -396,6 +397,18 @@ export default {
                 rotinput.value = '';
                 scaleinput.value = '';
             }
+        }
+
+        function finishObjectTransform() {
+            let data = [];
+            renderer.getSelectedObjects().forEach(k => {
+                data.push({ id: k, props: renderer.getObjectByKey(k) });
+            });
+            console.log(data);
+            renderer.placeObject({
+                mode: 'edit',
+                data: data
+            });
         }
 
         //renderer events
@@ -544,6 +557,11 @@ export default {
                         renderer.setRelativeTransform(detail.data);
                     }
                     updateEditInputs();
+                    finishObjectTransform();
+                    break;
+                case 'update': 
+                    updateEditInputs();
+                    finishObjectTransform();
                     break;
             }
         });

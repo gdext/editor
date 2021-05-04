@@ -205,6 +205,7 @@ function UiObject() {
                     if(input.getAttribute('unit')) p.value += input.getAttribute('unit');
                     document.removeEventListener('pointermove', moveFunction);
                     document.removeEventListener('pointerup', stopFunction);
+                    if(options.onIconDragEnd) options.onIconDragEnd();
                 }
 
                 inputIcon.onpointerdown = e => {
@@ -224,6 +225,7 @@ function UiObject() {
                 function stopFunction() {
                     document.removeEventListener('pointermove', moveFunction);
                     document.removeEventListener('pointerup', stopFunction);
+                    if(options.onIconDragEnd) options.onIconDragEnd();
                 }
 
                 inputIcon.onpointerdown = () => {
