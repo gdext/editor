@@ -404,7 +404,6 @@ export default {
             renderer.getSelectedObjects().forEach(k => {
                 data.push({ id: k, props: renderer.getObjectByKey(k) });
             });
-            console.log(data);
             renderer.placeObject({
                 mode: 'edit',
                 data: data

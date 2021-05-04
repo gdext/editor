@@ -38,7 +38,6 @@ function submitUndoGroup() {
 
     if(currentUndoGroup) undoHistory.unshift(currentUndoGroup);
     currentUndoGroup = null;
-    console.log(undoHistory);
 }
 
 function moveInHistory(backward) {
@@ -74,12 +73,10 @@ function moveInHistory(backward) {
         targetUndoGroup.forEach(action => {
             switch(action.type) {
                 case 'addObject':
-                    console.log('AAAABFBHGF', action.props);
                     let obj = level.createObject(action.props.id, action.props.x, action.props.y, true);
                     level.addObject(obj);
                     break;
                 case 'editObject':
-                    console.log(action.propsAfter);
                     level.editObject(action.key, action.propsAfter);
                     break;
                 case 'removeObject':
@@ -101,7 +98,6 @@ function selectObjects() {
             decor: -1
         }
         globalPrevProps[k] = JSON.parse(JSON.stringify(level.getObject(k)));
-        console.log(globalPrevProps[k]);
     });
     renderer.renderLevel(level, cvs.width, cvs.height, options);
 
