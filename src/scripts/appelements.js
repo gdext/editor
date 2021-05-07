@@ -390,6 +390,7 @@ export default {
             let rotinput = document.querySelector('#editRot');
             let scaleinput = document.querySelector('#editScale');
             let editrow2 = rotinput.parentElement.parentElement.parentElement;
+            let editrow3 = rotinput.parentElement.parentElement.parentElement.parentElement.parentElement.children[2].children[0]
             rotinput.setAttribute('unit', '°');
             scaleinput.setAttribute('unit', '');
             if(relativeTransform.rotation != undefined && relativeTransform.scale != undefined) {
@@ -400,10 +401,12 @@ export default {
                 rotinput.value = relativeTransform.rotation + rotinput.getAttribute('unit');
                 scaleinput.value = relativeTransform.scale + scaleinput.getAttribute('unit');
                 editrow2.classList.remove('disabled');
+                editrow3.classList.remove('disabled');
             } else {
                 rotinput.value = '';
                 scaleinput.value = '';
                 editrow2.classList.add('disabled');
+                editrow3.classList.add('disabled');
             }
         }
 
