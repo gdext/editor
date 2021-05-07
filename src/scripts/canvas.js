@@ -371,6 +371,18 @@ export default {
         
         selectObjects();
     },
+    selectObjectByKey: (k) => {
+        if(Array.isArray(k)) {
+            let objid = [];
+            k.forEach(kk => {
+                objid.push(kk);
+            });
+            selectedObjs = objid;
+        } else {
+            selectedObjs = [k];
+        }
+        selectObjects(); 
+    },
     clearSelected: () => {
         selectedObjs = [];
         selectObjects();
@@ -404,11 +416,13 @@ export default {
         }
         console.log(optdata);
 
+        let keys = [];
         switch (opt.mode) {
             case 'add':
                 optdata.forEach(d => {
                     let obj = level.createObject(d.id, d.x, d.y, true);
                     let objkey = level.addObject(obj);
+                    keys.push(objkey);
                     addUndoGroupAction({
                         type: 'addObject',
                         key: objkey,
@@ -424,6 +438,7 @@ export default {
                 optdata.forEach(d => {
                     let obj = level.getObject(d.id);
                     level.removeObject(d.id);
+                    keys.push(d.id);
                     addUndoGroupAction({
                         type: 'removeObject',
                         key: d.id,
@@ -441,6 +456,7 @@ export default {
                     });
                     level.editObject(d.id, d.props || opt.props);
                     globalPrevProps[d.id] = JSON.parse(JSON.stringify(level.getObject(d.id)));
+                    keys.push(d.id);
                     addUndoGroupAction({
                         type: 'editObject',
                         key: d.id,

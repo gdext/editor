@@ -594,10 +594,7 @@ const contextMenus = {
                                                 defaultValue: () => {
                                                     return 0;
                                                 },
-                                                icon: 'pick',
-                                                onIconClick: () => {
-                                                    alert('bruh')
-                                                }
+                                                icon: 'pick'
                                             }
                                         }
                                     ]
@@ -676,13 +673,21 @@ export default {
                 obj = contextMenus.editObject.normal;
                 let baseColorInput = obj.children[0].children[1].children[0].children[1];
                 let detailColorInput = obj.children[0].children[1].children[1].children[1];
-                baseColorInput.properties.onIconClick = (e) => {
+
+                function onColorInputClick(e, c) {
                     let obj2 = contextMenus.objColor.normal;
                     obj2.properties.x = e.pageX;
                     obj2.properties.y = e.pageY;
                     let el = document.querySelector('#editObjMenu');
                     if(!el) el = document.body;
                     ui.renderUiObject(obj2, el);
+                }
+
+                baseColorInput.properties.onIconClick = (e) => {
+                    onColorInputClick(e);
+                }
+                detailColorInput.properties.onIconClick = (e) => {
+                    onColorInputClick(e);
                 }
                 break;
         }
