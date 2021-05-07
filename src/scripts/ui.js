@@ -205,6 +205,7 @@ function UiObject() {
                     if(input.getAttribute('unit')) p.value += input.getAttribute('unit');
                     document.removeEventListener('pointermove', moveFunction);
                     document.removeEventListener('pointerup', stopFunction);
+                    if(options.onIconDragEnd) options.onIconDragEnd();
                 }
 
                 inputIcon.onpointerdown = e => {
@@ -224,6 +225,7 @@ function UiObject() {
                 function stopFunction() {
                     document.removeEventListener('pointermove', moveFunction);
                     document.removeEventListener('pointerup', stopFunction);
+                    if(options.onIconDragEnd) options.onIconDragEnd();
                 }
 
                 inputIcon.onpointerdown = () => {
@@ -514,9 +516,13 @@ function UiObject() {
         let menu = document.createElement('div');
         menu.classList.add('ui-context-menu');
         menu.classList.add('uistretch');
+        menu.tabIndex = 2;
+        setTimeout(() => {
+            menu.focus();
+        }, 25);
         if(id) menu.id = id;
-        if(options && options.maxwidth) menu.style.width = options.maxwidth;
-        if(options && options.maxheight) menu.style.maxHeight = options.maxheight;
+        if(options && options.maxwidth) menu.style.width = options.maxwidth + 'px';
+        if(options && options.maxheight) menu.style.maxHeight = options.maxheight + 'px';
         if(options && options.x) menu.style.left = options.x + 'px';
         if(options && options.y) menu.style.top = options.y + 'px';
 

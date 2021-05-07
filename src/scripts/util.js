@@ -7,6 +7,9 @@ import buildPreview from './buildPreview';
 
 let unsavedChanges = false;
 
+let closeFuncIds = [];
+let prevFocusElement = {};
+
 function closeDialog (id) {
     let dialog = document.getElementById(id);
     if(!dialog) return;
@@ -23,14 +26,29 @@ function closeDialog (id) {
             rootelem.parentElement.removeChild(rootelem);
         }
     }, 250);
-    window.removeEventListener('keydown', closeFunc);
+    closeFuncIds.shift();
+    if(closeFuncIds.length <= 0) {
+        window.removeEventListener('keydown', closeFunc);
+    }
+
+    if(prevFocusElement[id]) {
+        prevFocusElement[id].focus();
+        console.log(document.activeElement);
+    }
 }
 
-let closeFuncId;
+function openFunc(id) {
+    closeFuncIds.unshift(id);
+    window.addEventListener('keydown', closeFunc);
+    prevFocusElement[id] = document.activeElement;
+    console.log(document.activeElement);
+}
 function closeFunc(e) {
     if(e.keyCode == 27) {
-        closeDialog(closeFuncId);
-        window.removeEventListener('keydown', closeFunc);
+        closeDialog(closeFuncIds[0]);
+        if(closeFuncIds.length <= 0) {
+            window.removeEventListener('keydown', closeFunc);
+        }
     }
 
     return false;
@@ -109,8 +127,7 @@ export default {
         if(elemContent.getBoundingClientRect().height > maxheight)
             elemContent.style.height = maxheight + 'px';
 
-        closeFuncId = id;
-        window.addEventListener('keydown', closeFunc);
+        openFunc(id);
     },
 
     closeDialog: (id) => {
@@ -175,8 +192,7 @@ export default {
             });
         ui.renderUiObject(obj, document.body);
 
-        closeFuncId = id;
-        window.addEventListener('keydown', closeFunc);
+        openFunc(id);
     },
 
     confirm: (id, title, description, options) => {
@@ -244,8 +260,7 @@ export default {
             ]
         }, document.body);
 
-        closeFuncId = id;
-        window.addEventListener('keydown', closeFunc);
+        openFunc(id);
     },
 
     prompt: (id, title, description, options) => {
@@ -338,8 +353,7 @@ export default {
             ]
         }, document.body);
 
-        closeFuncId = id;
-        window.addEventListener('keydown', closeFunc);
+        openFunc(id);
     },
 
     showNotif: (id, text, time, type) => {

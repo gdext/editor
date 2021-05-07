@@ -1017,6 +1017,7 @@ export function GDRenderer(gl, loaded_callback = null) {
      * @returns 
      */
     this.renderObject = (obj, key = -1) => {
+        if(!obj) return;
         var def = this.objectDefs[obj.id];
 
         if (!def && obj.type != "text")

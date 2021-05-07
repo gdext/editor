@@ -16,6 +16,78 @@ let relativeTransform = {
     center: {},
     objdata: {}
 }
+let globalPrevProps = {};
+
+let undoHistory = [];
+let currentHistoryPosition = 0;
+let currentUndoGroup = null;
+
+function addUndoGroupAction(obj) {
+    if(typeof obj != 'object') return;
+    if(!currentUndoGroup) currentUndoGroup = [];
+    currentUndoGroup.push(obj);
+}
+
+function submitUndoGroup() {
+    if(currentHistoryPosition > 0) {
+        for(let i = 0; i < currentHistoryPosition; i++) {
+            undoHistory.shift();
+        }
+    }
+    currentHistoryPosition = 0;
+
+    if(currentUndoGroup) undoHistory.unshift(currentUndoGroup);
+    currentUndoGroup = null;
+}
+
+function moveInHistory(backward) {
+    if(backward) {
+        if(!undoHistory[currentHistoryPosition]) {
+            console.log('Nothing to undo!');
+            return;
+        }
+        let targetUndoGroup = undoHistory[currentHistoryPosition].slice();
+        currentHistoryPosition++;
+        targetUndoGroup.reverse();
+        targetUndoGroup.forEach(action => {
+            switch(action.type) {
+                case 'addObject':
+                    level.removeObject(action.key);
+                    break;
+                case 'editObject':
+                    level.editObject(action.key, action.propsBefore);
+                    break;
+                case 'removeObject':
+                    level.addObject(action.props);
+                    break;
+            }
+        });
+    } else {
+        if(currentHistoryPosition <= 0) {
+            console.log('Nothing to redo!');
+            currentHistoryPosition = 0;
+            return;
+        }
+        currentHistoryPosition--;
+        let targetUndoGroup = undoHistory[currentHistoryPosition].slice();
+        targetUndoGroup.forEach(action => {
+            switch(action.type) {
+                case 'addObject':
+                    let obj = level.createObject(action.props.id, action.props.x, action.props.y, true);
+                    level.addObject(obj);
+                    break;
+                case 'editObject':
+                    level.editObject(action.key, action.propsAfter);
+                    break;
+                case 'removeObject':
+                    level.removeObject(action.key);
+                    break;
+            }
+        });
+    }
+    level.confirmEdit();
+    renderer.renderLevel(level, cvs.width, cvs.height, options);
+}
 
 function selectObjects() {
     // color selected objects
@@ -25,6 +97,7 @@ function selectObjects() {
             base: -1,
             decor: -1
         }
+        globalPrevProps[k] = JSON.parse(JSON.stringify(level.getObject(k)));
     });
     renderer.renderLevel(level, cvs.width, cvs.height, options);
 
@@ -109,9 +182,28 @@ function selectObjects() {
 function updateRelativeTransform(obj) {
     if(!relativeTransform.objdata) return;
     Object.assign(relativeTransform, obj);
+    let changedProps = {
+        pos: false,
+        rot: false,
+        scale: false,
+        flip: false
+    }
+    if(relativeTransform.x || relativeTransform.y) changedProps.pos = true;
+    if(relativeTransform.rotation) changedProps.rot = true;
+    if(relativeTransform.scale) changedProps.scale = true;
+    if(relativeTransform.hflip || relativeTransform.vflip) changedProps.flip = true; 
+
     if(relativeTransform.rotation < 0) relativeTransform.rotation += 360;
     else if(relativeTransform.rotation >= 360) relativeTransform.rotation -= 360;
     
+    //pre-calculate rotation
+    function toRadians (angle) {
+        return angle * (Math.PI / 180);
+    }
+    let rotToRad = toRadians(relativeTransform.rotation)
+    let sinRot = Math.sin(rotToRad);
+    let cosRot = Math.cos(rotToRad);
+
     Object.keys(relativeTransform.objdata).forEach(k => {
         let v = relativeTransform.objdata[k];
         let od = level.getObject(k);
@@ -136,26 +228,30 @@ function updateRelativeTransform(obj) {
             targetY = v.yFromCenter;
 
             //relative transform scale
-            targetX *= relativeTransform.scale || 1;
-            targetY *= relativeTransform.scale || 1;
-
-            //relative transofrm rotate
-            function toRadians (angle) {
-                return angle * (Math.PI / 180);
+            if(changedProps.scale) {
+                targetX *= relativeTransform.scale || 1;
+                targetY *= relativeTransform.scale || 1;
             }
 
-            let newTargetX = (targetX * Math.cos(toRadians(relativeTransform.rotation))) + (targetY * Math.sin(toRadians(relativeTransform.rotation)))
-            let newTargetY = (targetY * Math.cos(toRadians(relativeTransform.rotation))) - (targetX * Math.sin(toRadians(relativeTransform.rotation)))
-            targetX = newTargetX;
-            targetY = newTargetY;
+            //relative transofrm rotate
+            if(changedProps.rot) {
+                let newTargetX = (targetX * cosRot) + (targetY * sinRot)
+                let newTargetY = (targetY * cosRot) - (targetX * sinRot)
+                targetX = newTargetX;
+                targetY = newTargetY;
+            }
 
             //relative transform flip
-            if(relativeTransform.hflip) targetX *= -1;
-            if(relativeTransform.vflip) targetY *= -1;
+            if(changedProps.flip) {
+                if(relativeTransform.hflip) targetX *= -1;
+                if(relativeTransform.vflip) targetY *= -1;
+            }
 
             //relative transform x,y
-            targetX += relativeTransform.x;
-            targetY += relativeTransform.y;
+            if(changedProps.pos) {
+                targetX += relativeTransform.x;
+                targetY += relativeTransform.y;
+            }
 
             //relative transform finish
             targetX += relativeTransform.center.x;
@@ -298,10 +394,23 @@ export default {
         
         selectObjects();
     },
+    selectObjectByKey: (k) => {
+        if(Array.isArray(k)) {
+            let objid = [];
+            k.forEach(kk => {
+                objid.push(kk);
+            });
+            selectedObjs = objid;
+        } else {
+            selectedObjs = [k];
+        }
+        selectObjects(); 
+    },
     clearSelected: () => {
         selectedObjs = [];
         selectObjects();
-        relativeTransform = {}
+        relativeTransform = {};
+        globalPrevProps = {};
     },
     closeSelectionBox: () => {
         sel = null;
@@ -321,40 +430,74 @@ export default {
     },
     placeObject: (opt) => {
         if(!level) return;
+
+        let optdata = [];
+        if(Array.isArray(opt.data)) {
+            optdata = opt.data;
+        } else {
+            optdata = [opt.data];
+        }
+        console.log(optdata);
+
+        let keys = [];
         switch (opt.mode) {
             case 'add':
-                if(Array.isArray(opt.data)) {
-                    opt.data.forEach(d => {
-                        let obj = level.createObject(d.id, d.x, d.y, true);
-                        level.addObject(obj);
+                optdata.forEach(d => {
+                    let obj = level.createObject(d.id, d.x, d.y, true);
+                    let objkey = level.addObject(obj);
+                    keys.push(objkey);
+                    addUndoGroupAction({
+                        type: 'addObject',
+                        key: objkey,
+                        props: {
+                            id: d.id,
+                            x: d.x,
+                            y: d.y
+                        }
                     });
-                } else {
-                    let obj = level.createObject(opt.data.id, opt.data.x, opt.data.y, true);
-                    level.addObject(obj);
-                }
-                level.confirmEdit();
+                });
                 break;
             case 'remove':
-                if(Array.isArray(opt.data)) {
-                    opt.data.forEach(d => {
-                        level.removeObject(d.id);
+                optdata.forEach(d => {
+                    let obj = level.getObject(d.id);
+                    level.removeObject(d.id);
+                    keys.push(d.id);
+                    addUndoGroupAction({
+                        type: 'removeObject',
+                        key: d.id,
+                        props: obj
                     });
-                } else {
-                    level.removeObject(opt.data.id);
-                }
-                level.confirmEdit();
+                });
                 break;
             case 'edit':
-                if(Array.isArray(opt.data)) {
-                    opt.data.forEach(d => {
-                        level.editObject(d.id, d.props || opt.props);
+                optdata.forEach(d => {
+                    let prevPropsAll = globalPrevProps[d.id] || level.getObject(d.id);
+                    let props = d.props || opt.props;
+                    let prevProps = {};
+                    Object.keys(props).forEach(k => {
+                        if(props[k]) prevProps[k] = prevPropsAll[k] || 0;
                     });
-                } else {
-                    level.editObject(opt.data.id, opt.props);
-                }
-                level.confirmEdit();
+                    level.editObject(d.id, d.props || opt.props);
+                    globalPrevProps[d.id] = JSON.parse(JSON.stringify(level.getObject(d.id)));
+                    keys.push(d.id);
+                    addUndoGroupAction({
+                        type: 'editObject',
+                        key: d.id,
+                        propsBefore: prevProps,
+                        propsAfter: JSON.parse(JSON.stringify(props))
+                    });
+                });
                 break;
-            }
+        }
+        level.confirmEdit();
         renderer.renderLevel(level, cvs.width, cvs.height, options);
+        if(!opt.dontSubmitUndo) submitUndoGroup();
+        return keys;
+    },
+    submitUndoGroup: () => {
+        submitUndoGroup();
+    },
+    moveInHistory: (t) => {
+        moveInHistory(t);
     }
 }

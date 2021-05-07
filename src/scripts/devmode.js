@@ -60,8 +60,20 @@ export default {
                                         window.location.reload();
                                     });
                                 break;*/
-                            case 'testRelativeTransform':
-                                canvas.setRelativeTransform({ scale: 2 });
+                            case 'testEditObject':
+                                canvas.placeObject({
+                                    mode: 'edit',
+                                    data: [
+                                        {
+                                            id: 1,
+                                            props: {
+                                                x: 25,
+                                                y: 60,
+                                                r: 45
+                                            }
+                                        }
+                                    ]
+                                });
                                 break;
                             case 'help':
                                 console.log(`lvlcode - show level's raw code

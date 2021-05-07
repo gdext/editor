@@ -4,6 +4,7 @@ import util from './util';
 import canvas from './canvas';
 import levelparse from './levelparse';
 import quicktoolsData from '../assets/quicktools.json';
+import ui from './ui';
 
 function loadLevel(levelTxt, lvlName) {
     let event = new CustomEvent('electronApi', { 
@@ -58,6 +59,12 @@ const bottomMenus = {
                                             x: parseFloat(v)*3,
                                         });
                                     },
+                                    onIconDragEnd: () => {
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'update'
+                                        }});
+                                        dispatchEvent(event);
+                                    },
                                     icon: 'slide',
                                     defaultToInteger: true,
                                     scale: 0.33
@@ -81,6 +88,12 @@ const bottomMenus = {
                                         canvas.setRelativeTransform({
                                             y: parseFloat(v)*3,
                                         });
+                                    },
+                                    onIconDragEnd: () => {
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'update'
+                                        }});
+                                        dispatchEvent(event);
                                     },
                                     icon: 'slide',
                                     defaultToInteger: true,
@@ -134,6 +147,12 @@ const bottomMenus = {
                                             rotation: parseFloat(v),
                                         });
                                     },
+                                    onIconDragEnd: () => {
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'update'
+                                        }});
+                                        dispatchEvent(event);
+                                    },
                                     icon: 'slide',
                                     defaultToInteger: true,
                                     scale: 1.33
@@ -157,6 +176,12 @@ const bottomMenus = {
                                         canvas.setRelativeTransform({
                                             scale: parseFloat(v),
                                         });
+                                    },
+                                    onIconDragEnd: () => {
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'update'
+                                        }});
+                                        dispatchEvent(event);
                                     },
                                     icon: 'slide',
                                     min: 0.1,
@@ -392,7 +417,6 @@ const bottomMenus = {
     }
 }
 
-
 const canvasMenus = {
     canvasOptions: {
         properties: {
@@ -492,6 +516,113 @@ const canvasMenus = {
     }
 }
 
+const contextMenus = {
+    editObject: {
+        normal: {
+            properties: {
+                type: 'contextMenu',
+                id: 'editObjMenu',
+                title: 'Edit Object',
+                x: 0,
+                y: 0
+            },
+            children: [
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 7,
+                        paddingY: 5
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                text: 'Color',
+                                style: 'bold'
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'container',
+                                direction: 'row',
+                                paddingX: 0,
+                                paddingY: 5
+                            },
+                            children: [
+                                //base color
+                                {
+                                    properties: {
+                                        type: 'container',
+                                        direction: 'column'
+                                    },
+                                    children: [
+                                        {
+                                            properties: {
+                                                type: 'label',
+                                                text: 'Base'
+                                            }
+                                        },
+                                        {
+                                            properties: {
+                                                type: 'numberInput',
+                                                id: 'editobjBaseColor',
+                                                defaultValue: () => {
+                                                    return 0;
+                                                },
+                                                icon: 'pick'
+                                            }
+                                        }
+                                    ]
+                                },
+                                // detail color
+                                {
+                                    properties: {
+                                        type: 'container',
+                                        direction: 'column'
+                                    },
+                                    children: [
+                                        {
+                                            properties: {
+                                                type: 'label',
+                                                text: 'Detail'
+                                            }
+                                        },
+                                        {
+                                            properties: {
+                                                type: 'numberInput',
+                                                id: 'editobjDetailColor',
+                                                defaultValue: () => {
+                                                    return 0;
+                                                },
+                                                icon: 'pick'
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    objColor: {
+        normal: {
+            properties: {
+                type: 'contextMenu',
+                id: 'colorChannelEditMenu',
+                title: 'Color Channel',
+                x: 0,
+                y: 0,
+                maxwidth: 140
+            },
+            children: [
+                
+            ]
+        }
+    }
+}
+
 export default {
 
     getBottomMenus: () => {
@@ -533,6 +664,38 @@ export default {
             });
         });
 
+        return obj;
+    },
+
+    getContextMenu: (type, options) => {
+        let obj = {};
+        switch(type) {
+            case 'editObjectNormal':
+                obj = contextMenus.editObject.normal;
+                let baseColorInput = obj.children[0].children[1].children[0].children[1];
+                let detailColorInput = obj.children[0].children[1].children[1].children[1];
+
+                function onColorInputClick(e, c) {
+                    let obj2 = contextMenus.objColor.normal;
+                    obj2.properties.x = e.pageX-30;
+                    obj2.properties.y = e.pageY+15;
+                    let el = document.querySelector('#editObjMenu');
+                    if(!el) el = document.body;
+                    ui.renderUiObject(obj2, el);
+                }
+
+                baseColorInput.properties.onIconClick = (e) => {
+                    onColorInputClick(e);
+                }
+                detailColorInput.properties.onIconClick = (e) => {
+                    onColorInputClick(e);
+                }
+                break;
+        }
+        if(options) {
+            obj.properties.x = options.x;
+            obj.properties.y = options.y;
+        }
         return obj;
     }
 

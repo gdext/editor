@@ -274,6 +274,12 @@ function executeAction(action) {
                 }
             });
             break;
+        case 'undo':
+            canvas.moveInHistory(true);
+            break;
+        case 'redo':
+            canvas.moveInHistory(false);
+            break;
         case 'about':
             util.alert('aboutDialog', 'About GDExt', 'TODO: Add about screen');
             break;

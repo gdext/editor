@@ -72,6 +72,24 @@
         "eventInfo": "load"
     },
     {
+        "keys": [ 17, 90 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "undo"
+    },
+    {
+        "keys": [ 16, 17, 90 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "redo"
+    },
+    {
+        "keys": [ 17, 89 ],
+        "type": "event",
+        "eventName": "action",
+        "eventInfo": "redo"
+    },
+    {
         "keys": [ 113 ],
         "type": "event",
         "eventName": "action",
@@ -85,7 +103,7 @@
         "eventInfo": {
             "action": "delete"
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 88 ],
@@ -94,7 +112,7 @@
         "eventInfo": {
             "action": "delete"
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 87 ],
@@ -107,7 +125,7 @@
                 "y": 30
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 65 ],
@@ -120,7 +138,7 @@
                 "x": -30
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 83 ],
@@ -133,7 +151,7 @@
                 "y": -30
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 68 ],
@@ -146,7 +164,7 @@
                 "x": 30
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 81 ],
@@ -159,7 +177,7 @@
                 "rotation": -90
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 69 ],
@@ -172,6 +190,6 @@
                 "rotation": 90
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     }
 ]
