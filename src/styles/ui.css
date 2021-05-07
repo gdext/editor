@@ -197,6 +197,7 @@
     width: fit-content;
     left: 0;
     top: 0;
+    z-index: 1;
     height: fit-content;
 }
 .ui-list-dropdown.vis {
