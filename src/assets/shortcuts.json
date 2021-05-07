@@ -103,7 +103,7 @@
         "eventInfo": {
             "action": "delete"
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 88 ],
@@ -112,7 +112,7 @@
         "eventInfo": {
             "action": "delete"
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 87 ],
@@ -125,7 +125,7 @@
                 "y": 30
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 65 ],
@@ -138,7 +138,7 @@
                 "x": -30
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 83 ],
@@ -151,7 +151,7 @@
                 "y": -30
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 68 ],
@@ -164,7 +164,7 @@
                 "x": 30
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 81 ],
@@ -177,7 +177,7 @@
                 "rotation": -90
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     },
     {
         "keys": [ 69 ],
@@ -190,6 +190,6 @@
                 "rotation": 90
             } 
         },
-        "focus": "appMain"
+        "focus": "app"
     }
 ]

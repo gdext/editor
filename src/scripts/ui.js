@@ -516,6 +516,10 @@ function UiObject() {
         let menu = document.createElement('div');
         menu.classList.add('ui-context-menu');
         menu.classList.add('uistretch');
+        menu.tabIndex = 2;
+        setTimeout(() => {
+            menu.focus();
+        }, 25);
         if(id) menu.id = id;
         if(options && options.maxwidth) menu.style.width = options.maxwidth;
         if(options && options.maxheight) menu.style.maxHeight = options.maxheight;

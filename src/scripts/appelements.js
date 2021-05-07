@@ -275,6 +275,7 @@ export default {
         }
 
         function beginObjectBuilding(e) {
+            if(document.activeElement.id != 'app') return;
             let eX = e.offsetX;
             let eY = e.offsetY;
             let coordsArray = [];
@@ -448,48 +449,7 @@ export default {
         // TODO: Replace the text context menu with data from menus.js
         top_canvas.oncontextmenu = (e) => {
             //test context menu
-            ui.renderUiObject({
-                properties: {
-                    type: 'contextMenu',
-                    id: 'testContext',
-                    title: 'Test Context Menu',
-                    x: e.pageX,
-                    y: e.pageY
-                },
-                children: [
-                    {
-                        properties: {
-                            type: 'container',
-                            paddingX: 7,
-                            paddingY: 10
-                        },
-                        children: [
-                            {
-                                properties: {
-                                    type: 'label',
-                                    text: 'Coming Soon!'
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        properties: {
-                            type: 'container',
-                            isBottomBar: true,
-                            paddingX: 7,
-                            paddingY: 5
-                        },
-                        children: [
-                            {
-                                properties: {
-                                    type: 'label',
-                                    text: 'idk...'
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }, document.body);
+            ui.renderUiObject(menus.getContextMenu('editObjectNormal', {x: e.pageX, y: e.pageY}), document.body);
             return false;
         }
 
