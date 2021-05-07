@@ -182,9 +182,28 @@ function selectObjects() {
 function updateRelativeTransform(obj) {
     if(!relativeTransform.objdata) return;
     Object.assign(relativeTransform, obj);
+    let changedProps = {
+        pos: false,
+        rot: false,
+        scale: false,
+        flip: false
+    }
+    if(relativeTransform.x || relativeTransform.y) changedProps.pos = true;
+    if(relativeTransform.rotation) changedProps.rot = true;
+    if(relativeTransform.scale) changedProps.scale = true;
+    if(relativeTransform.hflip || relativeTransform.vflip) changedProps.flip = true; 
+
     if(relativeTransform.rotation < 0) relativeTransform.rotation += 360;
     else if(relativeTransform.rotation >= 360) relativeTransform.rotation -= 360;
     
+    //pre-calculate rotation
+    function toRadians (angle) {
+        return angle * (Math.PI / 180);
+    }
+    let rotToRad = toRadians(relativeTransform.rotation)
+    let sinRot = Math.sin(rotToRad);
+    let cosRot = Math.cos(rotToRad);
+
     Object.keys(relativeTransform.objdata).forEach(k => {
         let v = relativeTransform.objdata[k];
         let od = level.getObject(k);
@@ -209,26 +228,30 @@ function updateRelativeTransform(obj) {
             targetY = v.yFromCenter;
 
             //relative transform scale
-            targetX *= relativeTransform.scale || 1;
-            targetY *= relativeTransform.scale || 1;
-
-            //relative transofrm rotate
-            function toRadians (angle) {
-                return angle * (Math.PI / 180);
+            if(changedProps.scale) {
+                targetX *= relativeTransform.scale || 1;
+                targetY *= relativeTransform.scale || 1;
             }
 
-            let newTargetX = (targetX * Math.cos(toRadians(relativeTransform.rotation))) + (targetY * Math.sin(toRadians(relativeTransform.rotation)))
-            let newTargetY = (targetY * Math.cos(toRadians(relativeTransform.rotation))) - (targetX * Math.sin(toRadians(relativeTransform.rotation)))
-            targetX = newTargetX;
-            targetY = newTargetY;
+            //relative transofrm rotate
+            if(changedProps.rot) {
+                let newTargetX = (targetX * cosRot) + (targetY * sinRot)
+                let newTargetY = (targetY * cosRot) - (targetX * sinRot)
+                targetX = newTargetX;
+                targetY = newTargetY;
+            }
 
             //relative transform flip
-            if(relativeTransform.hflip) targetX *= -1;
-            if(relativeTransform.vflip) targetY *= -1;
+            if(changedProps.flip) {
+                if(relativeTransform.hflip) targetX *= -1;
+                if(relativeTransform.vflip) targetY *= -1;
+            }
 
             //relative transform x,y
-            targetX += relativeTransform.x;
-            targetY += relativeTransform.y;
+            if(changedProps.pos) {
+                targetX += relativeTransform.x;
+                targetY += relativeTransform.y;
+            }
 
             //relative transform finish
             targetX += relativeTransform.center.x;
