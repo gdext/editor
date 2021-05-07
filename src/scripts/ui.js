@@ -65,6 +65,8 @@ function UiObject() {
             button.style.width = options.width + 'px';
             button.style.minWidth = '0px';
         }
+        if(options.marginTop != undefined) button.style.marginTop = options.marginTop + 'px';
+        if(options.marginBottom != undefined) button.style.marginBottom = options.marginBottom + 'px';
         if(options && options.height) button.style.height = options.height + 'px';
         if(icon && name) button.classList.add('s');
         if(id) button.id = id;
@@ -124,11 +126,14 @@ function UiObject() {
 
             if(input.getAttribute('unit') && !input.value.endsWith(input.getAttribute('unit'))) {  input.value += input.getAttribute('unit'); input.blur() }
 
-            options.onValueChange(input.value);
+            if(options.onValueChange) options.onValueChange(input.value);
         }
         input.onfocus = () => {
             inputContainer.classList.add('f');
-            if(type == 'number') input.value = parseFloat(input.value);
+            if(type == 'number') {
+                if(parseFloat(input.value).toString() == 'NaN') input.value = options.defaultValue ? options.defaultValue() : 0;
+                else input.value = parseFloat(input.value);
+            }
             input.type = type;
         }
         input.onblur = () => {
@@ -197,7 +202,7 @@ function UiObject() {
 
                     if(input.getAttribute('unit')) pv += input.getAttribute('unit');
                     p.value = pv;
-                    options.onValueChange(pv);
+                    if(options.onValueChange) options.onValueChange(pv);
                 }
                 function stopFunction() {
                     util.setCursor();
@@ -247,6 +252,11 @@ function UiObject() {
         if(id) tabContainer.id = id;
         tabContainer.setAttribute('items', items.join('|'));
         tabContainer.setAttribute('value', selected);
+        if(options && options.onSelectChange) {
+            setTimeout(() => {
+                options.onSelectChange(selected, items);
+            }, 10);
+        }
 
         let ii = -1;
         items.forEach(i => {
@@ -375,8 +385,8 @@ function UiObject() {
                     let listBox = listContainer.getBoundingClientRect();
                     let appBox = document.querySelector('#app').getBoundingClientRect();
                     listDropdown.style.top = (listBox.y + 28) + 'px';
-                    listDropdown.style.left = (listBox.x - 1) + 'px';
-                    listDropdown.style.width = listBox.width + 'px';
+                    listDropdown.style.left = listBox.x + 'px';
+                    listDropdown.style.width = (listBox.width - 2) + 'px';
                     if(listBox.y + dropdownBox.height + 28 > appBox.height) {
                         listDropdown.classList.add('b');
                         listDropdown.style.top = (listBox.y - dropdownBox.height) + 'px';
@@ -409,8 +419,8 @@ function UiObject() {
             labelElement.style.overflow = 'hidden';
             labelElement.style.textOverflow = 'ellipsis';
         }
-        if(options.marginTop) labelElement.style.marginTop = options.marginTop + 'px';
-        if(options.marginBottom) labelElement.style.marginBottom = options.marginBottom + 'px';
+        if(options.marginTop != undefined) labelElement.style.marginTop = options.marginTop + 'px';
+        if(options.marginBottom != undefined) labelElement.style.marginBottom = options.marginBottom + 'px';
         if(options.align == 'center') labelElement.style.textAlign = 'center';
         if(options.align == 'right') labelElement.style.textAlign = 'right';
 
@@ -440,13 +450,15 @@ function UiObject() {
         let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
         if(options.scroll) container.classList.add(scrolls[options.scroll]);
         if(options.isBottomBar) container.classList.add('bbg');
+        if(options.invisible) container.style.display = 'none';
 
         //create title
         if(title) {
             let titleElem = document.createElement('p');
             titleElem.className = 'ui-label heading';
             titleElem.innerText = title;
-            container.appendChild(title);
+            titleElem.style.marginTop = 0;
+            container.appendChild(titleElem);
         }
 
         return container;

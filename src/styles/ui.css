@@ -295,7 +295,7 @@
 .ui-label.heading {
     text-transform: uppercase;
     font-size: 11px;
-    color: #888;
+    color: #ffffff69;
     font-weight: 700;
     margin-bottom: 6px;
 }
@@ -340,7 +340,7 @@
 }
 
 .ui-container.bbg {
-    background: #3C94E4;
+    background: #3081CC;
     border-top: 1px solid #000;
 }
 
@@ -417,6 +417,7 @@
 .ui-context-menu .dialogtitle {
     margin-top: 5px;
     margin-left: 7px;
+    margin-bottom: 0;
     width: fit-content;
 }
 
