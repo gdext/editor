@@ -600,6 +600,14 @@ const contextMenus = {
                                     ]
                                 }
                             ]
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                text: 'Edit Colors',
+                                marginTop: 3,
+                                marginBottom: 5
+                            }
                         }
                     ]
                 }
@@ -681,13 +689,6 @@ const contextMenus = {
                                     properties: {
                                         type: 'button',
                                         text: 'Next Free ID',
-                                        marginTop: 5
-                                    }
-                                },
-                                {
-                                    properties: {
-                                        type: 'button',
-                                        text: 'Edit Colors',
                                         marginTop: 5
                                     }
                                 }
