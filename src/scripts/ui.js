@@ -521,8 +521,8 @@ function UiObject() {
             menu.focus();
         }, 25);
         if(id) menu.id = id;
-        if(options && options.maxwidth) menu.style.width = options.maxwidth;
-        if(options && options.maxheight) menu.style.maxHeight = options.maxheight;
+        if(options && options.maxwidth) menu.style.width = options.maxwidth + 'px';
+        if(options && options.maxheight) menu.style.maxHeight = options.maxheight + 'px';
         if(options && options.x) menu.style.left = options.x + 'px';
         if(options && options.y) menu.style.top = options.y + 'px';
 

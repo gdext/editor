@@ -613,7 +613,8 @@ const contextMenus = {
                 id: 'colorChannelEditMenu',
                 title: 'Color Channel',
                 x: 0,
-                y: 0
+                y: 0,
+                maxwidth: 140
             },
             children: [
                 
@@ -676,8 +677,8 @@ export default {
 
                 function onColorInputClick(e, c) {
                     let obj2 = contextMenus.objColor.normal;
-                    obj2.properties.x = e.pageX;
-                    obj2.properties.y = e.pageY;
+                    obj2.properties.x = e.pageX-30;
+                    obj2.properties.y = e.pageY+15;
                     let el = document.querySelector('#editObjMenu');
                     if(!el) el = document.body;
                     ui.renderUiObject(obj2, el);
