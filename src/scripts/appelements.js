@@ -288,7 +288,7 @@ export default {
                 let ta = tx + '|' + ty;
                 if(!coordsArray.includes(ta)) {
                     let objkeys = renderer.placeObject({ mode: 'add', data: { id: buildSelection, x: tx, y: ty }, dontSubmitUndo: true });
-                    renderer.selectObjectByKey(objkeys);
+                    if(objkeys) renderer.selectObjectByKey(objkeys);
                     renderer.update(canvas);
                     coordsArray.push(ta);
                 }

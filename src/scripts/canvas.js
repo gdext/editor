@@ -469,6 +469,7 @@ export default {
         level.confirmEdit();
         renderer.renderLevel(level, cvs.width, cvs.height, options);
         if(!opt.dontSubmitUndo) submitUndoGroup();
+        return keys;
     },
     submitUndoGroup: () => {
         submitUndoGroup();
