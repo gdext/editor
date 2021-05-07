@@ -195,15 +195,13 @@ export function EditorLevel(renderer, level) {
         utilscript.setUnsavedChanges(true);
     }
 
-    this.getObjectRect = function(obj, scale) {
+    this.getObjectDimensions = function(obj) {
         let def = this.renderer.objectDefs[obj.id];
 
         if (!def)
             return {
-                left: parseFloat(obj.x),
-                right: parseFloat(obj.x),
-                top: parseFloat(obj.y),
-                bottom: parseFloat(obj.y)
+                width:  0,
+                height: 0
             };
 
         let texture;
@@ -219,38 +217,119 @@ export function EditorLevel(renderer, level) {
 
         if (!texture)
             return {
-                left: parseFloat(obj.x),
-                right: parseFloat(obj.x),
-                top: parseFloat(obj.y),
-                bottom: parseFloat(obj.y)
+                width:  0,
+                height: 0
             };
 
-        let width  = texture.w / 62 * 30 * scale;
-        let height = texture.h / 62 * 30 * scale;
+        return {
+            width:  texture.w / 62 * 30 * (+obj.scale || 1),
+            height: texture.h / 62 * 30 * (+obj.scale || 1)
+        }
+    }
+
+    this.getObjectRect = function(obj) {
+        let dim = this.getObjectDimensions(obj);
 
         return {
-            left:   parseFloat(obj.x) - width/2,
-            right:  parseFloat(obj.x) + width/2,
-            top:    parseFloat(obj.y) + height/2,
-            bottom: parseFloat(obj.y) - height/2
+            left:   +obj.x - dim.width/2,
+            right:  +obj.x + dim.width/2,
+            top:    +obj.y + dim.height/2,
+            bottom: +obj.y - dim.height/2
         };
     }
 
     this.isInObject = function(key, x, y) {
         let obj = this.getObject(key);
-        let r = this.getObjectRect(obj, +obj.scale || 1);
+        let r = this.getObjectRect(obj);
 
         /* TODO: Support for rotated objects */
 
         return x >= r.left && x <= r.right && y <= r.top && y >= r.bottom;
     }
 
+    this.rotatePoint = function(cosRot, sinRot, point) {
+        return {
+            x: point[0] * cosRot + point[1] * sinRot,
+            y: -(point[0] * sinRot) + point[1] * cosRot
+        };
+    }
+
+    this.invertRotatePoint = function(cosRot, sinRot, point) {
+        return {
+            x: point[0] * cosRot - point[1] * sinRot,
+            y: point[0] * sinRot + point[1] * cosRot
+        };
+    }
+
+    this.rotatePointAroundOrigin = function(cosRot, sinRot, origin, point) {
+        let ret = this.rotatePoint(cosRot, sinRot, [point[0] - origin[0], point[1] - origin[1]]);
+
+        ret.x += origin[0];
+        ret.y += origin[1];
+        
+        return ret;
+    }
+
+    this.invertRotatePointAroundOrigin = function(cosRot, sinRot, origin, point) {
+        let ret = this.invertRotatePoint(cosRot, sinRot, [point[0] - origin[0], point[1] - origin[1]]);
+
+        ret.x += origin[0];
+        ret.y += origin[1];
+        
+        return ret;
+    }
+
+    this.objRectPoints = function(cosRot, sinRot, obj) {
+        let dim = this.getObjectDimensions(obj);
+        dim = {width: dim.width / 2, height: dim.height / 2};
+        return [
+            this.rotatePointAroundOrigin(cosRot, sinRot, [+obj.x, +obj.y], [
+                +obj.x - dim.width,
+                +obj.y - dim.height
+            ]),
+            this.rotatePointAroundOrigin(cosRot, sinRot, [+obj.x, +obj.y], [
+                +obj.x + dim.width,
+                +obj.y - dim.height
+            ]),
+            this.rotatePointAroundOrigin(cosRot, sinRot, [+obj.x, +obj.y], [
+                +obj.x - dim.width,
+                +obj.y + dim.height
+            ]),
+            this.rotatePointAroundOrigin(cosRot, sinRot, [+obj.x, +obj.y], [
+                +obj.x + dim.width,
+                +obj.y + dim.height
+            ])
+        ];
+    }
+
     this.collidesWithObject = function(key, box) {
         let obj = this.getObject(key);
-        let r = this.getObjectRect(obj, +obj.scale || 1);
+        let r = this.getObjectRect(obj);
 
-        return box.right >= r.left && box.left <= r.right &&
-               box.top >= r.bottom && box.bottom <= r.top;
+        let cosRot = Math.cos((+obj.r || 0) / 180 * Math.PI);
+        let sinRot = Math.sin((+obj.r || 0) / 180 * Math.PI);
+
+        let points = this.objRectPoints(cosRot, sinRot, obj);
+
+        for (let p of points)
+            if (p.x >= box.left   && p.x <= box.right &&
+                p.y >= box.bottom && p.y <= box.top) return true;
+
+        let selectPoint = [
+            [box.left, box.top],
+            [box.right, box.top],
+            [box.left, box.bottom],
+            [box.right, box.bottom]
+        ];
+
+        for (let i = 0; i < 4; i++)
+            selectPoint[i] = this.invertRotatePointAroundOrigin(cosRot, sinRot, [+obj.x, +obj.y], selectPoint[i]);
+
+        for (let p of selectPoint)
+            if (p.x >= r.left   && p.x <= r.right &&
+                p.y >= r.bottom && p.y <= r.top) return true;
+
+        return false;
     }
 
     this.getObjectsAt = function(x, y) {
