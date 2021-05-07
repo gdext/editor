@@ -369,6 +369,7 @@ export default {
             // position
             let xposinput = document.querySelector('#editXPos');
             let yposinput = document.querySelector('#editYPos');
+            let editrow1 = xposinput.parentElement.parentElement.parentElement;
             xposinput.setAttribute('unit', '');
             yposinput.setAttribute('unit', '');
             if(relativeTransform.x != undefined && relativeTransform.y != undefined) {
@@ -378,14 +379,17 @@ export default {
                 }
                 xposinput.value = relativeTransform.x/3 + xposinput.getAttribute('unit');
                 yposinput.value = relativeTransform.y/3 + yposinput.getAttribute('unit');
+                editrow1.classList.remove('disabled');
             } else {
                 xposinput.value = '';
                 yposinput.value = '';
+                editrow1.classList.add('disabled');
             }
 
             // rotation & scale
             let rotinput = document.querySelector('#editRot');
             let scaleinput = document.querySelector('#editScale');
+            let editrow2 = rotinput.parentElement.parentElement.parentElement;
             rotinput.setAttribute('unit', '°');
             scaleinput.setAttribute('unit', '');
             if(relativeTransform.rotation != undefined && relativeTransform.scale != undefined) {
@@ -395,9 +399,11 @@ export default {
                 }
                 rotinput.value = relativeTransform.rotation + rotinput.getAttribute('unit');
                 scaleinput.value = relativeTransform.scale + scaleinput.getAttribute('unit');
+                editrow2.classList.remove('disabled');
             } else {
                 rotinput.value = '';
                 scaleinput.value = '';
+                editrow2.classList.add('disabled');
             }
         }
 
@@ -411,6 +417,8 @@ export default {
                 data: data
             });
         }
+
+        updateEditInputs();
 
         //renderer events
         window.addEventListener('renderer', e => {
@@ -668,10 +676,13 @@ export default {
             mutations.forEach((mutation) => {
               if (mutation.type == "attributes") {
                 loadObjs(lastCategory, page);
+                let event = new CustomEvent('editor', { detail: {
+                    action: 'update'
+                }});
+                dispatchEvent(event);
               }
             });
         });
-        buildTabSelObserver.observe(tab1, { attributes: true });
 
         //edit tab
         let tab2 = document.getElementById('tabEdit');
@@ -681,6 +692,9 @@ export default {
         let editContent = document.createElement('div');
         ui.renderUiObject(menus.getBottomMenus().editMenu, editContent);
         tab2.appendChild(editContent);
+
+        buildTabSelObserver.observe(tab1, { attributes: true });
+        buildTabSelObserver.observe(tab2, { attributes: true });
 
         //minimize/maximize button
         const resizeEvent = new Event('resizeCanvas');

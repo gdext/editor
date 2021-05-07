@@ -591,40 +591,49 @@ export default {
                         let c = checkboxElement.getElementsByTagName('input')[0].checked;
                         p.onCheckChange(c);
                     }
+                    if(p.disabled) checkboxElement.classList.add('disabled');
                     elementContainer.appendChild(checkboxElement);
                     break;
                 case 'button':
                     let buttonElement = uiObject.createButton(p.text, p.id, p.icon, p);
                     buttonElement.onclick = p.onClick;
+                    if(p.disabled) buttonElement.classList.add('disabled');
                     elementContainer.appendChild(buttonElement);
                     break;
                 case 'textInput':
                     let inputElement = uiObject.createInput('text', p);
+                    if(p.disabled) inputElement.classList.add('disabled');
                     elementContainer.appendChild(inputElement);
                     break;
                 case 'numberInput':
                     let ninputElement = uiObject.createInput('number', p);
+                    if(p.disabled) ninputElement.classList.add('disabled');
                     elementContainer.appendChild(ninputElement);
                     break;
                 case 'tabs':
                     let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), { onSelectChange: p.onSelectChange });
+                    if(p.disabled) tabsElement.classList.add('disabled');
                     elementContainer.appendChild(tabsElement);
                     break;
                 case 'list':
                     let listElement = uiObject.createList(p.items, p.id, p.selected(), p);
+                    if(p.disabled) listElement.classList.add('disabled');
                     elementContainer.appendChild(listElement);
                     break;
                 case 'label':
                     let labelElement = uiObject.createLabel(p.id, p.text, p.style, p);
+                    if(p.disabled) labelElement.classList.add('disabled');
                     elementContainer.appendChild(labelElement);
                     break;
                 case 'container':
                     let containerElement = uiObject.createContainer(p.id, p.title, p.direction, p);
+                    if(p.disabled) containerElement.classList.add('disabled');
                     elementContainer.appendChild(containerElement);
                     targetElement = containerElement;
                     break;
                 case 'card':
                     let cardElement = uiObject.createCard(p.id, p.title, p.description, p);
+                    if(p.disabled) cardElement.classList.add('disabled');
                     elementContainer.appendChild(cardElement);
                     break;
                 case 'dialog':
