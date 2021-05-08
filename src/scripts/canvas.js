@@ -373,7 +373,7 @@ export default {
             y2: p2.y
         });
     },
-    selectObjectInSel: (sel) => {
+    selectObjectInSel: (sel, additive) => {
         let x = Math.min(sel.x1, sel.x2);
         let y = Math.min(sel.y1, sel.y2);
         let w = Math.max(sel.x1, sel.x2) - x;
@@ -382,10 +382,16 @@ export default {
         let rect = { x: x, y: y, w: w, h: h };
 
         let objids = level.getObjectsIn(rect);
-        selectedObjs = objids;
+        if(additive) {
+            objids.forEach(k => {
+                if(!selectedObjs.includes(k)) selectedObjs.push(k);
+            });
+        } else {
+            selectedObjs = objids;
+        }
         selectObjects();
     },
-    selectObjectAt: (x, y, cycle) => {
+    selectObjectAt: (x, y, cycle, additive) => {
         let p = renderer.screenToLevelPos(x, y);
 
         let objid;
@@ -395,7 +401,14 @@ export default {
         }
         else objid = level.getObjectsAt(p.x, p.y);
 
-        selectedObjs = objid;
+        if(additive) {
+            objid.forEach(k => {
+                if(selectedObjs.includes(k)) selectedObjs.splice(selectedObjs.indexOf(k), 1);
+                else selectedObjs.push(k);
+            });
+        } else {
+            selectedObjs = objid;
+        }
         selectObjects();
     },
     selectObjectByKey: (k) => {

@@ -272,7 +272,8 @@ export default {
                 renderer.update(canvas);
                 util.setCursor();
                 if(!drag) {
-                    renderer.selectObjectAt(e.offsetX, e.offsetY);
+                    let prevsel = renderer.getSelectedObjects().slice();
+                    renderer.selectObjectAt(e.offsetX, e.offsetY, true);
                     let sel = renderer.getSelectedObjects();
                     if(Array.isArray(sel) && sel.length > 0) {
                         let event = new CustomEvent('bottom', { detail: {
@@ -280,6 +281,8 @@ export default {
                             id: renderer.getObjectByKey(sel[0]).id
                         }});
                         dispatchEvent(event);
+                    } else {
+                        renderer.selectObjectByKey(prevsel);
                     }
                 }
             }
@@ -350,8 +353,8 @@ export default {
 
                 let selection = renderer.getSelection();
                 let selectionSize = Math.max(Math.abs(selection.x1 - selection.x2), Math.abs(selection.y1 - selection.y2))
-                if(selectionSize > 0) renderer.selectObjectInSel(selection);
-                else renderer.selectObjectAt(eX, eY, true);
+                if(selectionSize > 0) renderer.selectObjectInSel(selection, keyboard.getKeys().includes(16));
+                else renderer.selectObjectAt(eX, eY, true, keyboard.getKeys().includes(16));
                 renderer.closeSelectionBox();
                 updateEditInputs();
             }
