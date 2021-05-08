@@ -351,7 +351,7 @@ export default {
                 let selection = renderer.getSelection();
                 let selectionSize = Math.max(Math.abs(selection.x1 - selection.x2), Math.abs(selection.y1 - selection.y2))
                 if(selectionSize > 0) renderer.selectObjectInSel(selection);
-                else renderer.selectObjectAt(eX, eY);
+                else renderer.selectObjectAt(eX, eY, true);
                 renderer.closeSelectionBox();
                 updateEditInputs();
             }
