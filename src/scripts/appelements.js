@@ -671,7 +671,6 @@ export default {
                 return 'h';
             }
 
-            console.log('IM RENDERING PAGE', pagee);
             util.loadObjects(buildContentBlocks, category, ow.amount*pagee+pagee, ow.amount*(pagee+1)+pagee, (id, obj) => {
                 let selobj = document.querySelector('canvas.sel');
                 if(selobj) selobj.classList.remove('sel');
@@ -708,7 +707,6 @@ export default {
                 }
                 pi++;
             }
-            console.log('IM REQUESTING PAGE ', targetPage);
             if(targetPage < 0) return false;
 
             buildSelection = id;
