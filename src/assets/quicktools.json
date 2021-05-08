@@ -41,7 +41,9 @@
             "icon": "ic-duplicate.svg",
             "hint": "Duplicate Selected",
             "event": "editor",
-            "detail": "duplicate",
+            "detail": {
+                "action": "duplicate"
+            },
             "enabledCondition": [
                 "objSelected"
             ]

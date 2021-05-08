@@ -115,6 +115,15 @@
         "focus": "app"
     },
     {
+        "keys": [ 17, 68 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "duplicate"
+        },
+        "focus": "app"
+    },
+    {
         "keys": [ 87 ],
         "type": "event",
         "eventName": "editor",

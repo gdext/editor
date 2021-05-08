@@ -526,6 +526,23 @@ export default {
                         mode: 'remove',
                         data: data
                     });
+                    document.querySelector('#app').focus();
+                    break;
+                case 'duplicate':
+                    data = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        let props = JSON.parse(JSON.stringify(renderer.getObjectByKey(k)));
+                        props.x += 30;
+                        props.y -= 30;
+                        data.push(props);
+                    });
+                    let keys = renderer.placeObject({
+                        mode: 'add',
+                        data: data,
+                        disableCenterCorrection: true
+                    });
+                    renderer.selectObjectByKey(keys);
+                    document.querySelector('#app').focus();
                     break;
                 case 'transform':
                     data = [];

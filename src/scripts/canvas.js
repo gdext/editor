@@ -446,7 +446,7 @@ export default {
         switch (opt.mode) {
             case 'add':
                 optdata.forEach(d => {
-                    let obj = level.createObject(d.id, d.x, d.y, true);
+                    let obj = level.createObject(d.id, d.x, d.y, !opt.disableCenterCorrection);
                     let objkey = level.addObject(obj);
                     keys.push(objkey);
                     addUndoGroupAction({
