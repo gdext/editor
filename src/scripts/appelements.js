@@ -247,9 +247,10 @@ export default {
         }, 5000);
 
         //mouse events
-        function beginScreenPanning() {
+        function beginScreenPanning(e) {
             let coords = renderer.getCoords();
             let moving = true;
+            let drag = false;
             util.setCursor('grab');
             function update() {
                 renderer.update(canvas);
@@ -258,6 +259,7 @@ export default {
             }
             update();
             window.onmousemove = (e1) => {
+                drag = true;
                 coords.x -= e1.movementX / coords.z;
                 coords.y -= e1.movementY / coords.z;
                 renderer.moveTo(coords.x, coords.y, coords.z);
@@ -269,6 +271,17 @@ export default {
                 moving = false;
                 renderer.update(canvas);
                 util.setCursor();
+                if(!drag) {
+                    renderer.selectObjectAt(e.offsetX, e.offsetY);
+                    let sel = renderer.getSelectedObjects();
+                    if(Array.isArray(sel) && sel.length > 0) {
+                        let event = new CustomEvent('bottom', { detail: {
+                            action: 'selectObject',
+                            id: renderer.getObjectByKey(sel[0]).id
+                        }});
+                        dispatchEvent(event);
+                    }
+                }
             }
             window.onmouseup = stopMove;
             window.onmouseout = stopMove;
@@ -369,6 +382,7 @@ export default {
             // position
             let xposinput = document.querySelector('#editXPos');
             let yposinput = document.querySelector('#editYPos');
+            let editrow1 = xposinput.parentElement.parentElement.parentElement;
             xposinput.setAttribute('unit', '');
             yposinput.setAttribute('unit', '');
             if(relativeTransform.x != undefined && relativeTransform.y != undefined) {
@@ -378,14 +392,18 @@ export default {
                 }
                 xposinput.value = relativeTransform.x/3 + xposinput.getAttribute('unit');
                 yposinput.value = relativeTransform.y/3 + yposinput.getAttribute('unit');
+                editrow1.classList.remove('disabled');
             } else {
                 xposinput.value = '';
                 yposinput.value = '';
+                editrow1.classList.add('disabled');
             }
 
             // rotation & scale
             let rotinput = document.querySelector('#editRot');
             let scaleinput = document.querySelector('#editScale');
+            let editrow2 = rotinput.parentElement.parentElement.parentElement;
+            let editrow3 = rotinput.parentElement.parentElement.parentElement.parentElement.parentElement.children[2].children[0]
             rotinput.setAttribute('unit', '°');
             scaleinput.setAttribute('unit', '');
             if(relativeTransform.rotation != undefined && relativeTransform.scale != undefined) {
@@ -395,9 +413,13 @@ export default {
                 }
                 rotinput.value = relativeTransform.rotation + rotinput.getAttribute('unit');
                 scaleinput.value = relativeTransform.scale + scaleinput.getAttribute('unit');
+                editrow2.classList.remove('disabled');
+                editrow3.classList.remove('disabled');
             } else {
                 rotinput.value = '';
                 scaleinput.value = '';
+                editrow2.classList.add('disabled');
+                editrow3.classList.add('disabled');
             }
         }
 
@@ -412,6 +434,8 @@ export default {
             });
         }
 
+        updateEditInputs();
+
         //renderer events
         window.addEventListener('renderer', e => {
             if(e.detail == 'toggleTroubleshoot') {
@@ -422,7 +446,7 @@ export default {
 
         top_canvas.onmousedown = (e) => {
             if(e.button == 1) {
-                beginScreenPanning();
+                beginScreenPanning(e);
             }
         }
 
@@ -579,6 +603,7 @@ export default {
         // build tab vars
         let lastCategory = 'blocks';
         let page = 0;
+        let keepPageOverride = false;
 
         // generate build tab
         let buildTitle = document.createElement('h4');
@@ -598,9 +623,10 @@ export default {
                 buildCategory.classList.add('sel');
                 buildTitle.innerText = `Build: ${t.name}`;
                 //load objects
-                page = 0;
+                if(!keepPageOverride) page = 0;
                 loadObjs(t.id, page);
                 lastCategory = t.id;
+                keepPageOverride = false;
             }
             let categoryIcon = document.createElement('img');
             import(`../assets/buildtab/${t.icon}.svg`).then(({default: i}) => {
@@ -618,27 +644,77 @@ export default {
         buildContent.appendChild(buildContentBlocks);
         buildContent.appendChild(buildContentNext);
 
-        function loadObjs(category, page) {
+        function getObjs(category, pagee) {
+            let ow = util.calcBuildObjectsAmount(buildContent);
+            let l = Math.ceil(buildtabData.tabscontent[category].length / ow.amount);
+            if(pagee > l-1) { 
+                pagee = l;
+                return 'h';
+            }
+            return {
+                start: ow.amount*pagee+pagee,
+                end: ow.amount*(pagee+1)+pagee
+            }
+        }
+
+        function loadObjs(category, pagee) {
             buildContentBlocks.style.width = "";
             let ow = util.calcBuildObjectsAmount(buildContent);
             let l = Math.ceil(buildtabData.tabscontent[category].length / ow.amount);
 
             buildContentPrevious.classList.remove('lock');
             buildContentNext.classList.remove('lock');
-            if(page == 0) buildContentPrevious.classList.add('lock');
-            if(page >= l) buildContentNext.classList.add('lock');
-            if(page > l) { 
-                page = l;
+            if(pagee == 0) buildContentPrevious.classList.add('lock');
+            if(pagee >= l-1) buildContentNext.classList.add('lock');
+            if(pagee > l-1) { 
+                pagee = l;
                 return 'h';
             }
 
-            util.loadObjects(buildContentBlocks, category, ow.amount*page+page, ow.amount*(page+1)+page, (id, obj) => {
+            console.log('IM RENDERING PAGE', pagee);
+            util.loadObjects(buildContentBlocks, category, ow.amount*pagee+pagee, ow.amount*(pagee+1)+pagee, (id, obj) => {
                 let selobj = document.querySelector('canvas.sel');
                 if(selobj) selobj.classList.remove('sel');
                 buildSelection = id;
                 obj.classList.add('sel');
             }, buildSelection);
             buildContentBlocks.style.width = ow.parentw;
+        }
+
+        function focusOnObj(id) {
+            let categories = buildtabData.tabscontent;
+            let targetCategory = null;
+            Object.keys(categories).forEach(k => {
+                let v = categories[k];
+                if(Array.isArray(v) && v.includes(id)) targetCategory = k;
+            });
+            if(!targetCategory) return false;
+
+            let targetIndex = categories[targetCategory].indexOf(id);
+            if(targetIndex < 0) return false;
+
+            document.querySelector('#tabBuild').classList.add('sel');
+            document.getElementById('bcat'+targetCategory).click();
+
+            let targetPage = -1;
+            let pi = 0;
+            let done = false
+            while(!done) {
+                let objsdata = getObjs(targetCategory, pi);
+                if(objsdata == 'h') done = true;
+                else if(objsdata && objsdata.start <= targetIndex && objsdata.end >= targetIndex) {
+                    done = true;
+                    targetPage = parseInt(pi);
+                }
+                pi++;
+            }
+            console.log('IM REQUESTING PAGE ', targetPage);
+            if(targetPage < 0) return false;
+
+            buildSelection = id;
+            keepPageOverride = true;
+            page = targetPage;
+            document.getElementsByClassName('tab-selector')[0].click();
         }
 
         // append build tab
@@ -654,8 +730,9 @@ export default {
         });
         buildContentNext.onclick = () => {
             page++;
-            let h = loadObjs(lastCategory, page);
+            let h = getObjs(lastCategory, page);
             if(h == 'h') page--;
+            loadObjs(lastCategory, page);
         }
         buildContentPrevious.onclick = () => {
             if(page > 0) {
@@ -668,10 +745,13 @@ export default {
             mutations.forEach((mutation) => {
               if (mutation.type == "attributes") {
                 loadObjs(lastCategory, page);
+                let event = new CustomEvent('editor', { detail: {
+                    action: 'update'
+                }});
+                dispatchEvent(event);
               }
             });
         });
-        buildTabSelObserver.observe(tab1, { attributes: true });
 
         //edit tab
         let tab2 = document.getElementById('tabEdit');
@@ -681,6 +761,9 @@ export default {
         let editContent = document.createElement('div');
         ui.renderUiObject(menus.getBottomMenus().editMenu, editContent);
         tab2.appendChild(editContent);
+
+        buildTabSelObserver.observe(tab1, { attributes: true });
+        buildTabSelObserver.observe(tab2, { attributes: true });
 
         //minimize/maximize button
         const resizeEvent = new Event('resizeCanvas');
@@ -692,5 +775,16 @@ export default {
             window.dispatchEvent(resizeEvent);
         }
         elem.appendChild(minBtn);
+
+        //bottom part events
+        window.addEventListener('bottom', (e) => {
+            let detail = e.detail;
+            if(typeof detail != 'object') return;
+            switch(detail.action) {
+                case 'selectObject':
+                    focusOnObj(detail.id);
+                    break;
+            }
+        });
     }
 }

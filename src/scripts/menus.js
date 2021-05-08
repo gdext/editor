@@ -600,6 +600,14 @@ const contextMenus = {
                                     ]
                                 }
                             ]
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                text: 'Edit Colors',
+                                marginTop: 3,
+                                marginBottom: 5
+                            }
                         }
                     ]
                 }
@@ -614,10 +622,127 @@ const contextMenus = {
                 title: 'Color Channel',
                 x: 0,
                 y: 0,
-                maxwidth: 140
+                maxwidth: 150
             },
             children: [
-                
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 7,
+                        paddingY: 10
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                text: 'Type',
+                                marginTop: 0
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'tabs',
+                                items: ['Number', 'Special'],
+                                selected: () => {
+                                    return 0;
+                                },
+                                id: 'colorChannelEditType',
+                                onSelectChange: (n) => {
+                                    if(!document.querySelector('#colorChannelTypeNumber')) return;
+                                    if(n == 0) {
+                                        document.querySelector('#colorChannelTypeNumber').style.display = '';
+                                        document.querySelector('#colorChannelTypeSpecial').style.display = 'none';
+                                    } else {
+                                        document.querySelector('#colorChannelTypeNumber').style.display = 'none';
+                                        document.querySelector('#colorChannelTypeSpecial').style.display = '';
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'container',
+                                direction: 'column',
+                                id: 'colorChannelTypeNumber',
+                            },
+                            children: [
+                                {
+                                    properties: {
+                                        type: 'label',
+                                        text: 'Channel ID'
+                                    }
+                                },
+                                {
+                                    properties: {
+                                        type: 'numberInput',
+                                        min: 0,
+                                        max: 999,
+                                        integerOnly: true,
+                                        defaultValue: () => {
+                                            return 1;
+                                        },
+                                        icon: 'slide',
+                                        id: 'colorChannelEditChannelID'
+                                    }
+                                },
+                                {
+                                    properties: {
+                                        type: 'button',
+                                        text: 'Next Free ID',
+                                        marginTop: 5
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            properties: {
+                                type: 'container',
+                                direction: 'column',
+                                id: 'colorChannelTypeSpecial',
+                                invisible: true,
+                            },
+                            children: [
+                                {
+                                    properties: {
+                                        type: 'label',
+                                        text: 'Special Channel Name'
+                                    }
+                                },
+                                {
+                                    properties: {
+                                        type: 'list',
+                                        mode: 'dropdown',
+                                        items: [
+                                            'Player Color 1', 'Player Color 2',
+                                            'Light BG', 'Default'
+                                        ],
+                                        selected: () => {
+                                            return 0;
+                                        },
+                                        id: 'colorChannelEditSpecial'
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    properties: {
+                        type: 'container',
+                        paddingX: 7,
+                        paddingY: 7,
+                        isBottomBar: true,
+                        title: 'HSV Modify'
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'label',
+                                text: 'Coming Soon!'
+                            }
+                        }
+                    ]
+                }
             ]
         }
     }

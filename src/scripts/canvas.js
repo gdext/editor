@@ -7,14 +7,14 @@ let gl, renderer, cvs, options, level, top, sel;
 
 let selectedObjs = [];
 let relativeTransform = {
-    x: 0,
+    /*x: 0,
     y: 0,
     scale: 1,
     rotation: 0,
     hflip: false,
     vflip: false,
     center: {},
-    objdata: {}
+    objdata: {}*/
 }
 let globalPrevProps = {};
 
