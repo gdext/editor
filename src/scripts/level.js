@@ -342,6 +342,56 @@ export function EditorLevel(renderer, level) {
         return objs;
     }
 
+    this.compareArray = function(a1, a2) {
+        if (a1.length != a2.length) return false;
+        for (let i of a1) if (!a2.includes(i)) return false;
+        return true;
+    }
+
+    this.cycleObjects = [];
+    this.cycleIndex   = 0;
+
+    this.cycleObjectAt = function(x, y) {
+        let objs = this.getObjectsAt(x, y);
+
+        if (objs.length == 0) return null;
+
+        objs.sort((a, b) => {
+            let o1 = this.level.data[a];
+            let o2 = this.level.data[b];
+
+            let l1 = o1.z;
+            let l2 = o2.z;
+
+            if (!l1) l1 = renderer.objectDefs[o1.id].zlayer;
+            if (!l2) l2 = renderer.objectDefs[o2.id].zlayer;
+
+            let delta = l1 - l2;
+            if (delta != 0) return delta;
+
+            let z1 = o1.zorder;
+            let z2 = o2.zorder;
+
+            if (!z1) z1 = renderer.objectDefs[o1.id].zorder;
+            if (!z2) z2 = renderer.objectDefs[o2.id].zorder;
+
+            return z1 - z2;
+        });
+
+        if (this.cycleObjects.length == 0) {
+            this.cycleObjects = objs;
+            this.cycleIndex   = 0;
+        } else
+            if (this.compareArray(objs, this.cycleObjects))
+                this.cycleIndex++;
+            else {
+                this.cycleObjects = objs;
+                this.cycleIndex   = 0;
+            }
+
+        return this.cycleObjects[this.cycleIndex];
+    }
+
     this.getObjectsIn = function(rect) {
         let objs = [];
 
