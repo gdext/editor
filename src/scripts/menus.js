@@ -777,7 +777,7 @@ export default {
                     type: 'button',
                     icon: btn.icon,
                     hint: btn.hint,
-                    iconHeight: 20,
+                    iconHeight: btn.customHeight ? btn.customHeight : 20,
                     width: 40,
                     height: 40,
                     primary: false,

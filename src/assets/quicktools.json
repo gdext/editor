@@ -114,6 +114,7 @@
             "hint": "Unlink Selected",
             "event": "editor",
             "detail": "unlink",
+            "customHeight": 24,
             "enabledCondition": [
                 "objSelected", "&&", "hasLinkedObjs"
             ]
