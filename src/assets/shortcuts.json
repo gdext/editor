@@ -191,5 +191,32 @@
             } 
         },
         "focus": "app"
+    },
+    {
+        "keys": [49],
+        "type": "event",
+        "eventName": "bottom",
+        "eventInfo": {
+            "action": "setTab",
+            "tab": 0
+        }
+    },
+    {
+        "keys": [50],
+        "type": "event",
+        "eventName": "bottom",
+        "eventInfo": {
+            "action": "setTab",
+            "tab": 1
+        }
+    },
+    {
+        "keys": [51],
+        "type": "event",
+        "eventName": "bottom",
+        "eventInfo": {
+            "action": "setTab",
+            "tab": 2
+        }
     }
 ]

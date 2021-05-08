@@ -692,7 +692,11 @@ export default {
             let targetIndex = categories[targetCategory].indexOf(id);
             if(targetIndex < 0) return false;
 
-            document.querySelector('#tabBuild').classList.add('sel');
+            let event = new CustomEvent('bottom', { detail: {
+                action: 'setTab',
+                tab: 0
+            }});
+            dispatchEvent(event);
             document.getElementById('bcat'+targetCategory).click();
 
             let targetPage = -1;
@@ -712,7 +716,6 @@ export default {
             buildSelection = id;
             keepPageOverride = true;
             page = targetPage;
-            document.getElementsByClassName('tab-selector')[0].click();
         }
 
         // append build tab
@@ -782,6 +785,21 @@ export default {
                 case 'selectObject':
                     focusOnObj(detail.id);
                     break;
+                case 'setTab':
+                    //0 - build, 1 - edit, 2 - delete
+                    if(detail.tab > 2 || detail.tab < 0) return;
+                    document.getElementsByClassName('tab-selector')[detail.tab].click();
+                    switch(detail.tab) {
+                        case 0:
+                            document.querySelector('#tabBuild').classList.add('sel');
+                            break;
+                        case 1:
+                            document.querySelector('#tabEdit').classList.add('sel');
+                            break;
+                        case 2:
+                            document.querySelector('#tabDelete').classList.add('sel');
+                            break;
+                    }
             }
         });
     }

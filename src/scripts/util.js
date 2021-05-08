@@ -33,7 +33,6 @@ function closeDialog (id) {
 
     if(prevFocusElement[id]) {
         prevFocusElement[id].focus();
-        console.log(document.activeElement);
     }
 }
 
@@ -41,7 +40,6 @@ function openFunc(id) {
     closeFuncIds.unshift(id);
     window.addEventListener('keydown', closeFunc);
     prevFocusElement[id] = document.activeElement;
-    console.log(document.activeElement);
 }
 function closeFunc(e) {
     if(e.keyCode == 27) {

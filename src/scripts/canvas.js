@@ -396,7 +396,6 @@ export default {
         else objid = level.getObjectsAt(p.x, p.y);
 
         selectedObjs = objid;
-        console.log(selectedObjs);
         selectObjects();
     },
     selectObjectByKey: (k) => {
@@ -442,7 +441,6 @@ export default {
         } else {
             optdata = [opt.data];
         }
-        console.log(optdata);
 
         let keys = [];
         switch (opt.mode) {
