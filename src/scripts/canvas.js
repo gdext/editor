@@ -385,13 +385,18 @@ export default {
         selectedObjs = objids;
         selectObjects();
     },
-    selectObjectAt: (x, y) => {
+    selectObjectAt: (x, y, cycle) => {
         let p = renderer.screenToLevelPos(x, y);
 
-        let objid = level.getObjectsAt(p.x, p.y);
+        let objid;
+        if(cycle) {
+            objid = [level.cycleObjectAt(p.x, p.y)];
+            if(objid[0] == null) objid = [];
+        }
+        else objid = level.getObjectsAt(p.x, p.y);
+
         selectedObjs = objid;
-        console.log(selectedObjs)
-        
+        console.log(selectedObjs);
         selectObjects();
     },
     selectObjectByKey: (k) => {

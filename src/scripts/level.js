@@ -382,9 +382,10 @@ export function EditorLevel(renderer, level) {
             this.cycleObjects = objs;
             this.cycleIndex   = 0;
         } else
-            if (this.compareArray(objs, this.cycleObjects))
+            if (this.compareArray(objs, this.cycleObjects)) {
                 this.cycleIndex++;
-            else {
+                if(this.cycleIndex >= this.cycleObjects.length) this.cycleIndex = 0;
+            } else {
                 this.cycleObjects = objs;
                 this.cycleIndex   = 0;
             }

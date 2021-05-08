@@ -351,7 +351,7 @@ export default {
                 let selection = renderer.getSelection();
                 let selectionSize = Math.max(Math.abs(selection.x1 - selection.x2), Math.abs(selection.y1 - selection.y2))
                 if(selectionSize > 0) renderer.selectObjectInSel(selection);
-                else renderer.selectObjectAt(eX, eY);
+                else renderer.selectObjectAt(eX, eY, true);
                 renderer.closeSelectionBox();
                 updateEditInputs();
             }
@@ -671,7 +671,6 @@ export default {
                 return 'h';
             }
 
-            console.log('IM RENDERING PAGE', pagee);
             util.loadObjects(buildContentBlocks, category, ow.amount*pagee+pagee, ow.amount*(pagee+1)+pagee, (id, obj) => {
                 let selobj = document.querySelector('canvas.sel');
                 if(selobj) selobj.classList.remove('sel');
@@ -708,7 +707,6 @@ export default {
                 }
                 pi++;
             }
-            console.log('IM REQUESTING PAGE ', targetPage);
             if(targetPage < 0) return false;
 
             buildSelection = id;
