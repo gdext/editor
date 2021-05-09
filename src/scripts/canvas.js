@@ -460,6 +460,11 @@ export default {
             case 'add':
                 optdata.forEach(d => {
                     let obj = level.createObject(d.id, d.x, d.y, !opt.disableCenterCorrection);
+                    Object.keys(d).forEach(k => {
+                        if(k == 'id' || k == 'x' || k == 'y') return;
+                        let v = d[k];
+                        obj[k] = v;
+                    });
                     let objkey = level.addObject(obj);
                     keys.push(objkey);
                     addUndoGroupAction({
