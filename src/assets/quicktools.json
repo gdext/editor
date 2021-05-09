@@ -71,7 +71,9 @@
             "icon": "ic-deselect.svg",
             "hint": "Deselect",
             "event": "editor",
-            "detail": "deselect",
+            "detail": {
+                "action": "deselect"
+            },
             "enabledCondition": [
                 "objSelected"
             ]

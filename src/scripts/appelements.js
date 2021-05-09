@@ -568,6 +568,9 @@ export default {
                     updateEditInputs();
                     finishObjectTransform();
                     break;
+                case 'deselect': 
+                    renderer.clearSelected();
+                    break;
                 case 'copy':
                     let center = JSON.parse(JSON.stringify(renderer.getRelativeTransform().center));
                     center.x = Math.round(center.x/30)*30;
