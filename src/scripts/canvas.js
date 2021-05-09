@@ -294,7 +294,7 @@ export default {
         options = {
             grid: true,
             custom_colors: {
-                "-1": {r: 0, g: 0.7, b: 1, a: 0.7, i: true}
+                "-1": {r: 0, g: 0.8, b: 1, a: 0.7, i: true}
             }
         };
         gl = canvas.getContext("webgl");
