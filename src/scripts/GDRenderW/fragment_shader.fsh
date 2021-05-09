@@ -12,8 +12,7 @@ void main(void) {
     if (type == 1)
         gl_FragColor = a_tint;
     else if (type == 2) {
-        gl_FragColor   = mix(texture, a_tint, a_tint.a);
-        gl_FragColor.a = texture.a;
+        gl_FragColor = vec4(a_tint.rgb, texture.a * a_tint.a);
     } else
         gl_FragColor = texture * a_tint;
 }
