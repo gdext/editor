@@ -11,7 +11,9 @@
             "icon": "ic-copy.svg",
             "hint": "Copy Selected to Clipboard",
             "event": "editor",
-            "detail": "copy",
+            "detail": {
+                "action": "copy"
+            },
             "enabledCondition": [
                 "objSelected"
             ]
@@ -21,7 +23,9 @@
             "icon": "ic-paste.svg",
             "hint": "Paste from Clipboard",
             "event": "editor",
-            "detail": "paste",
+            "detail": {
+                "action": "paste"
+            },
             "enabledCondition": [
                 "clipboard"
             ]
@@ -31,7 +35,9 @@
             "icon": "ic-cut.svg",
             "hint": "Cut Selected (Copy & Delete)",
             "event": "editor",
-            "detail": "cut",
+            "detail": {
+                "action": "cut"
+            },
             "enabledCondition": [
                 "objSelected"
             ]

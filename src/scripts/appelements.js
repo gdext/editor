@@ -519,6 +519,7 @@ export default {
             let detail = e.detail;
             if(typeof detail != 'object') return;
             let data = [];
+            let keys;
             switch(detail.action) {
                 case 'delete':
                     data = [];
@@ -539,7 +540,7 @@ export default {
                         props.y -= 30;
                         data.push(props);
                     });
-                    let keys = renderer.placeObject({
+                    keys = renderer.placeObject({
                         mode: 'add',
                         data: data,
                         disableCenterCorrection: true
@@ -566,6 +567,69 @@ export default {
                 case 'update': 
                     updateEditInputs();
                     finishObjectTransform();
+                    break;
+                case 'copy':
+                    let center = JSON.parse(JSON.stringify(renderer.getRelativeTransform().center));
+                    center.x = Math.round(center.x/30)*30;
+                    center.y = Math.round(center.y/30)*30;
+
+                    let clipboard = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        let obj = JSON.parse(JSON.stringify(renderer.getObjectByKey(k)));
+                        obj.x = obj.x - center.x;
+                        obj.y = obj.y - center.y;
+                        clipboard.push(obj);
+                    });
+                    util.copyToClipboard(clipboard, 'objdata');
+                    break;
+                case 'cut':
+                    let center2 = JSON.parse(JSON.stringify(renderer.getRelativeTransform().center));
+                    center2.x = Math.round(center2.x/30)*30;
+                    center2.y = Math.round(center2.y/30)*30;
+
+                    let clipboard2 = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        let obj = JSON.parse(JSON.stringify(renderer.getObjectByKey(k)));
+                        obj.x = obj.x - center2.x;
+                        obj.y = obj.y - center2.y;
+                        clipboard2.push(obj);
+                    });
+                    util.copyToClipboard(clipboard2, 'objdata');
+
+                    data = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        data.push({ id: k });
+                    });
+                    renderer.placeObject({
+                        mode: 'remove',
+                        data: data
+                    });
+                    renderer.clearSelected();
+
+                    break;
+                case 'paste':
+                    let getclipboard = util.getClipboard('objdata');
+                    let screen = renderer.screen2LevelCoords(canvasSize.width/2, canvasSize.height/2);
+                    let newcenter = {
+                        x: screen.x,
+                        y: screen.y
+                    };
+                    newcenter.x = Math.round(newcenter.x/30)*30;
+                    newcenter.y = Math.round(newcenter.y/30)*30;
+                     
+                    data = [];
+                    getclipboard.forEach(obj => {
+                        let objj = JSON.parse(JSON.stringify(obj));
+                        objj.x += newcenter.x;
+                        objj.y += newcenter.y;
+                        data.push(objj);
+                    });
+                    keys = renderer.placeObject({
+                        mode: 'add',
+                        data: data,
+                        disableCenterCorrection: true
+                    });
+                    renderer.selectObjectByKey(keys);
                     break;
             }
         });

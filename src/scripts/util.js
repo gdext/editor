@@ -394,6 +394,18 @@ export default {
 
     updateTitle: () => {
        updateTitle();
+    },
+
+    copyToClipboard: (data, key) => {
+        let clipboardKey = key || 'default';
+        if(!window.clipboard) window.clipboard = {};
+        window.clipboard[clipboardKey] = data;
+    },
+
+    getClipboard: (key) => {
+        if(!window.clipboard) return;
+        let clipboardKey = key || 'default';
+        return window.clipboard[clipboardKey];
     }
 
 }
