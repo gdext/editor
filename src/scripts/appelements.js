@@ -589,6 +589,7 @@ export default {
                 case 'update': 
                     if(!detail.softUpdate) updateEditInputs();
                     if(!detail.softUpdate) finishObjectTransform();
+                    renderer.update(canvas);
                     break;
                 case 'deselect': 
                     renderer.clearSelected();

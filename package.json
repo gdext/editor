@@ -1,6 +1,6 @@
 {
   "name": "gdext-editor",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A web-based external Geometry Dash editor",
   "private": true,
   "scripts": {

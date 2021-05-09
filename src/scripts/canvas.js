@@ -317,12 +317,14 @@ export default {
         renderer = new GDRenderer(gl, (e) => {
             document.querySelector('#bottom-render-progress').style.width = (e.progress*100) + '%';
             if(e.loaded) {
-                let event = new CustomEvent('editor', { detail: {
-                    action: 'update',
-                    softUpdate: true
-                }});
-                dispatchEvent(event);
-                document.querySelector('#render').classList.remove('hid');
+                setTimeout(() => {
+                    let event = new CustomEvent('editor', { detail: {
+                        action: 'update',
+                        softUpdate: true
+                    }});
+                    dispatchEvent(event);
+                    document.querySelector('#render').classList.remove('hid');
+                }, 100);
                 document.querySelector('#bottom-render-progress').style.width = '100%';
                 setTimeout(() => {
                     document.querySelector('#bottom-render-progress').style.background = '#f88';
