@@ -2,6 +2,7 @@ import {GDRenderer} from './GDRenderW/main';
 import {EditorLevel} from './level';
 import TopCanvas from './topcanvas';
 import objectsData from '../assets/levelparse/objects.json';
+import util from './util';
 
 let gl, renderer, cvs, options, level, top, sel;
 
@@ -64,6 +65,9 @@ function moveInHistory(backward) {
                     selectedObjs = action.selectBefore;
                     selectObjects();
                     break;
+                case 'levelSettings':
+                    localStorage.setItem(action.key, action.valueBefore);
+                    break;
             }
         });
     } else {
@@ -90,11 +94,15 @@ function moveInHistory(backward) {
                     selectedObjs = action.selectAfter;
                     selectObjects();
                     break;
+                case 'levelSettings':
+                    localStorage.setItem(action.key, action.valueAfter);
+                    break;
             }
         });
     }
     level.confirmEdit();
     renderer.renderLevel(level, cvs.width, cvs.height, options);
+    util.updateTitle();
 }
 
 function selectObjects() {
@@ -551,6 +559,10 @@ export default {
         renderer.renderLevel(level, cvs.width, cvs.height, options);
         if(!opt.dontSubmitUndo) submitUndoGroup();
         return keys;
+    },
+    addUndoGroupAction: (obj, dontSubmitUndo) => {
+        addUndoGroupAction(obj);
+        if(!dontSubmitUndo) submitUndoGroup();
     },
     submitUndoGroup: () => {
         submitUndoGroup();

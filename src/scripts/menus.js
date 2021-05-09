@@ -255,7 +255,7 @@ const bottomMenus = {
                                             action: 'transform',
                                             mode: 'add',
                                             data: {
-                                                y: 30
+                                                y: parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
                                             }
                                         }});
                                         dispatchEvent(event);
@@ -299,7 +299,7 @@ const bottomMenus = {
                                             action: 'transform',
                                             mode: 'add',
                                             data: {
-                                                x: -30
+                                                x: - parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
                                             }
                                         }});
                                         dispatchEvent(event);
@@ -310,14 +310,28 @@ const bottomMenus = {
                                 properties: {
                                     type: 'button',
                                     id: 'editChangeScale',
-                                    text: '1/15',
+                                    text: 'x1',
                                     textStyle: 'bold',
                                     hint: 'Change Move Scale',
                                     width: 40,
                                     height: 40,
                                     primary: false,
                                     onClick: () => {
-                                        document.querySelector('#editChangeScale').querySelector('span').innerText = '1/30';
+                                        let scaleMultipliers = [
+                                            30, //1 scale
+                                            3, // 1/10 scale
+                                            0.6, // 1/50 scale
+                                            150, //5 scale
+                                        ];
+                                        let scaleMultiplierText = ['x1', '1/10', '1/50', 'x5']
+                                        let currentIndex = document.querySelector('#editChangeScale').getAttribute('multAmount');
+                                        if(currentIndex != undefined) currentIndex = scaleMultipliers.indexOf(parseFloat(currentIndex));
+                                        else currentIndex = 0;
+                                        currentIndex++;
+                                        if(currentIndex >= scaleMultipliers.length) currentIndex = 0;
+                                        document.querySelector('#editChangeScale').setAttribute('multAmount', scaleMultipliers[currentIndex]);
+
+                                        document.querySelector('#editChangeScale').querySelector('span').innerText = scaleMultiplierText[currentIndex];
                                     }
                                 }
                             },
@@ -336,7 +350,7 @@ const bottomMenus = {
                                             action: 'transform',
                                             mode: 'add',
                                             data: {
-                                                x: 30
+                                                x: parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
                                             }
                                         }});
                                         dispatchEvent(event);
@@ -380,7 +394,7 @@ const bottomMenus = {
                                             action: 'transform',
                                             mode: 'add',
                                             data: {
-                                                y: -30
+                                                y: - parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
                                             } 
                                         }});
                                         dispatchEvent(event);

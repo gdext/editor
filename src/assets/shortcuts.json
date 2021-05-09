@@ -235,7 +235,8 @@
         "eventInfo": {
             "action": "setTab",
             "tab": 0
-        }
+        },
+        "focus": "app"
     },
     {
         "keys": [50],
@@ -244,7 +245,8 @@
         "eventInfo": {
             "action": "setTab",
             "tab": 1
-        }
+        },
+        "focus": "app"
     },
     {
         "keys": [51],
@@ -253,6 +255,7 @@
         "eventInfo": {
             "action": "setTab",
             "tab": 2
-        }
+        },
+        "focus": "app"
     }
 ]
