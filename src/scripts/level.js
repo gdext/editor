@@ -16,6 +16,32 @@ export function EditorLevel(renderer, level) {
     this.reloadSpeeds    = false;
     this.reloadCTriggers = false;
 
+    
+    
+    /**
+     * This interpolates the 2 color components depending on the `blend` value
+     * @param {number} c1 color component 1
+     * @param {number} c2 color component 2
+     * @param {number} blend blend amount `0 - 1`
+     * @returns result blend
+     */
+     this.blendComp = (c1, c2, blend) => {
+        return c1 * (1-blend) + c2 * blend;
+    }
+    /**
+     * This interpolates the 2 color values depending on the `blend` value
+     * @param {{r: number, g: number, b: number}} col1 color value 1
+     * @param {{r: number, g: number, b: number}} col2 color value 2
+     * @param {number} blend blend amount `0 - 1`
+     * @returns result blend
+     */
+    this.blendColor = (col1, col2, blend) => {
+        let ret = {r: this.blendComp(col1.r, col2.r, blend), b: this.blendComp(col1.b, col2.b, blend), g: this.blendComp(col1.g, col2.g, blend)};
+        if (col1.a) ret.a = this.blendComp(col1.a, col2.a, blend);
+
+        return ret;
+    }
+
     this.getObject = function(i) {
         return this.level.data[i];
     }
@@ -23,7 +49,7 @@ export function EditorLevel(renderer, level) {
     this.reloadSpeedPortals = function() {
         let sps = [];
         this.level.data.forEach((obj, i) => {
-            if (util.getSpeedPortal(obj) != null)
+            if (util.getSpeedPortal(obj))
                 sps.push(i);
         });
 
@@ -46,46 +72,67 @@ export function EditorLevel(renderer, level) {
         this.level.sps = sps;
     }
 
+    this.pickColor = (o) => {
+        return { r: o.r / 255, g: o.g / 255, b: o.b / 255, a: o.a };
+    }
+
+    this.pickColorFromTrigger = (o) => {
+        return { r: o.red / 255, g: o.green / 255, b: o.blue / 255, a: o.opacity || 1 };
+    }
+
+    this.calColorFrom = (pX, pColor, pDuration, nX, nColor, lol) => {
+        let pSec = util.xToSec(this.level, pX);
+        let dSec = pSec + pDuration;
+
+        let nSec = util.xToSec(this.level, nX);
+        let minmax = (n) => Math.min(Math.max(n, 0), 1);
+
+        if (lol) console.log(pSec, dSec, nSec);
+
+        return this.blendColor(pColor, nColor,
+            minmax( (nSec - pSec) / pDuration ) );
+    }
+
     this.loadCTriggers = function(color) {
-        let level  = this.level;
+        let level = this.level;
+        let base  = level.info.colors.filter(f => f.channel == color);
 
-        let objs   = level.data;
-        let ctriggers = [];
+        let data  = level.data;
 
-        let base   = level.info.colors.filter(f => f.channel == color);
-
-        if (base.length > 0) base = base[0]
-        else base = {r: 255, g: 255, b: 255, a: 255};
-
-        objs.forEach((obj, i) => {
-            if (obj.type == "trigger" &&
-                obj.info == "color" &&
-                (obj.color || 1) == color)
-                ctriggers.push(i);
-        });
-
-        ctriggers.sort( (a, b) => objs[a].x - objs[b].x );
-
-        let pcol = {r: base.r, g: base.g, b: base.b};
-        let ccol = pcol;
-
-        let csec = -100000;
-        let cdur = 0;
-
-        for (let i of ctriggers) {
-            let obj   = objs[i];
-            let delta = util.xToSec(level, obj.x) - csec;
-
-            pcol =  util.blendColor(pcol, ccol, Math.min(delta / cdur, 1));
-            ccol =  util.longToShortCol(obj);
-
-            csec += delta;
-            cdur =  obj.duration;
-
-            obj.curCol = pcol;
+        if (base.length > 0) {
+            base = base[0];
+            base.a = +base.alpha;
         }
+        else base = {r: 255, g: 255, b: 255, a: 1};
+
+        let trgs = [];
+
+        for (let [k, v] of Object.entries(data))
+            if (v.type == 'trigger' &&
+                v.info == 'color' &&
+                (v.color || 1) == color)
+                trgs.push(k);
         
-        this.level.cts[color] = ctriggers;
+        trgs.sort( (a, b) => data[a].x - data[b].x );
+
+        let pX        = -1000000000;
+        let pColor    = this.pickColor(base);
+        let pDuration = 0;
+        
+        let nColor    = pColor;
+
+        for (let k of trgs) {
+            let o = data[k];
+            o.curCol = this.calColorFrom(pX, pColor, pDuration, +o.x, nColor, color == 1000);
+
+            pX        = +o.x;
+            pDuration = +o.duration;
+            pColor    = o.curCol;
+
+            nColor    = this.pickColorFromTrigger(o);
+        }
+
+        this.level.cts[color] = trgs;
     }
 
     this.removeObjectZList = function(key, chunkn, layern) {
