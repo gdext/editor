@@ -60,6 +60,10 @@ function moveInHistory(backward) {
                 case 'removeObject':
                     level.addObject(action.props);
                     break;
+                case 'select':
+                    selectedObjs = action.selectBefore;
+                    selectObjects();
+                    break;
             }
         });
     } else {
@@ -81,6 +85,10 @@ function moveInHistory(backward) {
                     break;
                 case 'removeObject':
                     level.removeObject(action.key);
+                    break;
+                case 'select':
+                    selectedObjs = action.selectAfter;
+                    selectObjects();
                     break;
             }
         });
@@ -382,6 +390,7 @@ export default {
         let rect = { x: x, y: y, w: w, h: h };
 
         let objids = level.getObjectsIn(rect);
+        let prevSelect = selectedObjs.slice();
         if(additive) {
             objids.forEach(k => {
                 if(!selectedObjs.includes(k)) selectedObjs.push(k);
@@ -389,7 +398,14 @@ export default {
         } else {
             selectedObjs = objids;
         }
+        
         selectObjects();
+        addUndoGroupAction({
+            type: 'select',
+            selectBefore: prevSelect,
+            selectAfter: selectedObjs
+        });
+        submitUndoGroup();
     },
     selectObjectAt: (x, y, cycle, additive) => {
         let p = renderer.screenToLevelPos(x, y);
@@ -401,6 +417,7 @@ export default {
         }
         else objid = level.getObjectsAt(p.x, p.y);
 
+        let prevSelect = selectedObjs.slice();
         if(additive) {
             objid.forEach(k => {
                 if(selectedObjs.includes(k)) selectedObjs.splice(selectedObjs.indexOf(k), 1);
@@ -410,8 +427,15 @@ export default {
             selectedObjs = objid;
         }
         selectObjects();
+        addUndoGroupAction({
+            type: 'select',
+            selectBefore: prevSelect,
+            selectAfter: selectedObjs
+        });
+        submitUndoGroup();
     },
-    selectObjectByKey: (k) => {
+    selectObjectByKey: (k, dontSubmitUndo) => {
+        let prevSelect = selectedObjs.slice();
         if(Array.isArray(k)) {
             let objid = [];
             k.forEach(kk => {
@@ -422,12 +446,25 @@ export default {
             selectedObjs = [k];
         }
         selectObjects(); 
+        addUndoGroupAction({
+            type: 'select',
+            selectBefore: prevSelect,
+            selectAfter: selectedObjs
+        });
+        if(!dontSubmitUndo) submitUndoGroup();
     },
-    clearSelected: () => {
+    clearSelected: (dontSubmitUndo) => {
+        let prevSelect = selectedObjs.slice();
         selectedObjs = [];
         selectObjects();
         relativeTransform = {};
         globalPrevProps = {};
+        addUndoGroupAction({
+            type: 'select',
+            selectBefore: prevSelect,
+            selectAfter: selectedObjs
+        });
+        if(!dontSubmitUndo) submitUndoGroup();
     },
     closeSelectionBox: () => {
         sel = null;

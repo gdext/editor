@@ -414,6 +414,22 @@ const bottomMenus = {
                 ]
             }
         ]
+    },
+    deleteMenu: {
+        properties: {
+            type: 'container',
+            direction: 'row',
+            paddingX: 15,
+            paddingY: 0
+        },
+        children: [
+            {
+                properties: {
+                    type: 'label',
+                    text: 'Coming Soon!'
+                }
+            }
+        ]
     }
 }
 

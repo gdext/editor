@@ -296,7 +296,7 @@ export default {
             let eY = e.offsetY;
             let coordsArray = [];
             let moving = true;
-            renderer.clearSelected();
+            renderer.clearSelected(true);
             function update() {
                 let coords = renderer.screen2LevelCoords(eX, eY);
                 let tx = Math.floor(coords.x/30)*30 + 15;
@@ -304,7 +304,7 @@ export default {
                 let ta = tx + '|' + ty;
                 if(!coordsArray.includes(ta)) {
                     let objkeys = renderer.placeObject({ mode: 'add', data: { id: buildSelection, x: tx, y: ty }, dontSubmitUndo: true });
-                    if(objkeys) renderer.selectObjectByKey(objkeys);
+                    if(objkeys) renderer.selectObjectByKey(objkeys, true);
                     renderer.update(canvas);
                     coordsArray.push(ta);
                 }
@@ -543,7 +543,8 @@ export default {
                     keys = renderer.placeObject({
                         mode: 'add',
                         data: data,
-                        disableCenterCorrection: true
+                        disableCenterCorrection: true,
+                        dontSubmitUndo: true
                     });
                     renderer.selectObjectByKey(keys);
                     document.querySelector('#app').focus();
@@ -605,7 +606,8 @@ export default {
                     });
                     renderer.placeObject({
                         mode: 'remove',
-                        data: data
+                        data: data,
+                        dontSubmitUndo: true
                     });
                     renderer.clearSelected();
 
@@ -630,7 +632,8 @@ export default {
                     keys = renderer.placeObject({
                         mode: 'add',
                         data: data,
-                        disableCenterCorrection: true
+                        disableCenterCorrection: true,
+                        dontSubmitUndo: true
                     });
                     renderer.selectObjectByKey(keys);
                     break;
@@ -849,6 +852,15 @@ export default {
         let editContent = document.createElement('div');
         ui.renderUiObject(menus.getBottomMenus().editMenu, editContent);
         tab2.appendChild(editContent);
+
+        //delete tab
+        let tab3 = document.getElementById('tabDelete');
+        let deleteTitle = document.createElement('h4');
+        deleteTitle.innerText = 'Delete';
+        tab3.appendChild(deleteTitle);
+        let deleteContent = document.createElement('div');
+        ui.renderUiObject(menus.getBottomMenus().deleteMenu, deleteContent);
+        tab3.appendChild(deleteContent);
 
         buildTabSelObserver.observe(tab1, { attributes: true });
         buildTabSelObserver.observe(tab2, { attributes: true });
