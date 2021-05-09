@@ -124,6 +124,33 @@
         "focus": "app"
     },
     {
+        "keys": [ 17, 67 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "copy"
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 17, 86 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "paste"
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 17, 88 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "cut"
+        },
+        "focus": "app"
+    },
+    {
         "keys": [ 87 ],
         "type": "event",
         "eventName": "editor",
