@@ -424,6 +424,7 @@ export function EditorLevel(renderer, level) {
 
             return z1 - z2;
         });
+        objs.reverse();
 
         if (this.cycleObjects.length == 0) {
             this.cycleObjects = objs;
