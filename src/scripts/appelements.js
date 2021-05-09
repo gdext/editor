@@ -2,6 +2,7 @@ import navbarData from '../assets/navbar.json';
 import buildtabData from '../assets/buildtab.json';
 
 import logoSrc from '../assets/logo-mono.svg';
+import logoGDRenderW from '../assets/logo-gdrenderw.svg';
 import icBuild from '../assets/ic-build.svg';
 import icEdit from '../assets/ic-edit.svg';
 import icDelete from '../assets/ic-delete.svg';
@@ -153,6 +154,24 @@ export default {
         const navbar = document.getElementById('appNavbar');
         const bottom = document.getElementById('appBottom');
 
+        const canvasLoader = document.createElement('div');
+        canvasLoader.id = 'bottom-render';
+        const canvasLoaderLogo = document.createElement('img');
+        canvasLoaderLogo.src = logoGDRenderW;
+        const canvasLoaderHeading = document.createElement('p');
+        canvasLoaderHeading.id = 'bottom-render-text'
+        canvasLoaderHeading.innerText = 'Loading GDRenderW';
+
+        const canvasLoaderProgress = document.createElement('div');
+        canvasLoaderProgress.classList.add('progress-bar-holder');
+        const canvasLoaderProgressBar = document.createElement('div');
+        canvasLoaderProgressBar.id = 'bottom-render-progress';
+        canvasLoaderProgressBar.classList.add('progress-bar-content');
+        canvasLoaderProgress.appendChild(canvasLoaderProgressBar);
+        canvasLoader.appendChild(canvasLoaderLogo);
+        canvasLoader.appendChild(canvasLoaderHeading);
+        canvasLoader.appendChild(canvasLoaderProgress);
+
         const canvas = document.createElement('canvas');
         let canvasSize = util.calcCanvasSize(
             { width: window.innerWidth, height: window.innerHeight }, 
@@ -163,6 +182,7 @@ export default {
         canvas.width = canvasSize.width;
         canvas.height = canvasSize.height;
         canvas.id = "render";
+        canvas.classList.add('hid');
 
         const top_canvas = document.createElement('canvas');
         top_canvas.width = canvasSize.width;
@@ -220,6 +240,7 @@ export default {
         
         canvasUi.appendChild(canvasUiQuicktools);
 
+        elem.appendChild(canvasLoader);
         elem.appendChild(canvas);
         elem.appendChild(top_canvas);
         elem.appendChild(canvasUi);
@@ -566,8 +587,8 @@ export default {
                     finishObjectTransform();
                     break;
                 case 'update': 
-                    updateEditInputs();
-                    finishObjectTransform();
+                    if(!detail.softUpdate) updateEditInputs();
+                    if(!detail.softUpdate) finishObjectTransform();
                     break;
                 case 'deselect': 
                     renderer.clearSelected();
