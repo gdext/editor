@@ -876,7 +876,7 @@ export function GDRenderer(gl, loaded_callback = null) {
     this.renderRect = (x, y, width, height, tint = {r: 1, g: 1, b: 1, a: 1}, toCamera = false) => {
         let gl = this.gl;
 
-        gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 1);
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 1);
         
         if (toCamera)
             util.setCamera(this);
@@ -891,7 +891,7 @@ export function GDRenderer(gl, loaded_callback = null) {
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-        gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 0);
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 0);
     }
 
     /**
@@ -905,7 +905,7 @@ export function GDRenderer(gl, loaded_callback = null) {
     this.renderLine = (x, vertical, tint = {r: 1, g: 1, b: 1, a: 1}, width = 1, toCamera = false) => {
         let gl = this.gl;
 
-        gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 1);
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 1);
         
         if (!toCamera)
             util.setCamera(this, 0, 0);
@@ -929,7 +929,7 @@ export function GDRenderer(gl, loaded_callback = null) {
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-        gl.uniform1i(gl.getUniformLocation(this.gProg, "render_line"), 0);
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 0);
     };
 
     this.renderText = (text, x, y, font, scale = 0.5, tint = {r: 1, g: 1, b: 1, a: 1}, toCamera = true, centered = true) => {
@@ -1007,7 +1007,12 @@ export function GDRenderer(gl, loaded_callback = null) {
         util.setTint(this, tint);
         util.setTexture(this, tex);
 
+        if (tint.i)
+            gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 2);
+
         gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 0);
     }
 
     /**
@@ -1047,6 +1052,8 @@ export function GDRenderer(gl, loaded_callback = null) {
             if (cld[key]) {
                 maincol = this.cache.getColor(this, cld[key].base || maincol);
                 seccol  = this.cache.getColor(this, cld[key].decor || seccol);
+
+                if (cld[key].base) def_tint = maincol;
             }
         }
 
