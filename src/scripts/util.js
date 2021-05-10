@@ -33,7 +33,6 @@ function closeDialog (id) {
 
     if(prevFocusElement[id]) {
         prevFocusElement[id].focus();
-        console.log(document.activeElement);
     }
 }
 
@@ -41,7 +40,6 @@ function openFunc(id) {
     closeFuncIds.unshift(id);
     window.addEventListener('keydown', closeFunc);
     prevFocusElement[id] = document.activeElement;
-    console.log(document.activeElement);
 }
 function closeFunc(e) {
     if(e.keyCode == 27) {
@@ -396,6 +394,18 @@ export default {
 
     updateTitle: () => {
        updateTitle();
+    },
+
+    copyToClipboard: (data, key) => {
+        let clipboardKey = key || 'default';
+        if(!window.clipboard) window.clipboard = {};
+        window.clipboard[clipboardKey] = data;
+    },
+
+    getClipboard: (key) => {
+        if(!window.clipboard) return;
+        let clipboardKey = key || 'default';
+        return window.clipboard[clipboardKey];
     }
 
 }

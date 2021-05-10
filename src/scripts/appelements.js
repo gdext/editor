@@ -2,6 +2,7 @@ import navbarData from '../assets/navbar.json';
 import buildtabData from '../assets/buildtab.json';
 
 import logoSrc from '../assets/logo-mono.svg';
+import logoGDRenderW from '../assets/logo-gdrenderw.svg';
 import icBuild from '../assets/ic-build.svg';
 import icEdit from '../assets/ic-edit.svg';
 import icDelete from '../assets/ic-delete.svg';
@@ -153,6 +154,24 @@ export default {
         const navbar = document.getElementById('appNavbar');
         const bottom = document.getElementById('appBottom');
 
+        const canvasLoader = document.createElement('div');
+        canvasLoader.id = 'bottom-render';
+        const canvasLoaderLogo = document.createElement('img');
+        canvasLoaderLogo.src = logoGDRenderW;
+        const canvasLoaderHeading = document.createElement('p');
+        canvasLoaderHeading.id = 'bottom-render-text'
+        canvasLoaderHeading.innerText = 'Loading GDRenderW';
+
+        const canvasLoaderProgress = document.createElement('div');
+        canvasLoaderProgress.classList.add('progress-bar-holder');
+        const canvasLoaderProgressBar = document.createElement('div');
+        canvasLoaderProgressBar.id = 'bottom-render-progress';
+        canvasLoaderProgressBar.classList.add('progress-bar-content');
+        canvasLoaderProgress.appendChild(canvasLoaderProgressBar);
+        canvasLoader.appendChild(canvasLoaderLogo);
+        canvasLoader.appendChild(canvasLoaderHeading);
+        canvasLoader.appendChild(canvasLoaderProgress);
+
         const canvas = document.createElement('canvas');
         let canvasSize = util.calcCanvasSize(
             { width: window.innerWidth, height: window.innerHeight }, 
@@ -163,6 +182,7 @@ export default {
         canvas.width = canvasSize.width;
         canvas.height = canvasSize.height;
         canvas.id = "render";
+        canvas.classList.add('hid');
 
         const top_canvas = document.createElement('canvas');
         top_canvas.width = canvasSize.width;
@@ -220,6 +240,7 @@ export default {
         
         canvasUi.appendChild(canvasUiQuicktools);
 
+        elem.appendChild(canvasLoader);
         elem.appendChild(canvas);
         elem.appendChild(top_canvas);
         elem.appendChild(canvasUi);
@@ -272,7 +293,8 @@ export default {
                 renderer.update(canvas);
                 util.setCursor();
                 if(!drag) {
-                    renderer.selectObjectAt(e.offsetX, e.offsetY);
+                    let prevsel = renderer.getSelectedObjects().slice();
+                    renderer.selectObjectAt(e.offsetX, e.offsetY, true);
                     let sel = renderer.getSelectedObjects();
                     if(Array.isArray(sel) && sel.length > 0) {
                         let event = new CustomEvent('bottom', { detail: {
@@ -280,6 +302,8 @@ export default {
                             id: renderer.getObjectByKey(sel[0]).id
                         }});
                         dispatchEvent(event);
+                    } else {
+                        renderer.selectObjectByKey(prevsel);
                     }
                 }
             }
@@ -293,7 +317,7 @@ export default {
             let eY = e.offsetY;
             let coordsArray = [];
             let moving = true;
-            renderer.clearSelected();
+            renderer.clearSelected(true);
             function update() {
                 let coords = renderer.screen2LevelCoords(eX, eY);
                 let tx = Math.floor(coords.x/30)*30 + 15;
@@ -301,7 +325,7 @@ export default {
                 let ta = tx + '|' + ty;
                 if(!coordsArray.includes(ta)) {
                     let objkeys = renderer.placeObject({ mode: 'add', data: { id: buildSelection, x: tx, y: ty }, dontSubmitUndo: true });
-                    if(objkeys) renderer.selectObjectByKey(objkeys);
+                    if(objkeys) renderer.selectObjectByKey(objkeys, true);
                     renderer.update(canvas);
                     coordsArray.push(ta);
                 }
@@ -350,8 +374,8 @@ export default {
 
                 let selection = renderer.getSelection();
                 let selectionSize = Math.max(Math.abs(selection.x1 - selection.x2), Math.abs(selection.y1 - selection.y2))
-                if(selectionSize > 0) renderer.selectObjectInSel(selection);
-                else renderer.selectObjectAt(eX, eY, true);
+                if(selectionSize > 0) renderer.selectObjectInSel(selection, keyboard.getKeys().includes(16));
+                else renderer.selectObjectAt(eX, eY, true, keyboard.getKeys().includes(16));
                 renderer.closeSelectionBox();
                 updateEditInputs();
             }
@@ -516,6 +540,7 @@ export default {
             let detail = e.detail;
             if(typeof detail != 'object') return;
             let data = [];
+            let keys;
             switch(detail.action) {
                 case 'delete':
                     data = [];
@@ -526,6 +551,24 @@ export default {
                         mode: 'remove',
                         data: data
                     });
+                    document.querySelector('#app').focus();
+                    break;
+                case 'duplicate':
+                    data = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        let props = JSON.parse(JSON.stringify(renderer.getObjectByKey(k)));
+                        props.x += 30;
+                        props.y -= 30;
+                        data.push(props);
+                    });
+                    keys = renderer.placeObject({
+                        mode: 'add',
+                        data: data,
+                        disableCenterCorrection: true,
+                        dontSubmitUndo: true
+                    });
+                    renderer.selectObjectByKey(keys);
+                    document.querySelector('#app').focus();
                     break;
                 case 'transform':
                     data = [];
@@ -544,8 +587,77 @@ export default {
                     finishObjectTransform();
                     break;
                 case 'update': 
-                    updateEditInputs();
-                    finishObjectTransform();
+                    if(!detail.softUpdate) updateEditInputs();
+                    if(!detail.softUpdate) finishObjectTransform();
+                    renderer.update(canvas);
+                    break;
+                case 'deselect': 
+                    renderer.clearSelected();
+                    break;
+                case 'copy':
+                    let center = JSON.parse(JSON.stringify(renderer.getRelativeTransform().center));
+                    center.x = Math.round(center.x/30)*30;
+                    center.y = Math.round(center.y/30)*30;
+
+                    let clipboard = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        let obj = JSON.parse(JSON.stringify(renderer.getObjectByKey(k)));
+                        obj.x = obj.x - center.x;
+                        obj.y = obj.y - center.y;
+                        clipboard.push(obj);
+                    });
+                    util.copyToClipboard(clipboard, 'objdata');
+                    break;
+                case 'cut':
+                    let center2 = JSON.parse(JSON.stringify(renderer.getRelativeTransform().center));
+                    center2.x = Math.round(center2.x/30)*30;
+                    center2.y = Math.round(center2.y/30)*30;
+
+                    let clipboard2 = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        let obj = JSON.parse(JSON.stringify(renderer.getObjectByKey(k)));
+                        obj.x = obj.x - center2.x;
+                        obj.y = obj.y - center2.y;
+                        clipboard2.push(obj);
+                    });
+                    util.copyToClipboard(clipboard2, 'objdata');
+
+                    data = [];
+                    renderer.getSelectedObjects().forEach(k => {
+                        data.push({ id: k });
+                    });
+                    renderer.placeObject({
+                        mode: 'remove',
+                        data: data,
+                        dontSubmitUndo: true
+                    });
+                    renderer.clearSelected();
+
+                    break;
+                case 'paste':
+                    let getclipboard = util.getClipboard('objdata');
+                    let screen = renderer.screen2LevelCoords(canvasSize.width/2, canvasSize.height/2);
+                    let newcenter = {
+                        x: screen.x,
+                        y: screen.y
+                    };
+                    newcenter.x = Math.round(newcenter.x/30)*30;
+                    newcenter.y = Math.round(newcenter.y/30)*30;
+                     
+                    data = [];
+                    getclipboard.forEach(obj => {
+                        let objj = JSON.parse(JSON.stringify(obj));
+                        objj.x += newcenter.x;
+                        objj.y += newcenter.y;
+                        data.push(objj);
+                    });
+                    keys = renderer.placeObject({
+                        mode: 'add',
+                        data: data,
+                        disableCenterCorrection: true,
+                        dontSubmitUndo: true
+                    });
+                    renderer.selectObjectByKey(keys);
                     break;
             }
         });
@@ -692,7 +804,11 @@ export default {
             let targetIndex = categories[targetCategory].indexOf(id);
             if(targetIndex < 0) return false;
 
-            document.querySelector('#tabBuild').classList.add('sel');
+            let event = new CustomEvent('bottom', { detail: {
+                action: 'setTab',
+                tab: 0
+            }});
+            dispatchEvent(event);
             document.getElementById('bcat'+targetCategory).click();
 
             let targetPage = -1;
@@ -712,7 +828,6 @@ export default {
             buildSelection = id;
             keepPageOverride = true;
             page = targetPage;
-            document.getElementsByClassName('tab-selector')[0].click();
         }
 
         // append build tab
@@ -760,6 +875,15 @@ export default {
         ui.renderUiObject(menus.getBottomMenus().editMenu, editContent);
         tab2.appendChild(editContent);
 
+        //delete tab
+        let tab3 = document.getElementById('tabDelete');
+        let deleteTitle = document.createElement('h4');
+        deleteTitle.innerText = 'Delete';
+        tab3.appendChild(deleteTitle);
+        let deleteContent = document.createElement('div');
+        ui.renderUiObject(menus.getBottomMenus().deleteMenu, deleteContent);
+        tab3.appendChild(deleteContent);
+
         buildTabSelObserver.observe(tab1, { attributes: true });
         buildTabSelObserver.observe(tab2, { attributes: true });
 
@@ -782,6 +906,21 @@ export default {
                 case 'selectObject':
                     focusOnObj(detail.id);
                     break;
+                case 'setTab':
+                    //0 - build, 1 - edit, 2 - delete
+                    if(detail.tab > 2 || detail.tab < 0) return;
+                    document.getElementsByClassName('tab-selector')[detail.tab].click();
+                    switch(detail.tab) {
+                        case 0:
+                            document.querySelector('#tabBuild').classList.add('sel');
+                            break;
+                        case 1:
+                            document.querySelector('#tabEdit').classList.add('sel');
+                            break;
+                        case 2:
+                            document.querySelector('#tabDelete').classList.add('sel');
+                            break;
+                    }
             }
         });
     }

@@ -268,8 +268,15 @@ function executeAction(action) {
                 onConfirm: (v) => {
                     console.log(v);
                     if(v) {
+                        let prevVal = localStorage.getItem('lvlname').toString();
                         localStorage.setItem('lvlname', v);
                         util.setUnsavedChanges(true);
+                        canvas.addUndoGroupAction({
+                            type: 'levelSettings',
+                            key: 'lvlname',
+                            valueBefore: prevVal,
+                            valueAfter: v
+                        });
                     }
                 }
             });

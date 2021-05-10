@@ -115,6 +115,42 @@
         "focus": "app"
     },
     {
+        "keys": [ 17, 68 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "duplicate"
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 17, 67 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "copy"
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 17, 86 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "paste"
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 17, 88 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "cut"
+        },
+        "focus": "app"
+    },
+    {
         "keys": [ 87 ],
         "type": "event",
         "eventName": "editor",
@@ -167,6 +203,84 @@
         "focus": "app"
     },
     {
+        "keys": [ 16, 87 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "y": 3
+            } 
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 16, 65 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "x": -3
+            } 
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 16, 83 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "y": -3
+            } 
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 16, 68 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "x": 3
+            } 
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 90 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "vflip": "$invert"
+            } 
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [ 67 ],
+        "type": "event",
+        "eventName": "editor",
+        "eventInfo": {
+            "action": "transform",
+            "mode": "add",
+            "data": {
+                "hflip": "$invert"
+            } 
+        },
+        "focus": "app"
+    },
+    {
         "keys": [ 81 ],
         "type": "event",
         "eventName": "editor",
@@ -189,6 +303,36 @@
             "data": {
                 "rotation": 90
             } 
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [49],
+        "type": "event",
+        "eventName": "bottom",
+        "eventInfo": {
+            "action": "setTab",
+            "tab": 0
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [50],
+        "type": "event",
+        "eventName": "bottom",
+        "eventInfo": {
+            "action": "setTab",
+            "tab": 1
+        },
+        "focus": "app"
+    },
+    {
+        "keys": [51],
+        "type": "event",
+        "eventName": "bottom",
+        "eventInfo": {
+            "action": "setTab",
+            "tab": 2
         },
         "focus": "app"
     }

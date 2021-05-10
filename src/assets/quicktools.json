@@ -11,7 +11,9 @@
             "icon": "ic-copy.svg",
             "hint": "Copy Selected to Clipboard",
             "event": "editor",
-            "detail": "copy",
+            "detail": {
+                "action": "copy"
+            },
             "enabledCondition": [
                 "objSelected"
             ]
@@ -21,7 +23,9 @@
             "icon": "ic-paste.svg",
             "hint": "Paste from Clipboard",
             "event": "editor",
-            "detail": "paste",
+            "detail": {
+                "action": "paste"
+            },
             "enabledCondition": [
                 "clipboard"
             ]
@@ -31,7 +35,9 @@
             "icon": "ic-cut.svg",
             "hint": "Cut Selected (Copy & Delete)",
             "event": "editor",
-            "detail": "cut",
+            "detail": {
+                "action": "cut"
+            },
             "enabledCondition": [
                 "objSelected"
             ]
@@ -41,7 +47,9 @@
             "icon": "ic-duplicate.svg",
             "hint": "Duplicate Selected",
             "event": "editor",
-            "detail": "duplicate",
+            "detail": {
+                "action": "duplicate"
+            },
             "enabledCondition": [
                 "objSelected"
             ]
@@ -63,7 +71,9 @@
             "icon": "ic-deselect.svg",
             "hint": "Deselect",
             "event": "editor",
-            "detail": "deselect",
+            "detail": {
+                "action": "deselect"
+            },
             "enabledCondition": [
                 "objSelected"
             ]
@@ -114,6 +124,7 @@
             "hint": "Unlink Selected",
             "event": "editor",
             "detail": "unlink",
+            "customHeight": 24,
             "enabledCondition": [
                 "objSelected", "&&", "hasLinkedObjs"
             ]

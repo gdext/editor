@@ -2,6 +2,7 @@ import {GDRenderer} from './GDRenderW/main';
 import {EditorLevel} from './level';
 import TopCanvas from './topcanvas';
 import objectsData from '../assets/levelparse/objects.json';
+import util from './util';
 
 let gl, renderer, cvs, options, level, top, sel;
 
@@ -60,6 +61,13 @@ function moveInHistory(backward) {
                 case 'removeObject':
                     level.addObject(action.props);
                     break;
+                case 'select':
+                    selectedObjs = action.selectBefore;
+                    selectObjects();
+                    break;
+                case 'levelSettings':
+                    localStorage.setItem(action.key, action.valueBefore);
+                    break;
             }
         });
     } else {
@@ -82,11 +90,19 @@ function moveInHistory(backward) {
                 case 'removeObject':
                     level.removeObject(action.key);
                     break;
+                case 'select':
+                    selectedObjs = action.selectAfter;
+                    selectObjects();
+                    break;
+                case 'levelSettings':
+                    localStorage.setItem(action.key, action.valueAfter);
+                    break;
             }
         });
     }
     level.confirmEdit();
     renderer.renderLevel(level, cvs.width, cvs.height, options);
+    util.updateTitle();
 }
 
 function selectObjects() {
@@ -294,11 +310,30 @@ export default {
         options = {
             grid: true,
             custom_colors: {
-                "-1": {r: 0, g: 0.7, b: 1, a: 0.7, i: true}
+                "-1": {r: 0, g: 0.8, b: 1, a: 0.7, i: true}
             }
         };
         gl = canvas.getContext("webgl");
-        renderer = new GDRenderer(gl);
+        renderer = new GDRenderer(gl, (e) => {
+            document.querySelector('#bottom-render-progress').style.width = (e.progress*100) + '%';
+            if(e.loaded) {
+                setTimeout(() => {
+                    let event = new CustomEvent('editor', { detail: {
+                        action: 'update',
+                        softUpdate: true
+                    }});
+                    dispatchEvent(event);
+                    document.querySelector('#render').classList.remove('hid');
+                }, 100);
+                document.querySelector('#bottom-render-progress').style.width = '100%';
+                setTimeout(() => {
+                    document.querySelector('#bottom-render-progress').style.background = '#f88';
+                    document.querySelector('#bottom-render-progress').parentElement.style.borderColor = '#f88';
+                    document.querySelector('#bottom-render-text').innerText = 'There was a problem loading the level!';
+                    document.querySelector('#bottom-render-text').style.color = '#f88';
+                }, 5000);
+            }
+        });
         cvs = canvas;
 
         top = new TopCanvas(top_canvas);
@@ -373,7 +408,7 @@ export default {
             y2: p2.y
         });
     },
-    selectObjectInSel: (sel) => {
+    selectObjectInSel: (sel, additive) => {
         let x = Math.min(sel.x1, sel.x2);
         let y = Math.min(sel.y1, sel.y2);
         let w = Math.max(sel.x1, sel.x2) - x;
@@ -382,10 +417,24 @@ export default {
         let rect = { x: x, y: y, w: w, h: h };
 
         let objids = level.getObjectsIn(rect);
-        selectedObjs = objids;
+        let prevSelect = selectedObjs.slice();
+        if(additive) {
+            objids.forEach(k => {
+                if(!selectedObjs.includes(k)) selectedObjs.push(k);
+            });
+        } else {
+            selectedObjs = objids;
+        }
+        
         selectObjects();
+        addUndoGroupAction({
+            type: 'select',
+            selectBefore: prevSelect,
+            selectAfter: selectedObjs
+        });
+        submitUndoGroup();
     },
-    selectObjectAt: (x, y, cycle) => {
+    selectObjectAt: (x, y, cycle, additive) => {
         let p = renderer.screenToLevelPos(x, y);
 
         let objid;
@@ -395,11 +444,25 @@ export default {
         }
         else objid = level.getObjectsAt(p.x, p.y);
 
-        selectedObjs = objid;
-        console.log(selectedObjs);
+        let prevSelect = selectedObjs.slice();
+        if(additive) {
+            objid.forEach(k => {
+                if(selectedObjs.includes(k)) selectedObjs.splice(selectedObjs.indexOf(k), 1);
+                else selectedObjs.push(k);
+            });
+        } else {
+            selectedObjs = objid;
+        }
         selectObjects();
+        addUndoGroupAction({
+            type: 'select',
+            selectBefore: prevSelect,
+            selectAfter: selectedObjs
+        });
+        submitUndoGroup();
     },
-    selectObjectByKey: (k) => {
+    selectObjectByKey: (k, dontSubmitUndo) => {
+        let prevSelect = selectedObjs.slice();
         if(Array.isArray(k)) {
             let objid = [];
             k.forEach(kk => {
@@ -410,12 +473,25 @@ export default {
             selectedObjs = [k];
         }
         selectObjects(); 
+        addUndoGroupAction({
+            type: 'select',
+            selectBefore: prevSelect,
+            selectAfter: selectedObjs
+        });
+        if(!dontSubmitUndo) submitUndoGroup();
     },
-    clearSelected: () => {
+    clearSelected: (dontSubmitUndo) => {
+        let prevSelect = selectedObjs.slice();
         selectedObjs = [];
         selectObjects();
         relativeTransform = {};
         globalPrevProps = {};
+        addUndoGroupAction({
+            type: 'select',
+            selectBefore: prevSelect,
+            selectAfter: selectedObjs
+        });
+        if(!dontSubmitUndo) submitUndoGroup();
     },
     closeSelectionBox: () => {
         sel = null;
@@ -442,13 +518,17 @@ export default {
         } else {
             optdata = [opt.data];
         }
-        console.log(optdata);
 
         let keys = [];
         switch (opt.mode) {
             case 'add':
                 optdata.forEach(d => {
-                    let obj = level.createObject(d.id, d.x, d.y, true);
+                    let obj = level.createObject(d.id, d.x, d.y, !opt.disableCenterCorrection);
+                    Object.keys(d).forEach(k => {
+                        if(k == 'id' || k == 'x' || k == 'y') return;
+                        let v = d[k];
+                        obj[k] = v;
+                    });
                     let objkey = level.addObject(obj);
                     keys.push(objkey);
                     addUndoGroupAction({
@@ -498,6 +578,10 @@ export default {
         renderer.renderLevel(level, cvs.width, cvs.height, options);
         if(!opt.dontSubmitUndo) submitUndoGroup();
         return keys;
+    },
+    addUndoGroupAction: (obj, dontSubmitUndo) => {
+        addUndoGroupAction(obj);
+        if(!dontSubmitUndo) submitUndoGroup();
     },
     submitUndoGroup: () => {
         submitUndoGroup();
