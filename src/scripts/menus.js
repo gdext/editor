@@ -721,6 +721,34 @@ const contextMenus = {
                                         text: 'Next Free ID',
                                         marginTop: 5
                                     }
+                                },
+                                {
+                                    properties: {
+                                        type: 'label',
+                                        text: 'Channel Color',
+                                        marginTop: 5
+                                    }
+                                },
+                                {
+                                    properties: {
+                                        type: 'colorInput',
+                                        defaultValue: () => {
+                                            return '#ffffff';
+                                        },
+                                        icon: 'edit',
+                                        id: 'colorChannelEditChannelColor'
+                                    }
+                                },
+                                {
+                                    properties: {
+                                        type: 'checkbox',
+                                        text: 'Blending',
+                                        checked: () => {
+                                            return false;
+                                        },
+                                        marginTop: 5,
+                                        id: 'colorChannelEditChannelBlending'
+                                    }
                                 }
                             ]
                         },

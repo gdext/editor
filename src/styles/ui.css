@@ -130,6 +130,7 @@
     font-size: 12px;
     width: 160px;
     min-width: 60px;
+    overflow: hidden;
 }
 
 .ui-input.f {
@@ -146,11 +147,25 @@
     font-size: 12px;
 }
 
+.ui-input input[type=color] {
+    height: 28px;
+    padding: 0;
+}
+input::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+input::-webkit-color-swatch {
+	border: none;
+}
+
 .ui-input img {
     opacity: 0.5;
     padding: 7px 9px;
     height: 14px;
     width: 14px;
+}
+.ui-input img:hover {
+    opacity: 0.75;
 }
 
 .uistretch .ui-input {

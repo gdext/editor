@@ -1,6 +1,7 @@
 import icPick from '../assets/ic-pick.svg';
 import icSlide from '../assets/ic-slide.svg';
 import icInfo from '../assets/ic-info.svg';
+import icEdit from '../assets/ic-edit2.svg';
 import icExit from '../assets/ic-exit.svg';
 import icArrowLeft from '../assets/ic-arrowleft.svg';
 import icArrowRight from '../assets/ic-arrowright.svg';
@@ -92,7 +93,8 @@ function UiObject() {
         if(options && options.marginBottom) inputContainer.style.marginBottom = options.marginBottom + 'px';
 
         let input = document.createElement('input');
-        input.type = 'text';
+        if(type == 'number') input.type = 'text';
+        else input.type = type;
         if(options.id) input.id = options.id;
         if(options.placeholder) input.placeholder = options.placeholder;
 
@@ -122,7 +124,7 @@ function UiObject() {
             if(input.value > options.max) input.value = options.max;
             else if(input.value < options.min) input.value = options.min;
 
-            input.type = 'text'; 
+            if(type == 'number') input.type = 'text'; 
 
             if(input.getAttribute('unit') && !input.value.endsWith(input.getAttribute('unit'))) {  input.value += input.getAttribute('unit'); input.blur() }
 
@@ -138,7 +140,7 @@ function UiObject() {
         }
         input.onblur = () => {
             inputContainer.classList.remove('f');
-            input.type = 'text';
+            if(type == 'number') input.type = 'text';
         }
 
         if(options.icon) {
@@ -159,6 +161,10 @@ function UiObject() {
                     src = icInfo;
                     pointer = 'pointer';
                     break;
+                case 'edit':
+                    src = icEdit;
+                    pointer = 'pointer';
+                    break;
             }
             inputIcon.src = src || (type == 'number' ? icSlide : icInfo);
             inputIcon.style.cursor = pointer || (type == 'number' ? 'e-resize' : 'pointer');
@@ -167,6 +173,11 @@ function UiObject() {
             if(options.onIconClick) {
                 inputIcon.onclick = e => {
                     if(click) options.onIconClick(e);
+                }
+            } else if(type == 'color') {
+                inputIcon.onclick = () => {
+                    input.click();
+                    input.focus();
                 }
             }
 
@@ -589,7 +600,7 @@ export default {
                     let checkboxElement = uiObject.createCheckbox(p.text, p.id, p.checked(), p);
                     checkboxElement.getElementsByTagName('input')[0].onchange = () => {
                         let c = checkboxElement.getElementsByTagName('input')[0].checked;
-                        p.onCheckChange(c);
+                        if(p.onCheckChange) p.onCheckChange(c);
                     }
                     if(p.disabled) checkboxElement.classList.add('disabled');
                     elementContainer.appendChild(checkboxElement);
@@ -609,6 +620,11 @@ export default {
                     let ninputElement = uiObject.createInput('number', p);
                     if(p.disabled) ninputElement.classList.add('disabled');
                     elementContainer.appendChild(ninputElement);
+                    break;
+                case 'colorInput':
+                    let cinputElement = uiObject.createInput('color', p);
+                    if(p.disabled) cinputElement.classList.add('disabled');
+                    elementContainer.appendChild(cinputElement);
                     break;
                 case 'tabs':
                     let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), { onSelectChange: p.onSelectChange });
