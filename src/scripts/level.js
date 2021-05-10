@@ -110,7 +110,7 @@ export function EditorLevel(renderer, level) {
         for (let [k, v] of Object.entries(data))
             if (v.type == 'trigger' &&
                 v.info == 'color' &&
-                (v.color || 1) == color)
+                util.getColorTriggerChannel(v) == color)
                 trgs.push(k);
         
         trgs.sort( (a, b) => data[a].x - data[b].x );
