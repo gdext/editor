@@ -913,7 +913,7 @@ export default {
                 function onColorInputClick(e, c) {
                     let obj2 = contextMenus.objColor.normal;
                     obj2.properties.x = e.pageX+5;
-                    obj2.properties.y = e.pageY+5;
+                    obj2.properties.y = e.pageY-15;
                     let el = document.querySelector('#editObjMenu');
                     if(!el) el = document.body;
                     ui.renderUiObject(obj2, el);

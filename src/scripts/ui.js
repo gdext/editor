@@ -629,12 +629,12 @@ function UiObject() {
         if(options && options.y) menu.style.top = options.y + 'px';
 
         function fixMenuHeight() {
-            let maxy = document.querySelector('#app').getBoundingClientRect().height - menu.getBoundingClientRect().height;
+            let maxy = document.querySelector('#app').getBoundingClientRect().height - menu.getBoundingClientRect().height - 10;
             if(parseInt(menu.style.top) > maxy) {
                 menu.style.top = maxy + 'px';
             }
 
-            let maxh = document.querySelector('#app').getBoundingClientRect().height - parseInt(menu.style.top);
+            let maxh = document.querySelector('#app').getBoundingClientRect().height - parseInt(menu.style.top) - 10;
             if(!options.maxheight) menu.style.maxHeight = maxh + 'px';
         }
         setTimeout(() => {
