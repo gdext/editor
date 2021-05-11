@@ -790,13 +790,65 @@ const contextMenus = {
                         paddingX: 7,
                         paddingY: 7,
                         isBottomBar: true,
-                        title: 'HSV Modify'
+                        title: 'HSV Modify',
+                        collapsible: true,
+                        collapsed: true
                     },
                     children: [
                         {
                             properties: {
-                                type: 'label',
-                                text: 'Coming Soon!'
+                                type: 'slider',
+                                defaultValue: () => {
+                                    return 0;
+                                },
+                                integerOnly: true,
+                                min: -180,
+                                max: 180,
+                                marginBottom: 0,
+                                label: 'Hue'
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'slider',
+                                defaultValue: () => {
+                                    return 0;
+                                },
+                                min: -1,
+                                max: 1,
+                                marginBottom: 5,
+                                label: 'Saturation'
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'tabs',
+                                items: ['Multiply', 'Add'],
+                                selected: () => {
+                                    return 1;
+                                }
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'slider',
+                                defaultValue: () => {
+                                    return 1;
+                                },
+                                min: 0,
+                                max: 2,
+                                marginBottom: 5,
+                                labelSeparator: ': x',
+                                label: 'Value'
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'tabs',
+                                items: ['Multiply', 'Add'],
+                                selected: () => {
+                                    return 0;
+                                }
                             }
                         }
                     ]
@@ -860,8 +912,8 @@ export default {
 
                 function onColorInputClick(e, c) {
                     let obj2 = contextMenus.objColor.normal;
-                    obj2.properties.x = e.pageX-30;
-                    obj2.properties.y = e.pageY+15;
+                    obj2.properties.x = e.pageX+5;
+                    obj2.properties.y = e.pageY+5;
                     let el = document.querySelector('#editObjMenu');
                     if(!el) el = document.body;
                     ui.renderUiObject(obj2, el);

@@ -12,6 +12,8 @@ import util from './util';
 // UiObject contains functions to create all types of UI elements
 // renderUiObject puts all these UiObjects together and returns them as DOM elements
 
+let sliderCount = 0;
+
 function UiObject() {
 
     this.createCheckbox = (name, id, state, options) => {
@@ -437,6 +439,70 @@ function UiObject() {
 
         return labelElement;
     }
+    
+    this.createSlider = (id, value, label, options) => {
+        let obj = {};
+
+        let sep =  options.labelSeparator || ': ';
+
+        let sliderElement = document.createElement('input');
+        sliderElement.type = 'range';
+        let idd = id || 'slider-' + sliderCount;
+        sliderElement.id = idd;
+        sliderCount++;
+        sliderElement.classList.add('ui-slider');
+        sliderElement.value = value;
+        sliderElement.min = options.min || 0;
+        sliderElement.max = options.max || 10;
+        if(options.integerOnly) sliderElement.step = 1;
+        else sliderElement.step = 0.02;
+
+        let sliderStyle = document.createElement('style');
+        sliderElement.appendChild(sliderStyle);
+
+        obj.slider = sliderElement;
+
+        let labelElement = null;
+        if(label) {
+            labelElement = document.createElement('p');
+            labelElement.classList.add('ui-label');
+            labelElement.innerText = options.label + sep + value;
+            obj.label = labelElement;
+
+            if(options.marginTop != undefined) labelElement.style.marginTop = options.marginTop + 'px';
+        } else {
+            if(options.marginTop != undefined) sliderElement.style.marginTop = options.marginTop + 'px';
+        }
+        if(options.marginBottom != undefined) sliderElement.style.marginBottom = options.marginBottom + 'px';
+
+        function updateSliderGradient() {
+            //change slider background gradien
+            //i cant stress enough how bad this implementation is
+            //but theres no other way to do it with webkit
+            let v = parseFloat(sliderElement.value);
+            let mn = parseFloat(sliderElement.min);
+            let mx = parseFloat(sliderElement.max);
+            let percent = (v - mn) / (mx-mn);
+            sliderStyle.innerText = `
+                #${idd}::-webkit-slider-runnable-track {
+                    background: -webkit-linear-gradient(left, #3C94E4 ${percent*100}%, #5A5A5A 0%);
+                }
+
+                .bbg #${idd}::-webkit-slider-runnable-track {
+                    background: -webkit-linear-gradient(left, #fff ${percent*100}%, #1865c5 0%);
+                }
+            `;
+        }
+
+        updateSliderGradient();
+
+        sliderElement.oninput = () => {    
+            if(labelElement) labelElement.innerText = options.label + sep + sliderElement.value;
+            if(options.onValueChange) options.onValueChange(sliderElement.value);
+            updateSliderGradient();
+        }
+        return obj;
+    }
 
     this.createContainer = (id, title, direction, options) => {
         //create container itself
@@ -458,8 +524,8 @@ function UiObject() {
             container.classList.add(directions[direction] || 'c');
         }
         container.style.padding = `${options.paddingY}px ${options.paddingX}px`;
-        let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
-        if(options.scroll) container.classList.add(scrolls[options.scroll]);
+        //let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
+        //if(options.scroll) container.classList.add(scrolls[options.scroll]);
         if(options.isBottomBar) container.classList.add('bbg');
         if(options.invisible) container.style.display = 'none';
 
@@ -470,6 +536,19 @@ function UiObject() {
             titleElem.innerText = title;
             titleElem.style.marginTop = 0;
             container.appendChild(titleElem);
+
+            if(options.collapsible) {
+                titleElem.classList.add('colps');
+                let titleIcon = document.createElement('img');
+                titleIcon.src = icArrowDown;
+                titleElem.appendChild(titleIcon);
+                titleElem.onclick = () => {
+                    container.classList.toggle('collapsed');
+                }
+            }
+            if(options.collapsible && options.collapsed) {
+                container.classList.add('collapsed');
+            }
         }
 
         return container;
@@ -548,6 +627,19 @@ function UiObject() {
         if(options && options.maxheight) menu.style.maxHeight = options.maxheight + 'px';
         if(options && options.x) menu.style.left = options.x + 'px';
         if(options && options.y) menu.style.top = options.y + 'px';
+
+        function fixMenuHeight() {
+            let maxy = document.querySelector('#app').getBoundingClientRect().height - menu.getBoundingClientRect().height;
+            if(parseInt(menu.style.top) > maxy) {
+                menu.style.top = maxy + 'px';
+            }
+
+            let maxh = document.querySelector('#app').getBoundingClientRect().height - parseInt(menu.style.top);
+            if(!options.maxheight) menu.style.maxHeight = maxh + 'px';
+        }
+        setTimeout(() => {
+            fixMenuHeight();
+        }, 8);
 
         if(title) {
             let menuTitle = document.createElement('p');
@@ -641,10 +733,22 @@ export default {
                     if(p.disabled) labelElement.classList.add('disabled');
                     elementContainer.appendChild(labelElement);
                     break;
+                case 'slider':
+                    let slider = uiObject.createSlider(p.id, p.defaultValue(), p.label, p);
+                    let sliderElement = slider.slider;
+                    let labelElement2 = slider.label;
+                    console.log(sliderElement, labelElement2);
+                    if(p.disabled) sliderElement.classList.add('disabled');
+                    if(labelElement2) elementContainer.appendChild(labelElement2);
+                    elementContainer.appendChild(sliderElement);
+                    elementContainer.style.flexDirection = 'column';
+                    break;
                 case 'container':
                     let containerElement = uiObject.createContainer(p.id, p.title, p.direction, p);
                     if(p.disabled) containerElement.classList.add('disabled');
                     elementContainer.appendChild(containerElement);
+                    let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
+                    if(p.scroll) elementContainer.classList.add(scrolls[p.scroll]);
                     targetElement = containerElement;
                     break;
                 case 'card':
