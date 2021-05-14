@@ -206,6 +206,8 @@ function UiObject() {
                     }
 
                     let pv = isInteger() ? Math.round(v) : Math.round(v*100)/100;
+                    console.log('pv', pv);
+                    if(pv.toString() == 'NaN') pv = options.defaultValue ? options.defaultValue() : 0;
                     //handle numbers after the decimal point
                     if(!isInteger()) {
                         let afterDecimal = pv.toString().split('.')[1];
@@ -219,7 +221,7 @@ function UiObject() {
                 }
                 function stopFunction() {
                     util.setCursor();
-                    p.value = isInteger() ? Math.round(v) : Math.round(v*100)/100;
+                    if(Math.round(v).toString() != 'NaN') p.value = isInteger() ? Math.round(v) : Math.round(v*100)/100;
                     if(input.getAttribute('unit')) p.value += input.getAttribute('unit');
                     document.removeEventListener('pointermove', moveFunction);
                     document.removeEventListener('pointerup', stopFunction);
@@ -229,7 +231,8 @@ function UiObject() {
                 inputIcon.onpointerdown = e => {
                     click = true;
                     p = e.target.parentElement.querySelector('input');
-                    v = parseFloat(p.value);
+                    if(parseFloat(p.value).toString() == 'NaN') v = options.defaultValue ? options.defaultValue() : 0;
+                    else v = parseFloat(p.value);
                     document.addEventListener('pointermove', moveFunction);
                     document.addEventListener('pointerup', stopFunction);
                 }
@@ -737,7 +740,6 @@ export default {
                     let slider = uiObject.createSlider(p.id, p.defaultValue(), p.label, p);
                     let sliderElement = slider.slider;
                     let labelElement2 = slider.label;
-                    console.log(sliderElement, labelElement2);
                     if(p.disabled) sliderElement.classList.add('disabled');
                     if(labelElement2) elementContainer.appendChild(labelElement2);
                     elementContainer.appendChild(sliderElement);
