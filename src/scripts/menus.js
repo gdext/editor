@@ -4,6 +4,8 @@ import util from './util';
 import canvas from './canvas';
 import levelparse from './levelparse';
 import quicktoolsData from '../assets/quicktools.json';
+import gdrenderwData from './GDRenderW/data.json';
+import settingidsData from '../assets/levelparse/settingids.json';
 import ui from './ui';
 
 function loadLevel(levelTxt, lvlName) {
@@ -599,6 +601,7 @@ const contextMenus = {
                                                 defaultValue: () => {
                                                     return 0;
                                                 },
+                                                integerOnly: true,
                                                 icon: 'pick'
                                             }
                                         }
@@ -624,6 +627,7 @@ const contextMenus = {
                                                 defaultValue: () => {
                                                     return 0;
                                                 },
+                                                integerOnly: true,
                                                 icon: 'pick'
                                             }
                                         }
@@ -771,7 +775,7 @@ const contextMenus = {
                                         type: 'list',
                                         mode: 'dropdown',
                                         items: [
-                                            'Player Color 1', 'Player Color 2',
+                                            'Player 1', 'Player 2',
                                             'Light BG', 'Default'
                                         ],
                                         selected: () => {
@@ -790,13 +794,65 @@ const contextMenus = {
                         paddingX: 7,
                         paddingY: 7,
                         isBottomBar: true,
-                        title: 'HSV Modify'
+                        title: 'HSV Modify',
+                        collapsible: true,
+                        collapsed: true
                     },
                     children: [
                         {
                             properties: {
-                                type: 'label',
-                                text: 'Coming Soon!'
+                                type: 'slider',
+                                defaultValue: () => {
+                                    return 0;
+                                },
+                                integerOnly: true,
+                                min: -180,
+                                max: 180,
+                                marginBottom: 0,
+                                label: 'Hue'
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'slider',
+                                defaultValue: () => {
+                                    return 0;
+                                },
+                                min: -1,
+                                max: 1,
+                                marginBottom: 5,
+                                label: 'Saturation'
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'tabs',
+                                items: ['Multiply', 'Add'],
+                                selected: () => {
+                                    return 1;
+                                }
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'slider',
+                                defaultValue: () => {
+                                    return 1;
+                                },
+                                min: 0,
+                                max: 2,
+                                marginBottom: 5,
+                                labelSeparator: ': x',
+                                label: 'Value'
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'tabs',
+                                items: ['Multiply', 'Add'],
+                                selected: () => {
+                                    return 0;
+                                }
                             }
                         }
                     ]
@@ -858,20 +914,205 @@ export default {
                 let baseColorInput = obj.children[0].children[1].children[0].children[1];
                 let detailColorInput = obj.children[0].children[1].children[1].children[1];
 
-                function onColorInputClick(e, c) {
+                baseColorInput.properties.onValueChange = v => {
+                    onColorIdInputChange(v, 0);
+                }
+                detailColorInput.properties.onValueChange = v => {
+                    onColorIdInputChange(v, 1);
+                }
+                let selectedColors = null;
+                let targetColor = 0; // 0 - base, 1 - detail
+
+                function onColorIdInputChange(v, col) {
+                    let vv = v;
+                    if(Object.values(settingidsData.colorchannelnames).includes(v)) {
+                        vv = Object.keys(settingidsData.colorchannelnames)[Object.values(settingidsData.colorchannelnames).indexOf(v)];
+                    }
+                    let sel = canvas.getSelectedObjects();
+                    let data = [];
+                    sel.forEach(k => {
+                        data.push({ id: k });
+                    });
+                    let props = {};
+                    if(col == 0) {
+                        props.baseCol = parseInt(vv);
+                    } else {
+                        props.decorCol = parseInt(vv);
+                    }
+                    canvas.placeObject({
+                        mode: 'edit',
+                        data: data,
+                        props: props
+                    });
+                }
+
+                function onColorInputChange(v) {
+                    let colinp = document.querySelector(targetColor ? '#editobjDetailColor' : '#editobjBaseColor');
+                    let col = canvas.getLevel().info.colors.filter(f => f.channel == colinp.value);
+                    let h = util.hexToRGB(v);
+                    if(col != '') {
+                        col[0].r = h.r;
+                        col[0].g = h.g;
+                        col[0].b = h.b;
+                    } else {
+                        canvas.getLevel().info.colors.push({ 
+                            r: h.r, g: h.g, b: h.b, a: 1, alpha: 1,
+                            channel: colinp.value,
+                            channelInfo: colinp.value,
+                            pcolor: "-1"
+                        });
+                        console.log(canvas.getLevel().info.colors);
+                    }
+                }
+
+                function onColorInputClick(e, targetc) {
+                    targetColor = targetc;
+                    colorInputValue(targetColor);
+
                     let obj2 = contextMenus.objColor.normal;
-                    obj2.properties.x = e.pageX-30;
-                    obj2.properties.y = e.pageY+15;
+                    obj2.properties.x = e.pageX+5;
+                    obj2.properties.y = e.pageY-15;
+
+                    let colorChannelMode = obj2.children[0].children[1];
+                    if(Object.keys(settingidsData.colorchannelnames).includes(selectedColors.toString())) {
+                        colorChannelMode.properties.selected = () => { return 1 };
+                    } else {
+                        colorChannelMode.properties.selected = () => { return 0 };
+                    }
+                    let colorChannelId = obj2.children[0].children[2].children[1];
+                    let colorChannelColor = obj2.children[0].children[2].children[4];
+                    let colorChannelBlending = obj2.children[0].children[2].children[5];
+
+                    let colorChannelSpecial = obj2.children[0].children[3].children[1];
+
+                    colorChannelSpecial.properties.selected = () => {
+                        let items = colorChannelSpecial.properties.items;
+                        console.log(items);
+                        let r;
+                        if(settingidsData.colorchannelnames[selectedColors]) {
+                            let b = settingidsData.colorchannelnames[selectedColors];
+                            console.log(b);
+                            r = items.indexOf(b);
+                            let a = targetColor ? 'secCol' : 'mainCol';
+                            
+                            let sel = canvas.getSelectedObjects();
+                            let isDefault = true;
+                            sel.forEach(k => {
+                                let id = canvas.getObjectByKey(k).id;
+                                if(selectedColors != gdrenderwData[id][a]) isDefault = false;
+                            });
+                            
+                            if(isDefault) r = items.indexOf('Default');
+                        } else {
+                            r = 0;
+                        }
+                        
+                        return r;
+                    }
+
+                    colorChannelSpecial.properties.onSelectChange = (s, ims) => {
+                        let col;
+                        if(ims[s] == 'Default') {
+                            let a = targetColor ? 'secCol' : 'mainCol';
+                            let sel = canvas.getSelectedObjects();
+                            let id = canvas.getObjectByKey(sel[0]).id;
+                            col = gdrenderwData[id][a]
+                        } else {
+                            col = ims[s];
+                        }
+                        document.querySelector(targetColor ? '#editobjDetailColor' : '#editobjBaseColor').value = col;
+                        document.querySelector(targetColor ? '#editobjDetailColor' : '#editobjBaseColor').onchange();
+                    }
+
+                    colorChannelId.properties.defaultValue = () => {
+                        return selectedColors || 0;
+                    }
+
+                    colorChannelColor.properties.onValueChange = onColorInputChange;
+
+                    function updateColor(element) {
+                        let targetCol = canvas.getLevel().info.colors.filter(f => parseInt(f.channel) == selectedColors);
+                        targetCol = targetCol != '' ? targetCol[0] : { r: 255, g: 255, b: 255, blending: 0 }
+                    
+                        let r;
+                        switch(element) {
+                            case 0:
+                                r = util.rgbToHex(targetCol.r, targetCol.g, targetCol.b);
+                                break;
+                            case 1:
+                                r = targetCol.blending == 1;
+                                break;
+                        }
+
+                        return r;
+                    }
+
+                    let targetCol = canvas.getLevel().info.colors.filter(f => parseInt(f.channel) == selectedColors);
+                    targetCol = targetCol != '' ? targetCol[0] : { r: 255, g: 255, b: 255, blending: 0 }
+                    colorChannelColor.properties.defaultValue = () => {
+                        return updateColor(0);
+                    }
+                    colorChannelBlending.properties.checked = () => {
+                        return updateColor(1);
+                    }
+
+                    colorChannelId.properties.onValueChange = (v) => {
+                        selectedColors = v;
+                        let colorInp = document.querySelector('#colorChannelEditChannelColor');
+                        let colorBlend = document.querySelector('#colorChannelEditChannelBlending');
+                        if(colorInp) colorInp.value = updateColor(0);
+                        if(colorBlend) colorBlend.checked = updateColor(1);
+
+                        document.querySelector(targetColor ? '#editobjDetailColor' : '#editobjBaseColor').value = v;
+                        document.querySelector(targetColor ? '#editobjDetailColor' : '#editobjBaseColor').onchange();
+                    }
+
                     let el = document.querySelector('#editObjMenu');
                     if(!el) el = document.body;
                     ui.renderUiObject(obj2, el);
                 }
 
+                function colorInputValue(col) {
+                    let sel = canvas.getSelectedObjects();
+                    if(!sel.length) return 0;
+                    
+                    //check if the values are equal
+                    let valuesEqual = true;
+                    let vals = [];
+                    sel.forEach(k => {
+                        let obj = canvas.getObjectByKey(k);
+                        let c = col ? obj.decorCol : obj.baseCol;
+                        let a = col ? 'secCol' : 'mainCol';
+                        let v = c == undefined ? (gdrenderwData[obj.id] ? gdrenderwData[obj.id][a] : 1) : c;
+                        vals.push(v);
+                        vals.forEach(vv => {
+                            if(vv != v) valuesEqual = false;
+                        });
+                    });
+
+                    //return
+                    if(valuesEqual) {
+                        selectedColors = vals[0];
+                        let clrname = settingidsData.colorchannelnames[vals[0]];
+                        return clrname ? clrname : vals[0];
+                    }
+                    else {
+                        selectedColors = 'Mixed';
+                        return 'Mixed';
+                    }
+                }
+
                 baseColorInput.properties.onIconClick = (e) => {
-                    onColorInputClick(e);
+                    onColorInputClick(e, 0);
+                }
+                baseColorInput.properties.defaultValue = () => {
+                    return colorInputValue(0);
                 }
                 detailColorInput.properties.onIconClick = (e) => {
-                    onColorInputClick(e);
+                    onColorInputClick(e, 1);
+                }
+                detailColorInput.properties.defaultValue = () => {
+                    return colorInputValue(1);
                 }
                 break;
         }

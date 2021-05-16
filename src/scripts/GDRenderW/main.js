@@ -1416,7 +1416,7 @@ export function GDRenderer(gl, loaded_callback = null) {
                     }
             }
 
-        console.log(this.level);
+        //console.log(this.level);
         
         /*   RIP /\/\/\   */
         this.renderObject({id: 8, x: -1005, y: 15, _MICHIGUN: true});

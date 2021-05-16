@@ -76,6 +76,18 @@
         "3": "3",
         "4": "4"
     },
+    "colorchannelnames": {
+        "1000": "Background",
+        "1001": "Ground",
+        "1002": "Line",
+        "1003": "3DLine",
+        "1004": "Obj",
+        "1005": "Player 1",
+        "1006": "Player 2",
+        "1007": "Light BG",
+        "1009": "Ground 2",
+        "1010": "Black"
+    },
     "colortriggers": {
         "29": "1000",
         "30": "1001",

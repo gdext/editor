@@ -91,6 +91,35 @@ export default {
             parentw: Math.floor(width/objw)*45 + 'px'
         };
     },
+      
+    rgbToHex: (r, g, b) => {
+        function componentToHex(c) {
+            var hex = c.toString(16);
+            return hex.length == 1 ? "0" + hex : hex;
+        }
+        return "#" + componentToHex(parseInt(r)) + componentToHex(parseInt(g)) + componentToHex(parseInt(b));
+    },
+
+    hexToRGB: (hex) => {
+        let r = 0, g = 0, b = 0;
+        // handling 3 digit hex
+        if (hex.length == 4) {
+           r = "0x" + hex[1] + hex[1];
+           g = "0x" + hex[2] + hex[2];
+           b = "0x" + hex[3] + hex[3];
+           // handling 6 digit hex
+        } else if (hex.length == 7) {
+           r = "0x" + hex[1] + hex[2];
+           g = "0x" + hex[3] + hex[4];
+           b = "0x" + hex[5] + hex[6];
+        };
+     
+        return{
+           r: +r,
+           g: +g,
+           b: +b
+        };
+    },
 
     setUnsavedChanges: (v) => {
         unsavedChanges = v;

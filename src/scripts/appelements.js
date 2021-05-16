@@ -158,6 +158,7 @@ export default {
         canvasLoader.id = 'bottom-render';
         const canvasLoaderLogo = document.createElement('img');
         canvasLoaderLogo.src = logoGDRenderW;
+        canvasLoaderLogo.draggable = 'false';
         const canvasLoaderHeading = document.createElement('p');
         canvasLoaderHeading.id = 'bottom-render-text'
         canvasLoaderHeading.innerText = 'Loading GDRenderW';

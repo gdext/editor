@@ -172,6 +172,36 @@ input::-webkit-color-swatch {
     width: 100%;
 }
 
+/* slider */
+.ui-slider {
+    width: 100%;
+    -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+    background: transparent; /* Otherwise white in Chrome */
+    padding-bottom: 5px;
+}
+.ui-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 6px;
+    background: #3C94E4;
+    cursor: pointer;
+    margin-top: -4px; 
+}
+.bbg .ui-slider::-webkit-slider-thumb {
+    background: #fff;
+}
+
+.ui-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 3px;
+    cursor: pointer;
+    background: #5A5A5A;
+    border-radius: 1px;
+    border: none;
+}
+
 /* list */
 .ui-list {
     display: flex;
@@ -258,6 +288,9 @@ input::-webkit-color-swatch {
     color: #fff;
     text-align: center;
 }
+.uistretch .ui-tab-part {
+    padding: 6px 0;
+}
 .ui-tab-part:last-child {
     border-right: none;
 }
@@ -266,6 +299,25 @@ input::-webkit-color-swatch {
 }
 .ui-tab-part.sel {
     background: #3081CC;
+}
+
+.bbg .ui-tabs {
+    border-color: #102577;
+}
+.bbg .ui-tab-part.sel {
+    background: #fff;
+    color: #3081CC;
+}
+.bbg .ui-tab-part.sel:hover {
+    background: #fff;
+    color: #3081CC;
+}
+.bbg .ui-tab-part {
+    border-color: #102577;
+    background: #1865c5;
+}
+.bbg .ui-tab-part:hover {
+    background: #135cb4;
 }
 
 .uistretch .ui-tabs {
@@ -320,6 +372,29 @@ input::-webkit-color-swatch {
     margin-bottom: 6px;
 }
 
+.ui-label.colps {
+    width: 100%;
+    position: relative;
+    cursor: pointer;
+}
+.ui-label.colps:hover {
+    color: #fff;
+}
+.collapsed .ui-label.colps img {
+    transform: none;
+}
+.ui-label.colps img {
+    position: absolute;
+    transform: rotate(180deg);
+    right: 0;
+    height: 8px;
+    top: 2px;
+    opacity: 0.69;
+}
+.ui-label.colps:hover img {
+    opacity: 1;
+}
+
 .uistretch .ui-label {
     width: 100%;
 }
@@ -335,6 +410,11 @@ input::-webkit-color-swatch {
     width: 100%;
 }
 
+
+.ui-container.collapsed {
+    height: 15px;
+}
+
 .ui-container.r {
     flex-direction: row;
 }
@@ -348,15 +428,18 @@ input::-webkit-color-swatch {
     column-gap: 5px;
 }
 
-.ui-container.sh {
+.ui-element.sh {
     overflow-x: auto;
+    display: block;
 }
-.ui-container.sv {
+.ui-element.sv {
     overflow-y: auto;
+    display: block;
 }
-.ui-container.sb {
+.ui-element.sb {
     overflow-x: auto;
     overflow-y: auto;
+    display: block;
 }
 
 .ui-container.bbg {
