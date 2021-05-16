@@ -54,11 +54,10 @@
             "title": "Settings",
             "options": [
                 [
-                    { "name": "Level", "id": "settings1" },
-                    { "name": "General", "id": "settings" },
-                    { "name": "Editor", "id": "settings3" },
-                    { "name": "Flags", "id": "settings4" },
-                    { "name": "Shortcuts", "id": "settings5" }
+                    { "name": "General", "id": "settings1" },
+                    { "name": "Editor", "id": "settings2" },
+                    { "name": "Flags", "id": "settings3" },
+                    { "name": "Shortcuts", "id": "settings4" }
                 ]
             ]
         },

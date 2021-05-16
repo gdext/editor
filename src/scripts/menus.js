@@ -927,6 +927,29 @@ const settingsMenus = {
                 ]
             }
         ]
+    },
+    editor: {
+        properties: {
+            type: 'container',
+            direction: 'row'
+        },
+        children: [
+            {
+                properties: {
+                    type: 'container',
+                    direction: 'column'
+                },
+                children: [
+                    {
+                        properties: {
+                            type: 'label',
+                            text: 'Coming Soon',
+                            align: 'center'
+                        }
+                    }
+                ]
+            }
+        ]
     }
 }
 
@@ -1191,19 +1214,25 @@ export default {
         return obj;
     },
 
-    openSettings: () => {
+    openSettings: (n) => {
         let settingsTabs = {
             properties: {
                 type: 'tabs',
                 items: [],
                 selected: () => {
-                    return 0;
+                    return n || 0;
                 },
                 id: 'settingsCategories',
                 marginBottom: 10,
                 style: 'header',
                 onSelectChange: (n) => {
-                    
+                    settingsData.categories.forEach(c => {
+                        let id = '#settingsCategory' + c.id;
+                        if(!document.querySelector(id)) return;
+                        document.querySelector(id).style.display = 'none';
+                    });
+                    let targetId = '#settingsCategory' + settingsData.categories[n].id;
+                    document.querySelector(targetId).style.display = '';
                 }
             }
         }
@@ -1223,7 +1252,14 @@ export default {
             ]
         }
 
-        obj.children.push(settingsMenus.general);
+        settingsData.categories.forEach(c => {
+            if(settingsMenus[c.id]) {
+                let objcat = settingsMenus[c.id];
+                objcat.properties.id = 'settingsCategory' + c.id;
+                obj.children.push(objcat);
+            }
+        });
+        
         util.createDialog('settingsDialog', 'GDExt Settings', true, [obj], true);
     }
 
