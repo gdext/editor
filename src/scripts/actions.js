@@ -3,6 +3,7 @@ import levelparse from '../scripts/levelparse';
 import canvas from './canvas';
 import util from './util';
 import songsData from '../assets/levelparse/songs.json';
+import menus from './menus';
 
 let fs = null;
 if(window.process) fs = window.require('fs');
@@ -289,6 +290,9 @@ function executeAction(action) {
             break;
         case 'about':
             util.alert('aboutDialog', 'About GDExt', 'TODO: Add about screen');
+            break;
+        case 'settings':
+            menus.openSettings();
             break;
         case 'githubissue':
             util.openUrl('https://github.com/gdext/editor/issues/new/choose');

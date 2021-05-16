@@ -274,6 +274,11 @@ function UiObject() {
             }, 10);
         }
 
+        if(options.style && options.style == 'header') tabContainer.classList.add('header');
+
+        if(options.marginTop != undefined) tabContainer.style.marginTop = options.marginTop + 'px';
+        if(options.marginBottom != undefined) tabContainer.style.marginBottom = options.marginBottom + 'px';
+
         let ii = -1;
         items.forEach(i => {
             ii++;
@@ -575,7 +580,7 @@ function UiObject() {
         return card;
     }
     
-    this.createDialog = (id, title, closeButton) => {
+    this.createDialog = (id, title, closeButton, fullSize) => {
         let dialog = document.createElement('div');
         dialog.classList.add('ui-dialog');
         dialog.classList.add('uistretch');
@@ -603,6 +608,9 @@ function UiObject() {
                 closeDialog();
             }
             dialog.appendChild(closeBtnElem);
+        }
+        if(fullSize) {
+            dialog.classList.add('fullsize');
         }
 
         openDialog();
@@ -722,7 +730,7 @@ export default {
                     elementContainer.appendChild(cinputElement);
                     break;
                 case 'tabs':
-                    let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), { onSelectChange: p.onSelectChange });
+                    let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), p);
                     if(p.disabled) tabsElement.classList.add('disabled');
                     elementContainer.appendChild(tabsElement);
                     break;
@@ -759,7 +767,7 @@ export default {
                     elementContainer.appendChild(cardElement);
                     break;
                 case 'dialog':
-                    let dialogElement = uiObject.createDialog(p.id, p.title, p.closeButton);
+                    let dialogElement = uiObject.createDialog(p.id, p.title, p.closeButton, p.fullSize);
                     let dialogBgElement = uiObject.createDialogBg(p.id);
 
                     dialogBgElement.appendChild(dialogElement);

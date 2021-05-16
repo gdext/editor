@@ -55,7 +55,7 @@
             "options": [
                 [
                     { "name": "Level", "id": "settings1" },
-                    { "name": "General", "id": "settings2" },
+                    { "name": "General", "id": "settings" },
                     { "name": "Editor", "id": "settings3" },
                     { "name": "Flags", "id": "settings4" },
                     { "name": "Shortcuts", "id": "settings5" }

@@ -1,0 +1,24 @@
+{
+    "categories": [ 
+        {
+            "id": "general",
+            "name": "General"
+        },
+        {
+            "id": "editor",
+            "name": "Editor"
+        },
+        {
+            "id": "flags",
+            "name": "Flags"
+        },
+        {
+            "id": "shortcuts",
+            "name": "Shortcuts"
+        }
+    ],
+    "defaults": {
+        "language": 0,
+        "guiZoom": 0
+    }
+}
