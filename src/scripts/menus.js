@@ -450,103 +450,51 @@ const bottomMenus = {
     }
 }
 
+function quickButton(id, icon, hint, primary = false, props = {}, children = []) {
+    return ui.button(undefined, Object.assign(props, { id, icon, hint, iconHeight: 20, width: 40, height: 40, primary }), children);
+}
+
 const canvasMenus = {
-    canvasOptions: {
-        properties: {
-            type: 'container',
-            direction: 'row'
-        },
-        children: [
-            {
-                properties: {
-                    type: 'button',
-                    id: 'levelSettingsBtn',
-                    icon: 'ic-settings.svg',
-                    hint: 'Level Settings',
-                    iconHeight: 20,
-                    width: 40,
-                    height: 40,
-                    primary: true,
-                    onClick: () => {
-                        util.alert('levelSettingsDialog', 'Level Settings', 'are empty rn, sorry :/', 'Æ');
-                    }
-                }
-            },
-            {
-                properties: {
-                    type: 'button',
-                    id: 'levelZoomIn',
-                    icon: 'ic-zoomin.svg',
-                    hint: 'Zoom In',
-                    iconHeight: 20,
-                    width: 40,
-                    height: 40,
-                    primary: false
-                }
-            },
-            {
-                properties: {
-                    type: 'button',
-                    id: 'levelZoomOut',
-                    icon: 'ic-zoomout.svg',
-                    hint: 'Zoom Out',
-                    iconHeight: 20,
-                    width: 40,
-                    height: 40,
-                    primary: false
-                }
-            },
-            {
-                properties: {
-                    type: 'button',
-                    id: 'levelPlaytestBtn',
-                    icon: 'ic-play.svg',
-                    iconHeight: 20,
-                    hint: 'Playtest Level (in Geometry Dash)',
-                    width: 40,
-                    height: 40,
-                    primary: false,
-                    onClick: () => {
-                        let gdPath = localStorage.getItem('settings.gdpath');
-                        let levelObj = canvas.getLevel();
-                        let levelTxt = levelparse.object2code(levelObj);
-                        if(!window.process) {
-                            util.alert('gdPathFailDialog', 'Playtesting is not supported\nin GDExt Web', 'Please use the desktop version', 'OK');
-                        } else if(gdPath == 'steam') {
-                            loadLevel(levelTxt, localStorage.getItem('lvlname'));
-                        } else {
-                            util.confirm(
-                                'gdPathDialog', 'GD Playtesting',
-                                'Before playtesting, please specify the location of your Geometry Dash app',
-                                {
-                                    buttonYes: 'I use Steam version',
-                                    buttonNo: 'I use pirated version',
-                                    onConfirm: (t) => {
-                                        if(t) {
-                                            localStorage.setItem('settings.gdpath', 'steam');
-                                            loadLevel(levelTxt, localStorage.getItem('lvlname'));
-                                        } else {
-                                            util.alert('gdPathFailDialog', 'Pirated GD is not yet supported', 'So yeah... get $2 and buy official GD, nerd', 'OK');
-                                        }
-                                    }
-                                }    
-                            )
-                        }
-                    }
-                }
+    canvasOptions: ui.container('row', {}, [
+        quickButton('levelSettingsBtn', 'ic-settings.svg', 'Level Settings', true, {
+            onClick: () => util.alert('levelSettingsDialog', 'Level Settings', 'are empty rn, sorry :/', 'Æ')
+        }),
+        quickButton('levelZoomIn', 'ic-zoomin.svg', 'Zoom In'),
+        quickButton('levelZoomOut', 'ic-zoomout.svg', 'Zoom Out'),
+        quickButton('levelPlaytestBtn', 'ic-play.svg', 'Playtest Level (in Geometry Dash)', false, {
+            onClick: () => {
+                let gdPath = localStorage.getItem('settings.gdpath');
+                let levelObj = canvas.getLevel();
+                let levelTxt = levelparse.object2code(levelObj);
+                if(!window.process) {
+                    util.alert('gdPathFailDialog', 'Playtesting is not supported\nin GDExt Web', 'Please use the desktop version', 'OK');
+                } else if(gdPath == 'steam') {
+                    loadLevel(levelTxt, localStorage.getItem('lvlname'));
+                } else {
+                    util.confirm(
+                        'gdPathDialog', 'GD Playtesting',
+                        'Before playtesting, please specify the location of your Geometry Dash app',
+                        {
+                            buttonYes: 'I use Steam version',
+                            buttonNo: 'I use pirated version',
+                            onConfirm: (t) => {
+                                if(t) {
+                                    localStorage.setItem('settings.gdpath', 'steam');
+                                    loadLevel(levelTxt, localStorage.getItem('lvlname'));
+                                } else {
+                                    util.alert('gdPathFailDialog', 'Pirated GD is not yet supported', 'So yeah... get $2 and buy official GD, nerd', 'OK');
+                                }
+                            }
+                        }    
+                    )
+                }   
             }
-        ]
-    },
-    quickTools: {
-        properties: {
-            type: 'container',
-            isGrid: true,
-            columns: 3
-        },
-        children: [
-            
-        ]
-    }
+        }),
+    ]),
+    quickTools: ui.container(undefined, {
+        isGrid: true,
+        columns: 3
+    }, [])
 }
 
 const contextMenus = {
