@@ -6,6 +6,7 @@ import levelparse from './levelparse';
 import quicktoolsData from '../assets/quicktools.json';
 import gdrenderwData from './GDRenderW/data.json';
 import settingidsData from '../assets/levelparse/settingids.json';
+import settingsData from '../assets/settings.json';
 import ui from './ui';
 
 function loadLevel(levelTxt, lvlName) {
@@ -862,6 +863,96 @@ const contextMenus = {
     }
 }
 
+const settingsMenus = {
+    general: {
+        properties: {
+            type: 'container',
+            direction: 'row'
+        },
+        children: [
+            {
+                properties: {
+                    type: 'container',
+                    direction: 'column'
+                },
+                children: [
+                    {
+                        properties: {
+                            type: 'label',
+                            text: 'Language'
+                        }
+                    },
+                    {
+                        properties: {
+                            type: 'list',
+                            mode: 'dropdown',
+                            items: [
+                                'English', 'Coming Soon',
+                                'El'
+                            ],
+                            selected: () => {
+                                return localStorage.getItem('settings.language') ? parseInt(localStorage.getItem('settings.language')) : settingsData.defaults.language;
+                            },
+                            id: 'settingsLanguage'
+                        }
+                    }
+                ]
+            },
+            {
+                properties: {
+                    type: 'container',
+                    direction: 'column'
+                },
+                children: [
+                    {
+                        properties: {
+                            type: 'label',
+                            text: 'GUI Zoom Level'
+                        }
+                    },
+                    {
+                        properties: {
+                            type: 'list',
+                            mode: 'horizontal',
+                            items: [
+                                '100%', '110%', '125%', '150%', '175%', '200%',
+                                '50%', '67%', '75%', '80%', '90%'
+                            ],
+                            selected: () => {
+                                return localStorage.getItem('settings.guiZoom') ? parseInt(localStorage.getItem('settings.guiZoom')) : settingsData.defaults.guiZoom;
+                            },
+                            id: 'settingsGuiZoom'
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    editor: {
+        properties: {
+            type: 'container',
+            direction: 'row'
+        },
+        children: [
+            {
+                properties: {
+                    type: 'container',
+                    direction: 'column'
+                },
+                children: [
+                    {
+                        properties: {
+                            type: 'label',
+                            text: 'Coming Soon',
+                            align: 'center'
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
+
 export default {
 
     getBottomMenus: () => {
@@ -1121,6 +1212,55 @@ export default {
             obj.properties.y = options.y;
         }
         return obj;
+    },
+
+    openSettings: (n) => {
+        let settingsTabs = {
+            properties: {
+                type: 'tabs',
+                items: [],
+                selected: () => {
+                    return n || 0;
+                },
+                id: 'settingsCategories',
+                marginBottom: 10,
+                style: 'header',
+                onSelectChange: (n) => {
+                    settingsData.categories.forEach(c => {
+                        let id = '#settingsCategory' + c.id;
+                        if(!document.querySelector(id)) return;
+                        document.querySelector(id).style.display = 'none';
+                    });
+                    let targetId = '#settingsCategory' + settingsData.categories[n].id;
+                    document.querySelector(targetId).style.display = '';
+                }
+            }
+        }
+        settingsData.categories.forEach(c => {
+            settingsTabs.properties.items.push(c.name);
+        });
+
+        let obj = {
+            properties: {
+                type: 'container',
+                direction: 'column',
+                paddingX: 15,
+                paddingY: 10,
+            },
+            children: [
+                settingsTabs
+            ]
+        }
+
+        settingsData.categories.forEach(c => {
+            if(settingsMenus[c.id]) {
+                let objcat = settingsMenus[c.id];
+                objcat.properties.id = 'settingsCategory' + c.id;
+                obj.children.push(objcat);
+            }
+        });
+        
+        util.createDialog('settingsDialog', 'GDExt Settings', true, [obj], true);
     }
 
 }

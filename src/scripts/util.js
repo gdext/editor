@@ -138,13 +138,14 @@ export default {
         return window.gdext ? window.gdext.isGdRunning : undefined;
     },
 
-    createDialog: (id, title, closeButton, content) => {
+    createDialog: (id, title, closeButton, content, fullSize) => {
         ui.renderUiObject({
             properties: {
                 type: 'dialog',
                 id: id,
                 title: title,
-                closeButton: closeButton
+                closeButton: closeButton,
+                fullSize: fullSize
             },
             children: content
         }, document.body);

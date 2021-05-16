@@ -267,6 +267,10 @@ input::-webkit-color-swatch {
     background: rgba(0,0,0,.25);
 }
 
+.uistretch .ui-list {
+    width: 100%;
+}
+
 /* tab */
 .ui-tabs {
     color: #fff;
@@ -322,6 +326,29 @@ input::-webkit-color-swatch {
 
 .uistretch .ui-tabs {
     width: 100%;
+}
+
+.ui-tabs.header {
+    background: none;
+    border: none;
+    border-radius: 0;
+}
+.header .ui-tab-part {
+    border-right: none;
+    font-size: 16px;
+    font-weight: 500;
+}
+.header .ui-tab-part.sel {
+    background: none;
+    border-bottom: 3px solid #3C94E4;
+    color: #5db1ff;
+}
+.header .ui-tab-part:hover {
+    background: none;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.2);
+}
+.header .ui-tab-part.sel:hover {
+    border-bottom: 3px solid #3081CC;
 }
 
 /* card */
@@ -462,6 +489,11 @@ input::-webkit-color-swatch {
 .ui-dialog.vis {
     display: block;
     animation: popIn ease 0.32s;
+}
+.ui-dialog.fullsize {
+    height: 480px;
+    max-height: 90vh;
+    min-width: 500px;
 }
 .ui-dialog.closing {
     display: block;
