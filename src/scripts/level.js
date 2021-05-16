@@ -85,7 +85,7 @@ export function blendColor(col1, col2, blend) {
 
 function lightBG(bg, p1) {
     let hsv = RGBtoHSV(bg);
-    hsv.s -= 20;
+    hsv.s -= 0.20;
 
     let ret = blendColor( p1, HSVtoRGB(hsv), hsv.v );
     return new BaseColor(ret.r, ret.g, ret.b, 1, true);

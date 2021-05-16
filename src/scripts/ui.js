@@ -690,7 +690,7 @@ function UiObject() {
 
 let uiObject = new UiObject();
 
-export default {
+const ui = {
     renderUiObject: (obj, elem) => {
         function cycle(o, e) {
             let elementContainer = document.createElement('div');
@@ -792,6 +792,137 @@ export default {
         }
 
         cycle(obj, elem);
-    }
+    },
+    /**
+     * Creates a general UIElement
+     * @param {string} type element type
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    create: (type, props = {}, children = []) => {
+        return {
+            properties: Object.assign(props, { type }),
+            children
+        };
+    },
+    /**
+     * Creates a checkbox
+     * @param {string} text checkbox text
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    checkbox: (text, props = {}, children = []) =>
+        ui.create('checkbox', Object.assign(props, { text }), children),
+    /**
+     * Creates a button
+     * @param {string} text button text
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    button: (text, props = {}, children = []) =>
+        ui.create('button', Object.assign(props, { text }), children),
+    /**
+     * Creates a textInput
+     * @param {string} placeholder textInput placeholder
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    textInput: (placeholder, props = {}, children = []) =>
+        ui.create('textInput', Object.assign(props, { placeholder }), children),
+    /**
+     * Creates a numberInput
+     * @param {string} placeholder numberInput placeholder
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    numberInput: (placeholder, props = {}, children = []) =>
+        ui.create('numberInput', Object.assign(props, { placeholder }), children),
+    /**
+     * Creates a colorInput
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    colorInput: (props = {}, children = []) =>
+        ui.create('colorInput', props, children),
+    /**
+     * Creates a tabs element
+     * @param {[]} items tabs items
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    tabs: (items, props = {}, children = []) =>
+        ui.create('tabs', Object.assign(props, { items }), children),
+    /**
+     * Creates a list
+     * @param {[]} items list items
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    list: (items, props = {}, children = []) =>
+        ui.create('list', Object.assign(props, { items }), children),
+    /**
+     * Creates a label
+     * @param {string} text label text
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    label: (text, props = {}, children = []) =>
+        ui.create('label', Object.assign(props, { text }), children),
+    /**
+     * Creates a slider
+     * @param {string} label slider label
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    slider: (label, props = {}, children = []) =>
+        ui.create('slider', Object.assign(props, { label }), children),
+    /**
+     * Creates a container
+     * @param {string} direction container direction
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    container: (direction, props = {}, children = []) =>
+        ui.create('container', Object.assign(props, { direction }), children),
+    /**
+     * Creates a card
+     * @param {string} title card title
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    card: (title, props = {}, children = []) =>
+        ui.create('card', Object.assign(props, { title }), children),
+    /**
+     * Creates a dialog
+     * @param {string} title dialog title
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    dialog: (title, props = {}, children = []) =>
+        ui.create('dialog', Object.assign(props, { title }), children),
+    /**
+     * Creates a contextMenu
+     * @param {string} title contextMenu title
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    contextMenu: (title, props = {}, children = []) =>
+        ui.create('contextMenu', Object.assign(props, { title }), children),
 }
+
+export default ui;
 
