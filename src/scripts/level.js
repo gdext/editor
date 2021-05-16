@@ -6,6 +6,199 @@ function getChunk(x) {
     return Math.floor(x / 992);
 }
 
+// By Parthik Gosar on Stack Overflow
+function HSVtoRGB(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return {
+        r: Math.round(r * 255),
+        g: Math.round(g * 255),
+        b: Math.round(b * 255)
+    };
+}
+
+// By Parthik Gosar on Stack Overflow
+function RGBtoHSV(r, g, b) {
+    if (arguments.length === 1) {
+        g = r.g, b = r.b, r = r.r;
+    }
+    var max = Math.max(r, g, b), min = Math.min(r, g, b),
+        d = max - min,
+        h,
+        s = (max === 0 ? 0 : d / max),
+        v = max / 255;
+
+    switch (max) {
+        case min: h = 0; break;
+        case r: h = (g - b) + d * (g < b ? 6: 0); h /= 6 * d; break;
+        case g: h = (b - r) + d * 2; h /= 6 * d; break;
+        case b: h = (r - g) + d * 4; h /= 6 * d; break;
+    }
+
+    return {
+        h: h,
+        s: s,
+        v: v
+    };
+}
+
+function changeByHSV(color, hsv) {
+    let hsv_col = RGBtoHSV(color.r * 255, color.g * 255, color.b * 255);
+
+    const loop = (v, max) => Math.abs( v % max ) / max;
+    const bcol = (rgb) => new BaseColor(rgb.r / 255, rgb.g / 255, rgb.b / 255, color.opacity, color.blending);
+
+    return bcol( HSVtoRGB( {
+        h: loop( ( hsv_col.h * 360 + hsv.h ), 360 ),
+        s: hsv.s_add ? loop( hsv_col.s * 100 + hsv.s, 100 ) : hsv_col.s * hsv.s,
+        v: hsv.v_add ? loop( hsv_col.v * 100 + hsv.v, 100 ) : hsv_col.v * hsv.v
+    } ) );
+}
+
+export function blendComp(c1, c2, blend) {
+    return c1 * (1-blend) + c2 * blend;
+}
+
+export function blendColor(col1, col2, blend) {
+    return {
+        r: blendComp(col1.r, col2.r, blend),
+        b: blendComp(col1.b, col2.b, blend),
+        g: blendComp(col1.g, col2.g, blend),
+        a: blendComp(col1.opacity, col2.opacity, blend)
+    };
+}
+
+function lightBG(bg, p1) {
+    let hsv = RGBtoHSV(bg);
+    hsv.s -= 20;
+
+    let ret = blendColor( p1, HSVtoRGB(hsv), hsv.v );
+    return new BaseColor(ret.r, ret.g, ret.b, 1, true);
+}
+
+export function BaseColor(r, g, b, opacity = 1, blending = false) {
+    this.type = 'BaseColor';
+
+    this.r = r;
+    this.g = g;
+    this.b = b;
+
+    this.opacity  = opacity;
+    this.blending = blending;
+
+    this.blendWith = (color, blend, blending = false) => {
+        let ret = blendColor(this, color, blend);
+        return new BaseColor(ret.r, ret.g, ret.b, ret.a, blending);
+    }
+}
+
+export function colorFromRGBA(r, g, b, opacity = 1, blending = false) {
+    return new BaseColor(r / 255, g / 255, b / 255, opacity, blending);
+}
+
+export function PlayerColor(player_color, opacity = 1, blending = false) {
+    this.type = 'PlayerColor';
+
+    this.color = player_color;
+
+    this.opacity  = opacity;
+    this.blending = blending;
+}
+
+export function CopyColor(copy_color, blending, copy_opacity, opacity, copy_hsv) {
+    this.type = 'CopyColor';
+
+    this.copy_color   = copy_color;
+    this.blending     = blending;
+
+    this.copy_opacity = copy_opacity;
+    this.opacity      = opacity;
+
+    this.copy_hsv     = copy_hsv;
+}
+
+export function MixedColor(color1, color2, blend) {
+    this.type = 'MixedColor';
+
+    this.color1 = color1;
+    this.color2 = color2;
+
+    this.blend  = blend;
+}
+
+export function createMixedColor(color1, color2, blend) {
+    if (blend <= 0) return color1;
+    if (blend >= 1) return color2;
+    if (color1.type == "BaseColor" && color2.type == "BaseColor")
+        return color1.blendWith(color2, blend, color2.blending);
+    else
+        return new MixedColor(color1, color2, blend);
+}
+
+export function createColorClass(r, g, b, pc, blending, copy_opacity, opacity, copy_color, copy_hsv) {
+    if (copy_color != 0)
+        return new CopyColor(copy_color, blending, copy_opacity, opacity, copy_hsv);
+
+    if (pc != 0)
+        return new PlayerColor(pc, opacity, blending);
+
+    return new BaseColor(r, g, b, opacity, blending);
+}
+
+export function parseHSV(hsv) {
+    return {
+        h: +hsv[0],
+        s: +hsv[1],
+        s_add: hsv[3] == 1,
+        v: +hsv[2],
+        v_add: hsv[4] == 1
+    };
+}
+
+export function getTriggerColor(trig) {
+    return createColorClass(
+        +trig.red / 255,
+        +trig.green / 255,
+        +trig.blue / 255,
+        trig.pCol1 ? 1 : ( trig.pCol2 ? 2 : 0 ),
+        trig.blending || false,
+        trig.copyOpacity || false,
+        +trig.opacity  || 1,
+        +trig.copiedID || 0,
+        parseHSV(trig.copiedHSV || [0, 1, 1, 0, 0])
+    );
+}
+
+export function getFirstColor(base) {
+    const ret = createColorClass(
+        +base.r / 255,
+        +base.g / 255,
+        +base.b / 255,
+        base.pcolor == -1 ? 0 : +base.pcolor,
+        base.blending || false,
+        base.copyalpha || false,
+        +base.alpha || 1,
+        +base.copychannel || 0,
+        parseHSV(base.copiedHSV || [0, 1, 1, 0, 0])
+    );
+    return ret;
+}
+
 export function EditorLevel(renderer, level) {
     this.level = level;
     this.level.format = "GDExt";
@@ -16,7 +209,10 @@ export function EditorLevel(renderer, level) {
     this.reloadSpeeds    = false;
     this.reloadCTriggers = false;
 
-    
+    this.player_colors = [
+        new BaseColor(1, 0.5, 0.5),
+        new BaseColor(0.5, 0.5, 1)
+    ];
     
     /**
      * This interpolates the 2 color components depending on the `blend` value
@@ -80,30 +276,58 @@ export function EditorLevel(renderer, level) {
         return { r: o.red / 255, g: o.green / 255, b: o.blue / 255, a: o.opacity || 1 };
     }
 
-    this.calColorFrom = (pX, pColor, pDuration, nX, nColor, lol) => {
-        let pSec = util.xToSec(this.level, pX);
-        let dSec = pSec + pDuration;
+    this.getBaseColor = (color) => {
+        let base  = this.level.info.colors.filter(f => f.channel == color);
 
-        let nSec = util.xToSec(this.level, nX);
-        let minmax = (n) => Math.min(Math.max(n, 0), 1);
+        if (base.length > 0) return getFirstColor(base[0]);
+        else return new BaseColor(1, 1, 1, 1, false);
+    }
 
-        if (lol) console.log(pSec, dSec, nSec);
+    this.fetchColor = (color, x, log = {}) => {
+        if (color.type == "BaseColor") return color;
+        else if (color.type == "PlayerColor") {
+            let col = this.player_colors[color.color - 1];
+            return new BaseColor(col.r, col.g, col.b, color.opacity, color.blending);
+        } else if (color.type == "CopyColor") {
+            let col = this.getColorAt(x, color.copy_color, log);
 
-        return this.blendColor(pColor, nColor,
-            minmax( (nSec - pSec) / pDuration ) );
+            if (!color.copy_opacity) col.opacity = color.opacity;
+            col.blending = color.blending;
+
+            col = changeByHSV(col, color.copy_hsv);
+            return col;
+        } else if (color.type == "MixedColor") {
+            let c1 = this.fetchColor( color.color1, x );
+            let c2 = this.fetchColor( color.color2, x );
+
+            return c1.blendWith( c2, color.blend, c2.blending );
+        } else return new BaseColor(1, 1, 1, 1, false);
+    }
+
+    this.colorTriggerBlend = (pX, nX, pDuration) => {
+        let pSec = this.getTimeAt(pX);
+        let nSec = this.getTimeAt(nX);
+
+        return (nSec - pSec) / pDuration;
+    }
+
+    this.pulseTriggerBlend = (pX, nX, pFadeIn, pHold, pFadeOut) => {
+        let pSec = this.getTimeAt(pX);
+        let nSec = this.getTimeAt(nX);
+
+        let fiSec = this.getTimeAt(pX + pFadeIn);
+        let hSec = this.getTimeAt(pX + pFadeIn + pHold);
+
+        if (nSec < fiSec) return (nSec - pSec) / pFadeIn;
+        else if (nSec < hSec) return 1;
+        else return 1 - (nSec - hSec) / pFadeOut;
     }
 
     this.loadCTriggers = function(color) {
         let level = this.level;
-        let base  = level.info.colors.filter(f => f.channel == color);
-
         let data  = level.data;
 
-        if (base.length > 0) {
-            base = base[0];
-            base.a = +base.alpha;
-        }
-        else base = {r: 255, g: 255, b: 255, a: 1};
+        let base = this.getBaseColor(color);
 
         let trgs = [];
 
@@ -116,24 +340,87 @@ export function EditorLevel(renderer, level) {
         trgs.sort( (a, b) => data[a].x - data[b].x );
 
         let pX        = -1000000000;
-        let pColor    = this.pickColor(base);
         let pDuration = 0;
         
-        let nColor    = pColor;
+        let bColor, eColor = base;
 
         for (let k of trgs) {
             let o = data[k];
-            o.curCol = this.calColorFrom(pX, pColor, pDuration, +o.x, nColor, color == 1000);
+
+            bColor = createMixedColor( bColor, eColor, this.colorTriggerBlend(pX, pDuration, +o.x) );
+            eColor = getTriggerColor(o);
 
             pX        = +o.x;
             pDuration = +o.duration;
-            pColor    = o.curCol;
 
-            nColor    = this.pickColorFromTrigger(o);
+            o.begin_color = bColor;
+            o.end_color   = eColor;
         }
 
         this.level.cts[color] = trgs;
     }
+
+    this.getTimeAt = (x) => {
+        let level = this.level;
+
+        let base = (+level.info.speed || 0) + 1;
+        let portal;
+
+        for (let k of level.sps) {
+            let sp = level.data[k];
+
+            if (+sp.x >= +x) break;
+            portal = sp;
+        }
+
+        if (!portal) return +x / util.ups[base];
+        else {
+            let spd = util.getSpeedPortal(portal);
+            return portal.secx + (x - +portal.x) / util.ups[spd];
+        }
+    },
+
+    this.getColorAt = (x, col, log = {}) => {
+        switch (+col) {
+        case 1005: return new BaseColor(1, 0, 0);
+        case 1006: return new BaseColor(1, 0, 0);
+        case 1007: return lightBG(this.getColorAt(x, 1000, log), this.player_colors[0]);
+        }
+
+        let level = this.level;
+        let base = this.getBaseColor( col );
+
+        let trigger;
+        if (level.cts[col])
+            for (let k of level.cts[col]) {
+                let trg = level.data[k];
+
+                if (+trg.x >= x) break;
+                trigger = trg;
+            }
+
+        if (log[col])
+            if (log[col] == 4) return new BaseColor(1, 1, 1);
+            else log[col]++;
+        else log[col] = 1;
+
+        //if (col == 1000) console.log(base);
+
+        if (trigger) {
+            //if (col == 1) console.log( this.calColorFrom(+trigger.x, trigger.begin_color, +trigger.duration, x, trigger.end_color) );
+            
+            return this.fetchColor(
+                createMixedColor( 
+                    trigger.begin_color,
+                    trigger.end_color,
+                    this.colorTriggerBlend(+trigger.x, +trigger.duration, x)
+                ),
+                x,
+                log
+            );
+        }
+        else return this.fetchColor( base, x, log );
+    },
 
     this.removeObjectZList = function(key, chunkn, layern) {
         let chunk = this.level.lchunks[chunkn];

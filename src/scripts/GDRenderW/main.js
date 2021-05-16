@@ -203,6 +203,12 @@ export const util = {
         
         gl.uniformMatrix3fv(renderer.vmUni, false, matrix);
     },
+    setAdditiveBlending: function(renderer, blending) {
+        let gl = renderer.gl;
+
+        if (blending) gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+        else gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    },
     color255: function(r = 255, g = 255, b = 255, a = 255) {
         return {r, g, b, a};
     },
@@ -225,7 +231,7 @@ export const util = {
      */
     setTint: function(renderer, tint) {
         let uniform = renderer.gl.getUniformLocation(renderer.gProg, "a_tint")
-        renderer.gl.uniform4fv(uniform, new Float32Array([tint.r, tint.g, tint.b, tint.a]));
+        renderer.gl.uniform4fv(uniform, new Float32Array([tint.r, tint.g, tint.b, tint.opacity || 1]));
     },
     getSpeedPortal: function(obj) {
         if (obj.id == 200)
@@ -273,30 +279,6 @@ export const util = {
         1004: "OBJ"
     },
     /**
-     * This function takes in a level and a x position and returns the time
-     * it takes to get to that x position given you went through each speed portal
-     * @param {GDExtLevel} level the level in GDExt JSON format. though it also needs the `sps` property.
-     * @param {number} x the x position
-     * @returns {number} the time to get to the x position in seconds.
-     */
-    xToSec: function(level, x) {
-        let base = (+level.info.speed || 0) + 1;
-        let portal;
-
-        for (let k of level.sps) {
-            let sp = level.data[k];
-
-            if (+sp.x >= +x) break;
-            portal = sp;
-        }
-
-        if (!portal) return +x / this.ups[base];
-        else {
-            let spd = this.getSpeedPortal(portal);
-            return portal.secx + (x - +portal.x) / this.ups[spd];
-        }
-    },
-    /**
      * This function takes in a level and time in seconds and returns the x position
      * where the amount of time passed is the same as the input given you went through each speed portal
      * @param {GDExtLevel} level the level in GDExt JSON format. though it also needs the `sps` property.
@@ -320,30 +302,6 @@ export const util = {
         }
 
         return lastX + (sec - lastSec) * this.ups[lastSpd];
-    },
-    /**
-     * forgot what this does
-     * @param {*} level 
-     * @param {*} x 
-     * @returns 
-     */
-    xToSecBC: function(level, x) {
-        var resSP = null;
-        var lspd = null;
-
-        lspd = parseInt((level.info.speed === undefined) ? 1 : (level.info.speed + 1));
-        
-        for (var sp of level.listSPs) {
-            if (parseFloat(sp.x) >= parseFloat(x))
-                break;
-            resSP = sp;
-        }
-        if (resSP != null) {
-            var speed = null;
-            speed = this.getSpeedPortal(resSP);
-            return resSP.secx + (x - resSP.x) / parseFloat(this.ups[speed]);
-        } else
-            return parseFloat(x) / parseFloat(this.ups[lspd]);
     },
     /**
      * Takes in a color object with properties `red, green, blue` (a color trigger for example).
@@ -372,64 +330,6 @@ export const util = {
 
         return this.blendColor(pColor, nColor,
             minmax( (nSec - pSec) / pDuration ) );
-    },
-    /**
-     * Takes in the level, a x position and a color id and calculates the color
-     * at that x position given you went through each speed portal.
-     * @param {GDExtLevel} level the level in GDExt JSON format. though it also needs the `sps` property.
-     * @param {number} x x position
-     * @param {number} col color id
-     * @returns {{r : number, g : number, b : number}}
-     */
-    xToCOL: function(level, x, col) {
-        let trigger;
-        let base = level.info.colors.filter((f) => f.channel == col);
-
-        if (base.length > 0) base = this.pickColor(base[0]);
-        else base = {r: 1, g: 1, b: 1, a: 1};
-
-        if (level.cts[col])
-            for (let k of level.cts[col]) {
-                let trg = level.data[k];
-
-                if (+trg.x >= x) break;
-                trigger = trg;
-            }
-
-        if (trigger) return this.calColorFrom(level, +trigger.x, trigger.curCol, +trigger.duration, x, this.pickColorFromTrigger(trigger));
-        else return base;
-    },
-    /**
-     * I think this one calculates a background color value
-     * @param {*} level 
-     * @param {*} x 
-     * @param {*} col 
-     * @returns 
-     */
-    xToCOLBC: function(level, x, col) {
-        var resCOL = null;
-        if (level.listCOLs[col] != undefined) {
-            for (var colo of level.listCOLs[col]) {
-                if (colo.x >= x)
-                    break;
-                resCOL = colo;
-            }
-        }
-        if (resCOL != null) {
-            var delta = this.xToSec(level, x, true) - this.xToSec(level, resCOL.x);
-            if (delta < parseFloat(resCOL.duration)) {
-                return this.blendColor(resCOL.curCol, this.longToShortCol(resCOL), delta / resCOL.duration);
-            } else
-                return this.longToShortCol(resCOL);
-        } else {
-            var baseColor = level.info.colors.filter((f) => {return f.channel == col;});
-            if (baseColor.length > 0) {
-                baseColor = baseColor[0];
-
-                return {r: baseColor.r, b: baseColor.b, g: baseColor.g};
-            } else
-                return {r: 255, b: 255, g: 255}
-        }
     },
     /**
      * This converts each color component so the values go from `0 - 255` to `0 - 1`
@@ -744,23 +644,19 @@ export function GDRenderer(gl, loaded_callback = null) {
             }
 
             if (!renderer.level.info.colors)
-                return {r: 1, g: 1, b: 1, a: 1};
-
-            if (color == 1005 || color == 1006 || color == 1007) // P1, P2, LBG
-                return {r: 1, g: 1, b: 1, a: 1};
+                return {r: 1, g: 1, b: 1, opacity: 1, blending: false};
             
             if (color == 1010) // BLACK
-                return {r: 0, g: 0, b: 0, a: 1};
+                return {r: 0, g: 0, b: 0, opacity: 1, blending: false};
             if (color == 1011) // WHITE (unverified color id)
-                return {r: 1, g: 1, b: 1, a: 1};
+                return {r: 1, g: 1, b: 1, opacity: 1, blending: false};
 
             /* LIGHTER TO BE ADDED (color id 1012 (unverified color id) ) */
 
             if (this.colors[color])
                 return this.colors[color];
 
-            this.colors[color] = util.xToCOL(renderer.level, renderer.camera.x, color);
-            if (!this.colors[color].a) this.colors[color].a = 1;
+            this.colors[color] = renderer.gdlevel.getColorAt(renderer.camera.x, color);
             monitor.endCategory("Color calculation");
 
             return this.colors[color];
@@ -776,7 +672,8 @@ export function GDRenderer(gl, loaded_callback = null) {
 
     // This enables blending so that objects can be seen through transparent objects 
     gl.enable(gl.BLEND);
-    gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    util.setAdditiveBlending(this, false);
+    //gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
     // These are the vertices of a rectangle since textures are rectangulair.
     // This is used in the rendering process.
@@ -884,7 +781,7 @@ export function GDRenderer(gl, loaded_callback = null) {
         util.setCamera(this, 0, 0);
         
         var size = Math.max(this.width, this.height);
-        util.setModelMatrix(this, 0, 0, size);
+        util.setModelMatrix(this, 0, 0, size * 2);
 
         util.setFullTexture(this);
         
@@ -935,7 +832,7 @@ export function GDRenderer(gl, loaded_callback = null) {
      * @param {number} width line width (1 by default)
      * @param {boolean} toCamera whenever the line should stick to the camera (false by default)
      */
-    this.renderLine = (x, vertical, tint = {r: 1, g: 1, b: 1, a: 1}, width = 1, toCamera = false) => {
+    this.renderLine = (x, vertical, tint = {r: 1, g: 1, b: 1, opacity: 1}, width = 1, toCamera = false) => {
         let gl = this.gl;
 
         gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 1);
@@ -965,7 +862,7 @@ export function GDRenderer(gl, loaded_callback = null) {
         gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 0);
     };
 
-    this.renderText = (text, x, y, font, scale = 0.5, tint = {r: 1, g: 1, b: 1, a: 1}, toCamera = true, centered = true) => {
+    this.renderText = (text, x, y, font, scale = 0.5, tint = {r: 1, g: 1, b: 1, opacity: 1}, toCamera = true, centered = true) => {
         let gl = this.gl;
         text = text + '';
 
@@ -1028,7 +925,7 @@ export function GDRenderer(gl, loaded_callback = null) {
      * @param {number} scale the scaling of the texture
      * @returns 
      */
-    this.renderTexture = (tex, x, y, rot, xflip, yflip, tint = {r: 1, g: 1, b: 1, a: 1}, scale = 1) => {
+    this.renderTexture = (tex, x, y, rot, xflip, yflip, tint = {r: 1, g: 1, b: 1, opacity: 1, blending: false}, scale = 1) => {
         if (tex == undefined)
             return;
 
@@ -1041,12 +938,13 @@ export function GDRenderer(gl, loaded_callback = null) {
         util.setTint(this, tint);
         util.setTexture(this, tex);
 
-        if (tint.i)
-            gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 2);
+        if (tint.blending) util.setAdditiveBlending(this, true);
+        if (tint.i) gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 2);
 
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
         gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 0);
+        util.setAdditiveBlending(this, false);
     }
 
     /**
@@ -1076,10 +974,10 @@ export function GDRenderer(gl, loaded_callback = null) {
 
         this.cache.objCount++;
 
-        var def_tint = {r: 1, g: 1, b: 1, a: 1};
+        var def_tint = {r: 1, g: 1, b: 1, a: 1, opacity: 1, blending: false};
         var slc      = obj.scale || 1;
 
-        if (obj._MICHIGUN) maincol = {r: 1, g: 1, b: 1, a: 0.5};
+        if (obj._MICHIGUN) maincol = {r: 1, g: 1, b: 1, opacity: 0.5, blending: false};
 
         if (this.current_options.colored_objects) {
             let cld = this.current_options.colored_objects;
@@ -1321,9 +1219,12 @@ export function GDRenderer(gl, loaded_callback = null) {
         if (!level.level)
             return;
 
+        console.log(level);
+
         this.current_options = options || {};
 
-        this.level = level.level;
+        this.gdlevel = level;
+        this.level   = level.level;
 
         // Starts the monitor
         monitor.startFrame();
