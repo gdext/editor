@@ -1,3 +1,5 @@
+/* This file is written by Ucrash and was originally intended towards GDExt */
+
 import propids from '../assets/levelparse/propids.json';
 import settingids from '../assets/levelparse/settingids.json';
 import objects from '../assets/levelparse/objects.json';

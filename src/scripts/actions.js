@@ -1,5 +1,5 @@
 import decodesave from '../scripts/decodesave';
-import levelparse from '../scripts/levelparse';
+import levelparse from './levelparse';
 import canvas from './canvas';
 import util from './util';
 import songsData from '../assets/levelparse/songs.json';

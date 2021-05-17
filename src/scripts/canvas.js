@@ -1,5 +1,5 @@
 import {GDRenderer} from './GDRenderW/main';
-import {EditorLevel} from './level';
+import {EditorLevel} from './GDRenderW/level';
 import TopCanvas from './topcanvas';
 import objectsData from '../assets/levelparse/objects.json';
 import util from './util';
