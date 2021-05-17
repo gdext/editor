@@ -20,9 +20,9 @@ function UiObject() {
         let checkboxContainer = document.createElement('label');
         checkboxContainer.classList.add('ui-checkbox');
         checkboxContainer.innerText = name;
-        if(options && options.light) checkboxContainer.classList.add('bbg');
+        if(options && options.big) checkboxContainer.classList.add('big');
         if(options && options.marginTop) checkboxContainer.style.marginTop = options.marginTop + 'px';
-        if(options && options.marginBottom) checkboxContainer.style.marginTop = options.marginBottom + 'px';
+        if(options && options.marginBottom) checkboxContainer.style.marginBottom = options.marginBottom + 'px';
 
         let checkbox = document.createElement('input');
         checkbox.type = 'checkbox';

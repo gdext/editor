@@ -33,6 +33,7 @@
     user-select: none;
     display: flex;
     flex-direction: row-reverse;
+    align-items: center;
 }
 
 .ui-checkbox input {
@@ -76,6 +77,16 @@
 }
 .ui-checkbox.bbg input:checked ~ .checkbox-mark::before{
     filter: none;
+}
+
+.ui-checkbox.big .checkbox-mark {
+    height: 20px;
+    margin-right: 10px;
+    width: 20px;
+}
+.ui-checkbox.big input:checked ~ .checkbox-mark::before {
+    top: 6px;
+    left: 5px;
 }
 
 /* button */

@@ -890,9 +890,85 @@ const settingsMenus = {
                 children: [
                     {
                         properties: {
+                            type: 'checkbox',
+                            text: 'Autosaving',
+                            big: true,
+                            checked: () => {
+                                return localStorage.getItem('settings.autosaveEnabled') == '1';
+                            },
+                            id: 'settingsAutosaveEnabled'
+                        }
+                    },
+                    {
+                        properties: {
                             type: 'label',
-                            text: 'Coming Soon',
-                            align: 'center'
+                            text: 'Autosave Interval',
+                            marginTop: 10,
+                        }
+                    },
+                    {
+                        properties: {
+                            type: 'list',
+                            mode: 'dropdown',
+                            items: [
+                                '5 Minutes', '10 Minutes', '15 Minutes',
+                                '30 Minutes', '1 Hour'
+                            ],
+                            selected: () => {
+                                return localStorage.getItem('settings.autosaveInterval') ? parseInt(localStorage.getItem('settings.autosaveInterval')) : settingsData.defaults.autosaveInterval;
+                            },
+                            id: 'settingsAutosaveInterval'
+                        }
+                    },
+                    {
+                        properties: {
+                            type: 'checkbox',
+                            text: 'Show Quick Tools',
+                            big: true,
+                            marginTop: 20,
+                            checked: () => {
+                                return localStorage.getItem('settings.showQuickTools') == '0';
+                            },
+                            id: 'settingsShowQuickTools'
+                        }
+                    },
+                    {
+                        properties: {
+                            type: 'button',
+                            text: 'Organize Quick Tools',
+                            marginTop: 10
+                        }
+                    }
+                ]
+            },
+            {
+                properties: {
+                    type: 'container',
+                    direction: 'column'
+                },
+                children: [
+                    {
+                        properties: {
+                            type: 'label',
+                            text: 'GD Levels File Location',
+                            marginTop: 0,
+                        }
+                    },
+                    {
+                        properties: {
+                            type: 'checkbox',
+                            text: 'Use Default',
+                            marginTop: 7,
+                            marginBottom: 7,
+                            checked: () => {
+                                return true;
+                            }
+                        }
+                    },
+                    {
+                        properties: {
+                            type: 'textInput',
+                            placeholder: 'Default'
                         }
                     }
                 ]
