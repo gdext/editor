@@ -2,10 +2,10 @@
 
 import util from './util';
 import canvas from './canvas';
-import levelparse from './GDRenderW/levelparse';
+import levelparse from './levelparse';
 import quicktoolsData from '../assets/quicktools.json';
 import gdrenderwData from './GDRenderW/assets/data.json';
-import settingidsData from './GDRenderW/assets/levelparse/settingids.json';
+import settingidsData from '../assets/levelparse/settingids.json';
 import settingsData from '../assets/settings.json';
 import ui from './ui';
 
