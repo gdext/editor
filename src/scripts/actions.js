@@ -1,8 +1,8 @@
 import decodesave from '../scripts/decodesave';
-import levelparse from './GDRenderW/levelparse';
+import levelparse from './levelparse';
 import canvas from './canvas';
 import util from './util';
-import songsData from './GDRenderW/assets/levelparse/songs.json';
+import songsData from '../assets/levelparse/songs.json';
 import menus from './menus';
 
 let fs = null;
