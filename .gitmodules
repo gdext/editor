@@ -1,0 +1,3 @@
+[submodule "src/scripts/GDRenderW"]
+	path = src/scripts/GDRenderW
+	url = https://github.com/iliasHDZ/GDRenderW
