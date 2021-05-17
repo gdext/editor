@@ -1,4 +1,4 @@
-import levelparse from './GDRenderW/levelparse';
+import levelparse from './levelparse';
 import canvas from './canvas';
 import util from './util';
 import pako from 'pako';
