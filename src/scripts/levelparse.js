@@ -1,8 +1,8 @@
 /* This file is written by Ucrash and was originally intended towards GDExt */
 
-import propids from './assets/levelparse/propids.json';
-import settingids from './assets/levelparse/settingids.json';
-import objects from './assets/levelparse/objects.json';
+import propids from '../assets/levelparse/propids.json';
+import settingids from '../assets/levelparse/settingids.json';
+import objects from '../assets/levelparse/objects.json';
 
 // this file contains functions to decode level data from string
 // to GDExt object format and encode it back to string
