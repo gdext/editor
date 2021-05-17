@@ -13,7 +13,7 @@ import icClose from '../assets/ic-close.svg';
 import ui from './ui';
 import util from './util';
 import renderer from './canvas';
-import levelparse from './GDRenderW/levelparse';
+import levelparse from './levelparse';
 import actionsExec from './actions';
 import keyboard from './keyboard';
 import menus from './menus';
