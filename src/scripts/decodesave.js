@@ -1,6 +1,6 @@
 import pako from 'pako';
 import plist from 'plist';
-import datakeys from '../assets/levelparse/datakeys.json';
+import datakeys from './GDRenderW/assets/levelparse/datakeys.json';
 const Buffer = require('buffer/').Buffer;
 
 // this file contains functions to decode the CCLocalLevels.dat file from encrypted xml

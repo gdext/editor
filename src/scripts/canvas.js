@@ -1,7 +1,7 @@
 import {GDRenderer} from './GDRenderW/main';
-import {EditorLevel} from './level';
+import {EditorLevel} from './GDRenderW/level';
 import TopCanvas from './topcanvas';
-import objectsData from '../assets/levelparse/objects.json';
+import objectsData from './GDRenderW/assets/levelparse/objects.json';
 import util from './util';
 
 let gl, renderer, cvs, options, level, top, sel;
