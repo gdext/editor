@@ -365,7 +365,7 @@
 
 .app-notification {
     position: fixed;
-    z-index: 128;
+    z-index: 1000;
     bottom: 20px;
     left: 0;
     right: 0;

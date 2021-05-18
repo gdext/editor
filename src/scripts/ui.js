@@ -335,14 +335,22 @@ function UiObject() {
             function moveFunction(e) {
                 util.setCursor('e-resize');
                 v += e.movementX * 0.06;
-                if(v >= items.length) v = 0;
-                else if(v < 0) v = items.length-1;
+                if(options.dontWrap) {
+                    if(v >= items.length) v = items.length-1;
+                    else if(v < 0) v = 0;
+                } else {
+                    if(v >= items.length) v = 0;
+                    else if(v < 0) v = items.length-1;
+                }
                 updateSelected(Math.round(v), true);
             }
             function stopFunction() {
                 util.setCursor();
                 document.removeEventListener('pointermove', moveFunction);
                 document.removeEventListener('pointerup', stopFunction);
+                if(options.onSelectStop) {
+                    options.onSelectStop(parseInt(listContainer.getAttribute('value')), items);
+                }
             }
 
             listDisplay.onpointerdown = e => {
@@ -356,6 +364,9 @@ function UiObject() {
             listArrowLeft.src = icArrowLeft
             listArrowLeft.onclick = () => {
                 updateSelected(-1);
+                if(options.onSelectStop) {
+                    options.onSelectStop(parseInt(listContainer.getAttribute('value')), items);
+                }
             }
 
             let listArrowRight = document.createElement('img');
@@ -363,6 +374,9 @@ function UiObject() {
             listArrowRight.src = icArrowRight
             listArrowRight.onclick = () => {
                 updateSelected(1);
+                if(options.onSelectStop) {
+                    options.onSelectStop(parseInt(listContainer.getAttribute('value')), items);
+                }
             }
 
             listContainer.appendChild(listArrowLeft);
@@ -536,6 +550,8 @@ function UiObject() {
         //if(options.scroll) container.classList.add(scrolls[options.scroll]);
         if(options.isBottomBar) container.classList.add('bbg');
         if(options.invisible) container.style.display = 'none';
+        if(options.seperationRight != undefined) container.style.marginRight = options.seperationRight + 'px';
+        if(options.seperationLeft != undefined) container.style.marginLeft = options.seperationLeft + 'px';
 
         //create title
         if(title) {
@@ -782,6 +798,12 @@ const ui = {
             }
 
             e.appendChild(elementContainer);
+
+            if(p.onCreate) {
+                setTimeout(() => {
+                    p.onCreate();
+                }, 5);
+            }
 
             if(!targetElement) return;
             if(o.children) {

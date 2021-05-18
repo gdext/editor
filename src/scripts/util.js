@@ -1,5 +1,6 @@
 import ui from './ui';
 import buildtabData from '../assets/buildtab.json';
+import settingsData from '../assets/settings.json';
 import buildPreview from './buildPreview';
 
 // this file contains miscellaneous functions, like calculating stuff, loading objects and 
@@ -56,6 +57,28 @@ function updateTitle() {
     let lvlnum = parseInt(localStorage.getItem('lvlnumber'));
     let t = `${lvlnum >= 0 ? localStorage.getItem('lvlname') : 'Untitled'}${unsavedChanges ? '*' : ''} - GDExt`
     document.title = t;
+}
+
+function showNotif (id, text, time, type) {
+    let oldNotification = document.querySelector('#' + id);
+    if(oldNotification && oldNotification.classList.contains('app-notification')) {
+        oldNotification.parentElement.removeChild(oldNotification);
+    }
+
+    let notification = document.createElement('div');
+    notification.classList.add('app-notification');
+    notification.id = id;
+    notification.innerText = text;
+    if(type) notification.classList.add(type);
+
+    setTimeout(() => {
+        notification.classList.add('cls');
+        setTimeout(() => {
+            if(notification.parentElement) notification.parentElement.removeChild(notification);
+        }, 800);
+    }, time);
+
+    document.body.appendChild(notification);
 }
 
 export default {
@@ -385,20 +408,7 @@ export default {
     },
 
     showNotif: (id, text, time, type) => {
-        let notification = document.createElement('div');
-        notification.classList.add('app-notification');
-        notification.id = id;
-        notification.innerText = text;
-        if(type) notification.classList.add(type);
-
-        setTimeout(() => {
-            notification.classList.add('cls');
-            setTimeout(() => {
-                if(notification.parentElement) notification.parentElement.removeChild(notification);
-            }, 800);
-        }, time);
-
-        document.getElementById('app').appendChild(notification);
+        showNotif(id, text, time, type);
     },
 
     getTimeDifferenceText: (date) =>{
@@ -436,6 +446,34 @@ export default {
         if(!window.clipboard) return;
         let clipboardKey = key || 'default';
         return window.clipboard[clipboardKey];
+    },
+
+    applySettings: (key) => {
+        switch(key) {
+            case 'comingsoon':
+                showNotif('settingsComingSoonNotif', 'Coming Soon!', 2500, 'warn');
+                break;
+            case 'guiZoom':
+                let zoomLevels = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2];
+                let zoomSel = parseInt(localStorage.getItem('settings.guiZoom') || settingsData.defaults.guiZoom);
+                let event = new CustomEvent('electronApi', { detail: {
+                    detail: 'setZoom',
+                    zoom: zoomLevels[zoomSel] 
+                }});
+                dispatchEvent(event);
+                break;
+            case 'autosaveEnabled':
+                let autosaveCheckbox = document.querySelector('#toggleAutosave');
+                if(autosaveCheckbox) autosaveCheckbox.checked = localStorage.getItem('settings.autosaveEnabled') == '1';
+                break;
+            case 'showQuickTools':
+                let canvasQuicktools = document.querySelector('#canvasQuickTools');
+                if(canvasQuicktools) {
+                    if(localStorage.getItem('settings.showQuickTools') == '1') canvasQuicktools.classList.add('hid');
+                    else canvasQuicktools.classList.remove('hid');
+                }
+                break;
+        }
     }
 
 }
