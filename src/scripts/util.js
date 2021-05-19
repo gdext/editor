@@ -5,8 +5,6 @@ import buildPreview from './buildPreview';
 
 if(!window.require) window.require = () => { return false }
 
-const { dialog } = window.require('electron');
-
 // this file contains miscellaneous functions, like calculating stuff, loading objects and 
 // creating dialogs
 

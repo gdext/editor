@@ -1025,6 +1025,9 @@ const settingsMenus = {
                             id: 'settingsGdLevelsPath',
                             uneditable: true,
                             icon: 'folder',
+                            defaultValue: () => {
+                                return localStorage.getItem('settings.gdLevelsPath') || '';
+                            },
                             onIconClick: () => {
                                 let path = util.pickFiles({
                                     defaultPath: actions.getGDPath(),
@@ -1035,6 +1038,8 @@ const settingsMenus = {
                                     properties: [ 'openFile' ]
                                 });
                                 document.querySelector('#settingsGdLevelsPath').value = path || '';
+                                localStorage.setItem('settings.gdLevelsPath', path || '');
+                                actions.updateGDPath();
                             }
                         }
                     },
@@ -1047,6 +1052,7 @@ const settingsMenus = {
                             onClick: () => {
                                 let targetInput = document.querySelector('#settingsGdLevelsPath');
                                 if(targetInput) targetInput.value = '';
+                                localStorage.setItem('settings.gdLevelsPath', '');
                             }
                         }
                     }
