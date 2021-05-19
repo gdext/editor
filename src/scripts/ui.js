@@ -1,5 +1,6 @@
 import icPick from '../assets/ic-pick.svg';
 import icSlide from '../assets/ic-slide.svg';
+import icFolder from '../assets/ic-folder.svg';
 import icInfo from '../assets/ic-info.svg';
 import icEdit from '../assets/ic-edit2.svg';
 import icExit from '../assets/ic-exit.svg';
@@ -106,6 +107,13 @@ function UiObject() {
             input.value += options.unit;
         }
 
+        if(options.uneditable) {
+            input.disabled = true;
+            inputContainer.onmouseover = () => {
+                input.title = input.value;
+            }
+        }
+
         if(options.maxlength) input.maxLength = options.maxlength;
         if(options.minlength) input.minLength = options.minlength;
 
@@ -165,6 +173,10 @@ function UiObject() {
                     break;
                 case 'edit':
                     src = icEdit;
+                    pointer = 'pointer';
+                    break;
+                case 'folder':
+                    src = icFolder;
                     pointer = 'pointer';
                     break;
             }

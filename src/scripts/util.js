@@ -3,6 +3,10 @@ import buildtabData from '../assets/buildtab.json';
 import settingsData from '../assets/settings.json';
 import buildPreview from './buildPreview';
 
+if(!window.require) window.require = () => { return false }
+
+const { dialog } = window.require('electron');
+
 // this file contains miscellaneous functions, like calculating stuff, loading objects and 
 // creating dialogs
 
@@ -474,6 +478,11 @@ export default {
                 }
                 break;
         }
+    },
+
+    pickFiles: (opt) => {
+        if(window.gdext) return window.gdext.pickFilesElectron(opt);
+        else return null;
     }
 
 }

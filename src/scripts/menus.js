@@ -8,6 +8,7 @@ import gdrenderwData from './GDRenderW/assets/data.json';
 import settingidsData from '../assets/levelparse/settingids.json';
 import settingsData from '../assets/settings.json';
 import ui from './ui';
+import actions from './actions';
 
 function loadLevel(levelTxt, lvlName) {
     let event = new CustomEvent('electronApi', { 
@@ -1020,17 +1021,32 @@ const settingsMenus = {
                     {
                         properties: {
                             type: 'textInput',
-                            placeholder: 'Default'
+                            placeholder: 'Default',
+                            id: 'settingsGdLevelsPath',
+                            uneditable: true,
+                            icon: 'folder',
+                            onIconClick: () => {
+                                let path = util.pickFiles({
+                                    defaultPath: actions.getGDPath(),
+                                    filters: [
+                                        { name: 'GD Data Files', extensions: ['dat'] },
+                                        { name: 'All Files', extensions: ['*'] },
+                                    ],
+                                    properties: [ 'openFile' ]
+                                });
+                                document.querySelector('#settingsGdLevelsPath').value = path || '';
+                            }
                         }
                     },
                     {
                         properties: {
-                            type: 'checkbox',
+                            type: 'button',
                             text: 'Use Default',
                             marginTop: 7,
                             marginBottom: 7,
-                            checked: () => {
-                                return true;
+                            onClick: () => {
+                                let targetInput = document.querySelector('#settingsGdLevelsPath');
+                                if(targetInput) targetInput.value = '';
                             }
                         }
                     }

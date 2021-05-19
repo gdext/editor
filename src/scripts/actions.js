@@ -151,7 +151,7 @@ function executeAction(action) {
                         name: localStorage.getItem('lvlname') || "GDExt Level",
                         song: localStorage.getItem('lvlsong') || 1,
                         data: levelTxt,
-                        author: ccll[0].author || '-',
+                        author: ccll[0] ? ccll[0].author : '-',
                         k13: true,
                         k21: 2,
                         version: 1,
@@ -208,7 +208,7 @@ function executeAction(action) {
                             name: localStorage.getItem('lvlname') || "GDExt Level",
                             song: localStorage.getItem('lvlsong') || 1,
                             data: levelTxt,
-                            author: ccll[0].author || '-',
+                            author: ccll[0] ? ccll[0].author : '-',
                             k13: true,
                             k21: 2,
                             version: 1,
@@ -382,5 +382,8 @@ export default {
             let ccll = readLocalLevels();
             return ccll[num];
         }
+    },
+    getGDPath: () => {
+        return gdPath;
     }
 }
