@@ -1,6 +1,7 @@
 import pako from 'pako';
 import plist from 'plist';
 import datakeys from '../assets/levelparse/datakeys.json';
+import util from './util';
 const Buffer = require('buffer/').Buffer;
 
 // this file contains functions to decode the CCLocalLevels.dat file from encrypted xml
@@ -21,20 +22,44 @@ function plist_parse(data) {
     return plist.parse(val);
 }
 
+function corruptAlert() {
+    localStorage.setItem('settings.gdLevelsPath', '');
+    if(document.querySelector('#corruptSaveDialog')) return;
+    util.confirm('corruptSaveDialog', 'The Level Data is Corrupt!',
+    'GDExt has reset the level data file settings to default, try Refreshing the Page.\n' + 
+    'If the issue remains, contact us "Via Help > Report a Bug"', {
+        buttonYes: 'OK',
+        buttonNo: 'Reload GDExt',
+        onConfirm: t => {
+            if(t) return;
+            let event = new CustomEvent('electronApi', { detail: 'reload' });
+            dispatchEvent(event);
+        }
+    });
+}
+
 export default {
     decode: (data) => {
-        function xor (str, key) {     
-            str = String(str).split('').map(letter => letter.charCodeAt());
-            let res = "";
-            for (let i = 0; i < str.length; i++) res += String.fromCodePoint(str[i] ^ key);
-            return res; 
+        let err = false;
+        try {
+            function xor (str, key) {     
+                str = String(str).split('').map(letter => letter.charCodeAt());
+                let res = "";
+                for (let i = 0; i < str.length; i++) res += String.fromCodePoint(str[i] ^ key);
+                return res; 
+            }
+            if (data.startsWith('<?xml version="1.0"?>')) return data;
+            let decoded = xor(data, 11);
+            try { decoded = Buffer.from(decoded, 'base64') }
+            catch (e) { err = true; }
+            try { return new TextDecoder("utf-8").decode(pako.ungzip(decoded)) }
+            catch (e) { err = true }
+        } catch (e) {
+            err = true;
         }
-        if (data.startsWith('<?xml version="1.0"?>')) return data;
-        let decoded = xor(data, 11);
-        try { decoded = Buffer.from(decoded, 'base64') }
-        catch (e) { return {error: true, reason: e} }
-        try { return new TextDecoder("utf-8").decode(pako.ungzip(decoded)) }
-        catch (e) { return {error: true, reason: 'corrupt'} }
+        if(err) {
+            corruptAlert();
+        }
     },
     xml2object: (xml) => {
         let pl = plist_parse(xml);
@@ -43,32 +68,36 @@ export default {
 
         let lvl_id = 0;
 
-        while (pl.LLM_01["k_" + lvl_id]) {
-            let level = {};
+        try {
+            while (pl.LLM_01["k_" + lvl_id]) {
+                let level = {};
 
-            for (let key in pl.LLM_01["k_" + lvl_id]) {
-                if (Object.prototype.hasOwnProperty.call(pl.LLM_01["k_" + lvl_id], key)) {
-                    let value = pl.LLM_01["k_" + lvl_id][key];
+                for (let key in pl.LLM_01["k_" + lvl_id]) {
+                    if (Object.prototype.hasOwnProperty.call(pl.LLM_01["k_" + lvl_id], key)) {
+                        let value = pl.LLM_01["k_" + lvl_id][key];
 
-                    if (datakeys[key]) {
-                        if (datakeys[key] == "description")
-                            level[datakeys[key]] = Buffer.from(value, "base64").toString();
-                        else if (datakeys[key] == "data"){
-                            let datDecoded = Buffer.from(value, 'base64');
-                            let datUnzip = new TextDecoder("utf-8").decode(pako.ungzip(datDecoded));
-                            level[datakeys[key]]  = datUnzip;
+                        if (datakeys[key]) {
+                            if (datakeys[key] == "description")
+                                level[datakeys[key]] = Buffer.from(value, "base64").toString();
+                            else if (datakeys[key] == "data"){
+                                let datDecoded = Buffer.from(value, 'base64');
+                                let datUnzip = new TextDecoder("utf-8").decode(pako.ungzip(datDecoded));
+                                level[datakeys[key]]  = datUnzip;
+                            }
+                            else
+                                level[datakeys[key]] = value;
+                        } else {
+                            level[key] = value;
                         }
-                        else
-                            level[datakeys[key]] = value;
-                    } else {
-                        level[key] = value;
                     }
                 }
-            }
 
-            dataObj.push(level);
-            
-            lvl_id++;
+                dataObj.push(level);
+                
+                lvl_id++;
+            }
+        } catch (e) {
+            corruptAlert();
         }
 
         return dataObj;

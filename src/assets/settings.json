@@ -19,7 +19,7 @@
     ],
     "defaults": {
         "language": 0,
-        "guiZoom": 0,
+        "guiZoom": 5,
         "autosaveEnabled": "0",
         "autosaveInterval": 1,
         "showQuickTools": "1"

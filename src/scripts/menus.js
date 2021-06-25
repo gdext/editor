@@ -8,6 +8,7 @@ import gdrenderwData from './GDRenderW/assets/data.json';
 import settingidsData from '../assets/levelparse/settingids.json';
 import settingsData from '../assets/settings.json';
 import ui from './ui';
+import actions from './actions';
 
 function loadLevel(levelTxt, lvlName) {
     let event = new CustomEvent('electronApi', { 
@@ -821,7 +822,8 @@ const settingsMenus = {
             {
                 properties: {
                     type: 'container',
-                    direction: 'column'
+                    direction: 'column',
+                    seperationRight: 15
                 },
                 children: [
                     {
@@ -840,6 +842,9 @@ const settingsMenus = {
                             ],
                             selected: () => {
                                 return localStorage.getItem('settings.language') ? parseInt(localStorage.getItem('settings.language')) : settingsData.defaults.language;
+                            },
+                            onSelectChange: () => {
+                                util.applySettings('comingsoon');
                             },
                             id: 'settingsLanguage'
                         }
@@ -863,11 +868,17 @@ const settingsMenus = {
                             type: 'list',
                             mode: 'horizontal',
                             items: [
-                                '100%', '110%', '125%', '150%', '175%', '200%',
-                                '50%', '67%', '75%', '80%', '90%'
+                                '50%', '67%', '75%', '80%', '90%',
+                                '100%', '110%', '125%', '150%', '175%', '200%'
+                                
                             ],
+                            dontWrap: true,
                             selected: () => {
                                 return localStorage.getItem('settings.guiZoom') ? parseInt(localStorage.getItem('settings.guiZoom')) : settingsData.defaults.guiZoom;
+                            },
+                            onSelectStop: (s) => {
+                                localStorage.setItem('settings.guiZoom', s);
+                                util.applySettings('guiZoom');
                             },
                             id: 'settingsGuiZoom'
                         }
@@ -885,7 +896,8 @@ const settingsMenus = {
             {
                 properties: {
                     type: 'container',
-                    direction: 'column'
+                    direction: 'column',
+                    seperationRight: 15
                 },
                 children: [
                     {
@@ -896,29 +908,60 @@ const settingsMenus = {
                             checked: () => {
                                 return localStorage.getItem('settings.autosaveEnabled') == '1';
                             },
+                            onCheckChange: (c) => {
+                                if(c) {
+                                    localStorage.setItem('settings.autosaveEnabled', '1');
+                                } else {
+                                    localStorage.setItem('settings.autosaveEnabled', '0');
+                                }
+                                util.applySettings('autosaveEnabled');
+
+                                let h = document.querySelector('#settingsAutosaveRelatedSettings');
+                                if(h) {
+                                    if(c) h.classList.remove('disabled');
+                                    else h.classList.add('disabled');
+                                }
+                            },
+                            onCreate: () => {
+                                let h = document.querySelector('#settingsAutosaveRelatedSettings');
+                                if(h && localStorage.getItem('settings.autosaveEnabled') != '1') 
+                                    h.classList.add('disabled');
+                            },
                             id: 'settingsAutosaveEnabled'
                         }
                     },
                     {
                         properties: {
-                            type: 'label',
-                            text: 'Autosave Interval',
-                            marginTop: 10,
-                        }
-                    },
-                    {
-                        properties: {
-                            type: 'list',
-                            mode: 'dropdown',
-                            items: [
-                                '5 Minutes', '10 Minutes', '15 Minutes',
-                                '30 Minutes', '1 Hour'
-                            ],
-                            selected: () => {
-                                return localStorage.getItem('settings.autosaveInterval') ? parseInt(localStorage.getItem('settings.autosaveInterval')) : settingsData.defaults.autosaveInterval;
+                            type: 'container',
+                            direction: 'column',
+                            id: 'settingsAutosaveRelatedSettings'
+                        },
+                        children: [
+                            {
+                                properties: {
+                                    type: 'label',
+                                    text: 'Autosave Interval',
+                                    marginTop: 10,
+                                }
                             },
-                            id: 'settingsAutosaveInterval'
-                        }
+                            {
+                                properties: {
+                                    type: 'list',
+                                    mode: 'dropdown',
+                                    items: [
+                                        '5 Minutes', '10 Minutes', '15 Minutes',
+                                        '30 Minutes', '1 Hour'
+                                    ],
+                                    selected: () => {
+                                        return localStorage.getItem('settings.autosaveInterval') ? parseInt(localStorage.getItem('settings.autosaveInterval')) : settingsData.defaults.autosaveInterval;
+                                    },
+                                    onSelectChange: () => {
+                                        util.applySettings('comingsoon');
+                                    },
+                                    id: 'settingsAutosaveInterval'
+                                }
+                            }
+                        ]
                     },
                     {
                         properties: {
@@ -927,7 +970,27 @@ const settingsMenus = {
                             big: true,
                             marginTop: 20,
                             checked: () => {
+                                if(!localStorage.getItem('settings.showQuickTools')) return true;
                                 return localStorage.getItem('settings.showQuickTools') == '0';
+                            },
+                            onCheckChange: (c) => {
+                                if(c) {
+                                    localStorage.setItem('settings.showQuickTools', '0');
+                                } else {
+                                    localStorage.setItem('settings.showQuickTools', '1');
+                                }
+                                util.applySettings('showQuickTools');
+
+                                let h = document.querySelector('#settingsOrganizeQuickTools');
+                                if(h) {
+                                    if(c) h.classList.remove('disabled');
+                                    else h.classList.add('disabled');
+                                }
+                            },
+                            onCreate: () => {
+                                let h = document.querySelector('#settingsOrganizeQuickTools');
+                                if(h && localStorage.getItem('settings.showQuickTools') == '1') 
+                                    h.classList.add('disabled');
                             },
                             id: 'settingsShowQuickTools'
                         }
@@ -936,7 +999,8 @@ const settingsMenus = {
                         properties: {
                             type: 'button',
                             text: 'Organize Quick Tools',
-                            marginTop: 10
+                            marginTop: 10,
+                            id: 'settingsOrganizeQuickTools'
                         }
                     }
                 ]
@@ -956,19 +1020,40 @@ const settingsMenus = {
                     },
                     {
                         properties: {
-                            type: 'checkbox',
-                            text: 'Use Default',
-                            marginTop: 7,
-                            marginBottom: 7,
-                            checked: () => {
-                                return true;
+                            type: 'textInput',
+                            placeholder: 'Default',
+                            id: 'settingsGdLevelsPath',
+                            uneditable: true,
+                            icon: 'folder',
+                            defaultValue: () => {
+                                return localStorage.getItem('settings.gdLevelsPath') || '';
+                            },
+                            onIconClick: () => {
+                                let path = util.pickFiles({
+                                    defaultPath: actions.getGDPath(),
+                                    filters: [
+                                        { name: 'GD Data Files', extensions: ['dat'] },
+                                        { name: 'All Files', extensions: ['*'] },
+                                    ],
+                                    properties: [ 'openFile' ]
+                                });
+                                document.querySelector('#settingsGdLevelsPath').value = path || '';
+                                localStorage.setItem('settings.gdLevelsPath', path || '');
+                                actions.updateGDPath();
                             }
                         }
                     },
                     {
                         properties: {
-                            type: 'textInput',
-                            placeholder: 'Default'
+                            type: 'button',
+                            text: 'Use Default',
+                            marginTop: 7,
+                            marginBottom: 7,
+                            onClick: () => {
+                                let targetInput = document.querySelector('#settingsGdLevelsPath');
+                                if(targetInput) targetInput.value = '';
+                                localStorage.setItem('settings.gdLevelsPath', '');
+                            }
                         }
                     }
                 ]

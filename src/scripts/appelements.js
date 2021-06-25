@@ -202,6 +202,7 @@ export default {
 
         let canvasUiQuicktools = document.createElement('div');
         canvasUiQuicktools.className = 'canvas-ui-element t r';
+        canvasUiQuicktools.id = 'canvasQuickTools';
         if(localStorage.getItem('settings.showQuickTools') == '1') {
             canvasUiQuicktools.classList.add('hid');
         }

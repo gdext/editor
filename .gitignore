@@ -104,3 +104,4 @@ dist
 .tern-port
 index.html
 src/assets/obj-align-notes.js
+.vscode/settings.json
