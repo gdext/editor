@@ -428,22 +428,27 @@ export default {
             // rotation & scale
             let rotinput = document.querySelector('#editRot');
             let scaleinput = document.querySelector('#editScale');
+            let zorderinput = document.querySelector('#editZOrder');
             let editrow2 = rotinput.parentElement.parentElement.parentElement;
             let editrow3 = rotinput.parentElement.parentElement.parentElement.parentElement.parentElement.children[2].children[0]
             rotinput.setAttribute('unit', '°');
             scaleinput.setAttribute('unit', '');
-            if(relativeTransform.rotation != undefined && relativeTransform.scale != undefined) {
+            zorderinput.setAttribute('unit', '');
+            if(relativeTransform.rotation != undefined && relativeTransform.scale != undefined && relativeTransform.zorder != undefined) {
                 if(!relativeTransform.absolute) {
                     rotinput.setAttribute('unit', '° (relative)');
                     scaleinput.setAttribute('unit', ' (relative)');
+                    zorderinput.setAttribute('unit', ' (relative)');
                 }
                 rotinput.value = relativeTransform.rotation + rotinput.getAttribute('unit');
                 scaleinput.value = relativeTransform.scale + scaleinput.getAttribute('unit');
+                zorderinput.value = relativeTransform.zorder + zorderinput.getAttribute('unit');
                 editrow2.classList.remove('disabled');
                 editrow3.classList.remove('disabled');
             } else {
                 rotinput.value = '';
                 scaleinput.value = '';
+                zorderinput.value = '';
                 editrow2.classList.add('disabled');
                 editrow3.classList.add('disabled');
             }
@@ -578,7 +583,8 @@ export default {
                         let relativeTransform = renderer.getRelativeTransform();
                         Object.keys(detail.data).forEach(k => {
                             let v = detail.data[k];
-                            if(v == '$invert') relativeTransform[k] = !relativeTransform[k];
+                            if(k == 'shiftcenter') relativeTransform[k] = v;
+                            else if(v == '$invert') relativeTransform[k] = !relativeTransform[k];
                             else relativeTransform[k] += v;
                         });
                         renderer.setRelativeTransform(relativeTransform);
