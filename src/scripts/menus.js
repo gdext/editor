@@ -207,6 +207,17 @@ const bottomMenus = {
                                     id: 'editZOrder',
                                     placeholder: 'Number',
                                     defaultValue: () => { return '10' },
+                                    onValueChange: (v) => {
+                                        canvas.setRelativeTransform({
+                                            zorder: parseInt(v),
+                                        });
+                                    },
+                                    onIconDragEnd: () => {
+                                        let event = new CustomEvent('editor', { detail: {
+                                            action: 'update'
+                                        }});
+                                        dispatchEvent(event);
+                                    },
                                     icon: 'slide',
                                     scale: 0.5,
                                     integerOnly: true
@@ -237,7 +248,8 @@ const bottomMenus = {
                                             action: 'transform',
                                             mode: 'add',
                                             data: {
-                                                rotation: -90
+                                                rotation: -90,
+                                                shiftcenter: true
                                             } 
                                         }});
                                         dispatchEvent(event);
@@ -281,7 +293,8 @@ const bottomMenus = {
                                             action: 'transform',
                                             mode: 'add',
                                             data: {
-                                                rotation: 90
+                                                rotation: 90,
+                                                shiftcenter: true
                                             } 
                                         }});
                                         dispatchEvent(event);

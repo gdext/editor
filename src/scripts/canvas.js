@@ -2,6 +2,8 @@ import {GDRenderer} from './GDRenderW/main';
 import {EditorLevel} from './GDRenderW/level';
 import TopCanvas from './topcanvas';
 import objectsData from '../assets/levelparse/objects.json';
+import objAlignData from '../assets/obj-align.json';
+import gdrenderwData from './GDRenderW/assets/data.json';
 import util from './util';
 
 let gl, renderer, cvs, options, level, top, sel;
@@ -14,6 +16,7 @@ let relativeTransform = {
     rotation: 0,
     hflip: false,
     vflip: false,
+    zorder: 0,
     center: {},
     objdata: {}*/
 }
@@ -127,6 +130,7 @@ function selectObjects() {
         rotation: 0,
         hflip: false,
         vflip: false,
+        zorder: 0,
         absolute: false
     }
 
@@ -143,6 +147,7 @@ function selectObjects() {
         relativeTransform.scale = obj.scale || 1;
         relativeTransform.hflip = obj.flipx == true;
         relativeTransform.vflip = obj.flipx == true;
+        relativeTransform.zorder = obj.order || gdrenderwData[obj.id.toString()].zorder;
         relativeTransform.absolute = true;
 
         relativeTransform.objdata = {};
@@ -153,6 +158,7 @@ function selectObjects() {
             rotation: 0,
             flipx: false,
             flipy: false,
+            zorder: 0
         }
     } else {
         // calculate selection center
@@ -189,28 +195,47 @@ function selectObjects() {
                 scale: od.scale || 1,
                 rotation: od.r || 0,
                 flipx: od.flipx || false,
-                flipy: od.flipy || false
+                flipy: od.flipy || false,
+                zorder: od.order || gdrenderwData[od.id.toString()].zorder
             }
         });
     }
 }
 
-function updateRelativeTransform(obj) {
+function updateRelativeTransform(obj, shiftcenter) {
     if(!relativeTransform.objdata) return;
     Object.assign(relativeTransform, obj);
     let changedProps = {
         pos: false,
         rot: false,
         scale: false,
-        flip: false
+        flip: false,
+        zorder: false
     }
     if(relativeTransform.x || relativeTransform.y) changedProps.pos = true;
     if(relativeTransform.rotation) changedProps.rot = true;
     if(relativeTransform.scale) changedProps.scale = true;
     if(relativeTransform.hflip || relativeTransform.vflip) changedProps.flip = true; 
+    if(relativeTransform.zorder) changedProps.zorder = true; 
 
     if(relativeTransform.rotation < 0) relativeTransform.rotation += 360;
     else if(relativeTransform.rotation >= 360) relativeTransform.rotation -= 360;
+
+    let objid;
+    let objidn;
+    let objcontent;
+    if(shiftcenter) {
+        objid = level.getObject(Object.keys(relativeTransform.objdata)[0]);
+        if(objid) objid = objid.id.toString();
+        else objid = null;
+        objidn = objid ? parseInt(objid) : null;
+        relativeTransform.center.x -= objAlignData[objid] ? objAlignData[objid].alignX : 0;
+        relativeTransform.center.x -= objAlignData[objid] ? objAlignData[objid].alignY : 0;
+        
+        objcontent = relativeTransform.objdata[Object.keys(relativeTransform.objdata)[0]];
+        objcontent.xFromCenter += objAlignData[objid] ? objAlignData[objid].alignX : 0;
+        objcontent.yFromCenter += objAlignData[objid] ? objAlignData[objid].alignY : 0;
+    }
     
     //pre-calculate rotation
     function toRadians (angle) {
@@ -230,6 +255,7 @@ function updateRelativeTransform(obj) {
             od.scale = relativeTransform.scale;
             od.flipx = relativeTransform.hflip ? 1 : null;
             od.flipy = relativeTransform.vflip ? 1 : null;
+            od.order = relativeTransform.zorder;
 
             let targetRot = relativeTransform.rotation;
             if(od && objectsData.solids.includes(od.id)) targetRot = Math.round(targetRot/90)*90;
@@ -237,6 +263,20 @@ function updateRelativeTransform(obj) {
             else if(targetRot >= 360) targetRot -= 360;
             //relativeTransform.rotation = targetRot;
             od.r = targetRot;
+
+            if(shiftcenter) {
+                let targetX, targetY;
+                targetX = v.xFromCenter;
+                targetY = v.yFromCenter;
+                let newTargetX = (targetX * cosRot) + (targetY * sinRot);
+                let newTargetY = (targetY * cosRot) - (targetX * sinRot);
+                targetX = newTargetX;
+                targetY = newTargetY;
+
+                console.log(targetX, targetY);
+                od.x = relativeTransform.center.x + targetX;
+                od.y = relativeTransform.center.y + targetY;
+            }
         } else {
             //relative transform init
             let targetX, targetY;
@@ -251,8 +291,8 @@ function updateRelativeTransform(obj) {
 
             //relative transofrm rotate
             if(changedProps.rot) {
-                let newTargetX = (targetX * cosRot) + (targetY * sinRot)
-                let newTargetY = (targetY * cosRot) - (targetX * sinRot)
+                let newTargetX = (targetX * cosRot) + (targetY * sinRot);
+                let newTargetY = (targetY * cosRot) - (targetX * sinRot);
                 targetX = newTargetX;
                 targetY = newTargetY;
             }
@@ -261,6 +301,11 @@ function updateRelativeTransform(obj) {
             if(changedProps.flip) {
                 if(relativeTransform.hflip) targetX *= -1;
                 if(relativeTransform.vflip) targetY *= -1;
+            }
+
+            //relative transform z order
+            if(changedProps.zorder) {
+                od.order = v.zorder + relativeTransform.zorder;
             }
 
             //relative transform x,y
@@ -299,6 +344,15 @@ function updateRelativeTransform(obj) {
 
         level.editObject(k, od);
     });
+
+    if(shiftcenter) {
+        relativeTransform.center.x += objAlignData[objid] ? objAlignData[objid].alignX : 0;
+        relativeTransform.center.x += objAlignData[objid] ? objAlignData[objid].alignY : 0;
+        objcontent.xFromCenter -= objAlignData[objid] ? objAlignData[objid].alignX : 0;
+        objcontent.yFromCenter -= objAlignData[objid] ? objAlignData[objid].alignY : 0;
+        relativeTransform.shiftcenter = false;
+    }
+
     level.confirmEdit();
     renderer.renderLevel(level, cvs.width, cvs.height, options);
 }
@@ -507,7 +561,7 @@ export default {
         return relativeTransform;
     },
     setRelativeTransform: (obj) => {
-        updateRelativeTransform(obj);
+        updateRelativeTransform(obj, obj.shiftcenter);
     },
     placeObject: (opt) => {
         if(!level) return;
