@@ -247,7 +247,7 @@ function updateRelativeTransform(obj, shiftcenter) {
 
     Object.keys(relativeTransform.objdata).forEach(k => {
         let v = relativeTransform.objdata[k];
-        let od = level.getObject(k);
+        let od = Object.assign({}, level.getObject(k));
 
         if(relativeTransform.absolute) {
             od.x = relativeTransform.x;
