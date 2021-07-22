@@ -27,7 +27,7 @@ const bottomMenus = {
         properties: {
             type: 'container',
             direction: 'row',
-            scroll: 'both', 
+            scroll: 'horizontal', 
             paddingX: 15,
             paddingY: 0
         },
