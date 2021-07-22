@@ -408,7 +408,7 @@ export default {
             // position
             let xposinput = document.querySelector('#editXPos');
             let yposinput = document.querySelector('#editYPos');
-            let editrow1 = xposinput.parentElement.parentElement.parentElement;
+            let editrow1 = xposinput.parentElement.parentElement;
             xposinput.setAttribute('unit', '');
             yposinput.setAttribute('unit', '');
             if(relativeTransform.x != undefined && relativeTransform.y != undefined) {
@@ -429,8 +429,8 @@ export default {
             let rotinput = document.querySelector('#editRot');
             let scaleinput = document.querySelector('#editScale');
             let zorderinput = document.querySelector('#editZOrder');
-            let editrow2 = rotinput.parentElement.parentElement.parentElement;
-            let editrow3 = rotinput.parentElement.parentElement.parentElement.parentElement.parentElement.children[2].children[0]
+            let editrow2 = rotinput.parentElement.parentElement;
+            let editrow3 = rotinput.parentElement.parentElement.parentElement.children[2];
             rotinput.setAttribute('unit', '°');
             scaleinput.setAttribute('unit', '');
             zorderinput.setAttribute('unit', '');

@@ -37,6 +37,7 @@ const bottomMenus = {
                 properties: {
                     type: 'container',
                     direction: 'row',
+                    align: 'end'
                 },
                 children: [
                     {
@@ -829,7 +830,8 @@ const settingsMenus = {
     general: {
         properties: {
             type: 'container',
-            direction: 'row'
+            direction: 'row',
+            align: 'start'
         },
         children: [
             {
@@ -903,7 +905,8 @@ const settingsMenus = {
     editor: {
         properties: {
             type: 'container',
-            direction: 'row'
+            direction: 'row',
+            align: 'start'
         },
         children: [
             {

@@ -145,8 +145,8 @@
     display: none;
 }
 
-.canvas-ui-element .ui-button {
-    margin-right: 5px;
+.canvas-ui-element .r .ui-button {
+    margin-right: 10px !important;
 }
 .canvas-ui-element.r .ui-button {
     margin-right: 0;
