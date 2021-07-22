@@ -502,7 +502,7 @@ input::-webkit-color-swatch {
 }
 
 .sh > .ui-container, .sb > .ui-container {
-    width: fit-content;
+    width: max-content;
 }
 
 .ui-container.bbg {
