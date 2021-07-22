@@ -47,6 +47,10 @@ function UiObject() {
         if(options.textStyle) {
             if(options.textStyle == 'bold') buttonText.style.fontWeight = 600;
             else if(options.textStyle == 'italic') buttonText.style.fontStyle = 'italic';
+            else if(options.textStyle == 'small') {
+                buttonText.style.fontWeight = 600;
+                buttonText.style.fontSize = '10px';
+            }
         }
         if(options.hint) button.title = options.hint;
         let buttonIcon = document.createElement('img');

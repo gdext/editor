@@ -380,7 +380,7 @@ const bottomMenus = {
                                     type: 'button',
                                     id: 'editFlipV',
                                     icon: 'ic-flipv.svg',
-                                    hint: 'Move Vertically',
+                                    hint: 'Flip Vertically',
                                     iconHeight: 20,
                                     width: 40,
                                     height: 40,
@@ -442,9 +442,94 @@ const bottomMenus = {
                                 }
                             },
                         ]
+                    },
+                    {
+                        properties: {
+                            type: 'container',
+                            direction: 'column',
+                            seperationLeft: 50,
+                            uistretch: true
+                        },
+                        children: [
+                            // groups
+                            ui.label('Groups'),
+                            ui.textInput('Coming Soon!', {
+                                id: 'editGroup',
+                                //defaultValue: () => { return '0' },
+                                icon: 'pick'
+                            }),
+
+                            // misc checkboxes
+                            ui.container('row', { marginTop: 8.5, marginBottom: 8.5 }, [
+                                ui.container('column', {}, [
+                                    ui.checkbox('No Fade', { checked: () => { return false } }),
+                                    ui.checkbox('Group Parent', { checked: () => { return false }, marginTop: 7 })
+                                ]),
+                                ui.container('column', {}, [
+                                    ui.checkbox('No Enter', { checked: () => { return false } }),
+                                    ui.checkbox('High Detail', { checked: () => { return false }, marginTop: 7 })
+                                ])
+                            ]),
+
+                            // editor layers
+                            ui.label('Editor Layers'),
+                            ui.textInput('Coming Soon!', {
+                                id: 'editELayers',
+                                //defaultValue: () => { return '0' },
+                                icon: 'pick'
+                            }),
+                        ]
+                    },
+                    {
+                        properties: {
+                            type: 'container',
+                            direction: 'column',
+                            seperationLeft: 50
+                        },
+                        children: [
+                            // tools
+                            ui.container('column', {}, [
+                                ui.label('Tools'),
+                                {
+                                    properties: {
+                                        type: 'container',
+                                        isGrid: true,
+                                        id: 'editTransformTools',
+                                        columns: 2,
+                                    },
+                                    children: [
+                                        ui.button(null, { id: 'editToolMove', icon: 'ic-move.svg',
+                                            hint: 'Toggle Move Tool', iconHeight: 20, width: 40, 
+                                            height: 40, primary: false
+                                        }),
+                                        ui.button(null, { id: 'editToolRotate', icon: 'ic-rotate.svg',
+                                            hint: 'Toggle Rotate Tool', iconHeight: 20, width: 40, 
+                                            height: 40, primary: false
+                                        }),
+                                        ui.button(null, { id: 'editToolScale', icon: 'ic-scale.svg',
+                                            hint: 'Toggle Scale Tool', iconHeight: 20, width: 40, 
+                                            height: 40, primary: false
+                                        }),
+                                        ui.button(null, { id: 'editToolSnap', icon: 'ic-magnet.svg',
+                                            hint: 'Toggle Grid Snapping', iconHeight: 20, width: 40, 
+                                            height: 40,primary: false
+                                        }),
+                                        ui.button('Free Move', { id: 'editToolFreeMove', textStyle: 'small',
+                                            hint: 'Toggle Free Move', iconHeight: 20, width: 40, height: 40,
+                                            primary: false
+                                        }),
+                                        ui.button(null, { id: 'editToolFilter', icon: 'ic-filter.svg',
+                                            hint: 'Selection Filter', iconHeight: 20, width: 40, 
+                                            height: 40, primary: false
+                                        }),
+                                    ]
+                                },
+                            ]),
+
+                        ]
                     }
                 ]
-            }
+            },
         ]
     },
     deleteMenu: {
