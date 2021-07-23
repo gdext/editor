@@ -29,6 +29,7 @@
 }
 .ui-dialog .ui-element {
     align-items: unset;
+    justify-content: center;
 }
 
 /* checkbox */

@@ -595,7 +595,7 @@ export default {
                     finishObjectTransform();
                     break;
                 case 'update': 
-                    if(!detail.softUpdate) updateEditInputs();
+                    if(!detail.softUpdate || detail.updateInputs) updateEditInputs();
                     if(!detail.softUpdate) finishObjectTransform();
                     renderer.update(canvas);
                     break;
@@ -867,7 +867,9 @@ export default {
               if (mutation.type == "attributes") {
                 loadObjs(lastCategory, page);
                 let event = new CustomEvent('editor', { detail: {
-                    action: 'update'
+                    action: 'update',
+                    softUpdate: true,
+                    updateInputs: true
                 }});
                 dispatchEvent(event);
               }
