@@ -424,6 +424,12 @@ input::-webkit-color-swatch {
     font-weight: 700;
     margin-bottom: 6px;
 }
+.ui-label.small {
+    width: min-content !important;
+    opacity: 0.5;
+    font-size: 10px;
+    min-width: 100%;
+}
 
 .ui-label.colps {
     width: 100%;

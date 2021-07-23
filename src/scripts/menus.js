@@ -1160,6 +1160,49 @@ const settingsMenus = {
                 ]
             }
         ]
+    },
+    flags: {
+        properties: {
+            type: 'container',
+            direction: 'column',
+            align: 'start',
+            scroll: 'vertical'
+        },
+        children: [
+            ui.label('Appearance', { style: 'heading', marginBottom: 10 }),
+            ui.container('row', { align: 'start', marginBottom: 20 }, [
+                ui.container('column', { seperationRight: 15 }, [
+                    ui.checkbox('Show Grid', { checked: () => { return true }, big: true, marginBottom: 10 }),
+                    ui.checkbox('Show Colors', { checked: () => { return true }, big: true, marginBottom: 10 }),
+                    ui.checkbox('Show Alpha', { checked: () => { return true }, big: true }),
+                    ui.label('If disabled, all objects have 100% opacity, regardless of alpha triggers',
+                    {  marginBottom: 10, style: 'small' } ),
+                    ui.checkbox('Show Lines', { checked: () => { return true }, big: true }),
+                ]),
+                ui.container('column', { }, [
+                    ui.checkbox('Show Collision Boxes', { checked: () => { return true }, big: true, marginBottom: 10 }),
+                    ui.checkbox('Show Duration Lines', { checked: () => { return false }, big: true, marginBottom: 10 }),
+                    ui.checkbox('Show Ground Texture', { checked: () => { return false }, big: true }),
+                    ui.label('If disabled, the ground is shown as a line, instead of an actual ground texture',
+                    {  marginBottom: 10, style: 'small' } ),
+                    ui.checkbox('Show Object Info', { checked: () => { return false }, big: true }),
+                ])
+            ]),
+
+            ui.label('Functionality', { style: 'heading', marginBottom: 10 }),
+            ui.container('row', { align: 'start', marginBottom: 20 }, [
+                ui.container('column', { seperationRight: 15 }, [
+                    ui.checkbox('Scroll Wheel to Zoom', { checked: () => { return true }, big: true }),
+                    ui.label('If disabled, scroll wheel is used to move the camera vertically, instead of zoomin in/out',
+                    {  marginBottom: 10, style: 'small' } ),
+                ]),
+                ui.container('column', { }, [
+                    ui.checkbox('Selection Cycle', { checked: () => { return false }, big: true }),
+                    ui.label('Cycle between all the objects, that collide with the mouse pointer, when selecting',
+                    {  marginBottom: 10, style: 'small' } ),
+                ])
+            ])
+        ]
     }
 }
 
