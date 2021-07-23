@@ -288,7 +288,8 @@
             "action": "transform",
             "mode": "add",
             "data": {
-                "rotation": -90
+                "rotation": -90,
+                "shiftcenter": true
             } 
         },
         "focus": "app"
@@ -301,7 +302,8 @@
             "action": "transform",
             "mode": "add",
             "data": {
-                "rotation": 90
+                "rotation": 90,
+                "shiftcenter": true
             } 
         },
         "focus": "app"
