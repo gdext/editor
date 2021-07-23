@@ -279,7 +279,6 @@
 .bottom-tab {
     display: none;
     height: 100%;
-    overflow: auto;
 }
 .bottom-tab.sel {
     display: flex;
