@@ -52,7 +52,10 @@ function loadLevel(n, cclll) {
         localStorage.setItem('lvlcode', ccll[n].data);
         localStorage.setItem('lvlnumber', n);
         localStorage.setItem('lvlname', ccll[n].name);
-        localStorage.setItem('lvlsong', ccll[n].song);
+        let song = ccll[n].customsong;
+        if(!song) song = ccll[n].song;
+        else song = 'c' + song;
+        localStorage.setItem('lvlsong', song);
         window.location.reload();
     }
 }

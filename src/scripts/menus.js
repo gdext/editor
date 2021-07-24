@@ -10,12 +10,13 @@ import settingsData from '../assets/settings.json';
 import ui from './ui';
 import actions from './actions';
 
-function loadLevel(levelTxt, lvlName) {
+function loadLevel(level) {
     let event = new CustomEvent('electronApi', { 
         detail: {
             detail: 'loadLevel',
-            name: lvlName,
-            data: levelTxt
+            name: level.name,
+            data: level.data,
+            song: level.song
         }
     });
     dispatchEvent(event);
@@ -503,7 +504,11 @@ const canvasMenus = {
                 if(!window.process) {
                     util.alert('gdPathFailDialog', 'Playtesting is not supported\nin GDExt Web', 'Please use the desktop version', 'OK');
                 } else if(gdPath == 'steam') {
-                    loadLevel(levelTxt, localStorage.getItem('lvlname'));
+                    loadLevel({
+                        data: levelTxt, 
+                        name: localStorage.getItem('lvlname'),
+                        song: localStorage.getItem('lvlsong')
+                    });
                 } else {
                     util.confirm(
                         'gdPathDialog', 'GD Playtesting',
@@ -514,7 +519,11 @@ const canvasMenus = {
                             onConfirm: (t) => {
                                 if(t) {
                                     localStorage.setItem('settings.gdpath', 'steam');
-                                    loadLevel(levelTxt, localStorage.getItem('lvlname'));
+                                    loadLevel({
+                                        data: levelTxt, 
+                                        name: localStorage.getItem('lvlname'),
+                                        song: localStorage.getItem('lvlsong')
+                                    });
                                 } else {
                                     util.alert('gdPathFailDialog', 'Pirated GD is not yet supported', 'So yeah... get $2 and buy official GD, nerd', 'OK');
                                 }

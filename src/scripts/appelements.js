@@ -257,7 +257,10 @@ export default {
             l = actionsExec.getLevelData(localStorage.getItem('lvlnumber'));
             localStorage.setItem('lvlcode', l.data);
             localStorage.setItem('lvlname', l.name);
-            localStorage.setItem('lvlsong', l.song);
+            let song = l.customsong;
+            if(!song) song = l.song;
+            else song = 'c' + song;
+            localStorage.setItem('lvlsong', song);
         }
         util.updateTitle();
 
