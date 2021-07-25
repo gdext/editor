@@ -47,6 +47,10 @@ function UiObject() {
         if(options.textStyle) {
             if(options.textStyle == 'bold') buttonText.style.fontWeight = 600;
             else if(options.textStyle == 'italic') buttonText.style.fontStyle = 'italic';
+            else if(options.textStyle == 'small') {
+                buttonText.style.fontWeight = 600;
+                buttonText.style.fontSize = '10px';
+            }
         }
         if(options.hint) button.title = options.hint;
         let buttonIcon = document.createElement('img');
@@ -473,6 +477,47 @@ function UiObject() {
 
         return labelElement;
     }
+
+    this.createIcon = (id, src, srcType, options) => {
+        let iconElement = document.createElement('img');
+        iconElement.classList.add('ui-icon');
+        if(id) iconElement.id = id;
+
+        if(srcType == 'asset') {
+            import(`../assets/${src}`).then(({default: i}) => {
+                iconElement.src = i;
+            }).catch(() => {
+                console.error('Cannot load icon asset');
+            });
+        } else {
+            iconElement.src = src;
+        }
+
+        if(options.width) iconElement.style.width = options.width + 'px';
+        if(options.height) iconElement.style.height = options.height + 'px';    
+        
+        if(options.marginTop != undefined) iconElement.style.marginTop = options.marginTop + 'px';
+        if(options.marginBottom != undefined) iconElement.style.marginBottom = options.marginBottom + 'px';
+
+        return iconElement;
+    }
+
+    this.createImage = (id, src, options) => {
+        let imgElement = document.createElement('img');
+        imgElement.classList.add('ui-image');
+        if(id) imgElement.id = id;
+            
+        imgElement.src = src;
+
+        if(options.width) imgElement.style.width = options.width + 'px';
+        if(options.height) imgElement.style.height = options.height + 'px';    
+        if(options.round) imgElement.classList.add('round');
+
+        if(options.marginTop != undefined) imgElement.style.marginTop = options.marginTop + 'px';
+        if(options.marginBottom != undefined) imgElement.style.marginBottom = options.marginBottom + 'px';
+
+        return imgElement;
+    }
     
     this.createSlider = (id, value, label, options) => {
         let obj = {};
@@ -521,7 +566,6 @@ function UiObject() {
                 #${idd}::-webkit-slider-runnable-track {
                     background: -webkit-linear-gradient(left, #3C94E4 ${percent*100}%, #5A5A5A 0%);
                 }
-
                 .bbg #${idd}::-webkit-slider-runnable-track {
                     background: -webkit-linear-gradient(left, #fff ${percent*100}%, #1865c5 0%);
                 }
@@ -558,12 +602,24 @@ function UiObject() {
             container.classList.add(directions[direction] || 'c');
         }
         container.style.padding = `${options.paddingY}px ${options.paddingX}px`;
-        //let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
-        //if(options.scroll) container.classList.add(scrolls[options.scroll]);
+        let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
+        if(options.scroll)
+            container.classList.add(scrolls[options.scroll]);
+        if(options.scroll == 'horizontal') {
+            container.onwheel = (e) => {
+                container.scrollLeft += e.deltaY/4;
+            }
+        }
+        
         if(options.isBottomBar) container.classList.add('bbg');
         if(options.invisible) container.style.display = 'none';
         if(options.seperationRight != undefined) container.style.marginRight = options.seperationRight + 'px';
         if(options.seperationLeft != undefined) container.style.marginLeft = options.seperationLeft + 'px';
+        if(options && options.marginTop) container.style.marginTop = options.marginTop + 'px';
+        if(options && options.marginBottom) container.style.marginBottom = options.marginBottom + 'px';
+        if(options.align == 'end') container.style.alignItems = 'flex-end';
+        else if(options.align == 'start') container.style.alignItems = 'flex-start';
+
 
         //create title
         if(title) {
@@ -698,7 +754,7 @@ function UiObject() {
             }
             if(!clickedInsideContextMenu) {
                 let menuParent = menu.parentElement;
-                if(menuParent.parentElement) menuParent.parentElement.removeChild(menuParent);
+                if(menuParent) menuParent.removeChild(menu);
                 window.removeEventListener('mousedown', windowClickEventListener);
             }
             clickedInsideContextMenu = false;
@@ -723,7 +779,6 @@ const ui = {
         function cycle(o, e) {
             let elementContainer = document.createElement('div');
             let p = o.properties;
-            elementContainer.classList.add('ui-element');
             let targetElement;
 
             switch(o.properties.type) {
@@ -734,45 +789,58 @@ const ui = {
                         if(p.onCheckChange) p.onCheckChange(c);
                     }
                     if(p.disabled) checkboxElement.classList.add('disabled');
-                    elementContainer.appendChild(checkboxElement);
+                    elementContainer = checkboxElement;
                     break;
                 case 'button':
                     let buttonElement = uiObject.createButton(p.text, p.id, p.icon, p);
                     buttonElement.onclick = p.onClick;
                     if(p.disabled) buttonElement.classList.add('disabled');
-                    elementContainer.appendChild(buttonElement);
+                    elementContainer = buttonElement;
                     break;
                 case 'textInput':
                     let inputElement = uiObject.createInput('text', p);
                     if(p.disabled) inputElement.classList.add('disabled');
-                    elementContainer.appendChild(inputElement);
+                    elementContainer = inputElement;
                     break;
                 case 'numberInput':
                     let ninputElement = uiObject.createInput('number', p);
                     if(p.disabled) ninputElement.classList.add('disabled');
-                    elementContainer.appendChild(ninputElement);
+                    elementContainer = ninputElement;
                     break;
                 case 'colorInput':
                     let cinputElement = uiObject.createInput('color', p);
                     if(p.disabled) cinputElement.classList.add('disabled');
-                    elementContainer.appendChild(cinputElement);
+                    elementContainer = cinputElement;
                     break;
                 case 'tabs':
                     let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), p);
                     if(p.disabled) tabsElement.classList.add('disabled');
-                    elementContainer.appendChild(tabsElement);
+                    elementContainer = tabsElement;
                     break;
                 case 'list':
                     let listElement = uiObject.createList(p.items, p.id, p.selected(), p);
                     if(p.disabled) listElement.classList.add('disabled');
-                    elementContainer.appendChild(listElement);
+                    elementContainer = listElement;
                     break;
                 case 'label':
                     let labelElement = uiObject.createLabel(p.id, p.text, p.style, p);
                     if(p.disabled) labelElement.classList.add('disabled');
-                    elementContainer.appendChild(labelElement);
+                    elementContainer = labelElement;
+                    break;
+                case 'icon':
+                    let iconElement = uiObject.createIcon(p.id, p.src, p.srcType, p);
+                    if(p.disabled) iconElement.classList.add('disabled');
+                    elementContainer = iconElement;
+                    break;
+                case 'image':
+                    let imgElement = uiObject.createImage(p.id, p.src, p);
+                    if(p.disabled) imgElement.classList.add('disabled');
+                    elementContainer = imgElement;
                     break;
                 case 'slider':
+                    let sliderContainer = document.createElement('div');
+                    sliderContainer.classList.add('ui-element');
+                    elementContainer = sliderContainer;
                     let slider = uiObject.createSlider(p.id, p.defaultValue(), p.label, p);
                     let sliderElement = slider.slider;
                     let labelElement2 = slider.label;
@@ -784,32 +852,34 @@ const ui = {
                 case 'container':
                     let containerElement = uiObject.createContainer(p.id, p.title, p.direction, p);
                     if(p.disabled) containerElement.classList.add('disabled');
-                    elementContainer.appendChild(containerElement);
-                    let scrolls = {none: '', vertical: 'sv', horizontal: 'sh', both: 'sb'};
-                    if(p.scroll) elementContainer.classList.add(scrolls[p.scroll]);
+                    elementContainer = containerElement;
                     targetElement = containerElement;
                     break;
                 case 'card':
                     let cardElement = uiObject.createCard(p.id, p.title, p.description, p);
                     if(p.disabled) cardElement.classList.add('disabled');
-                    elementContainer.appendChild(cardElement);
+                    elementContainer = cardElement;
                     break;
                 case 'dialog':
                     let dialogElement = uiObject.createDialog(p.id, p.title, p.closeButton, p.fullSize);
                     let dialogBgElement = uiObject.createDialogBg(p.id);
 
                     dialogBgElement.appendChild(dialogElement);
-                    elementContainer.appendChild(dialogBgElement);
+                    elementContainer = dialogBgElement;
                     targetElement = dialogElement;
                     break;
                 case 'contextMenu':
                     let menuElement = uiObject.createContextMenu(p.id, p.title, p);
-                    elementContainer.appendChild(menuElement);
+                    elementContainer = menuElement;
                     targetElement = menuElement;
                     break;
             }
 
+            if(p.uistretch) elementContainer.classList.add('uistretch');
+            else if(p.uiunstretch) elementContainer.classList.add('uiunstretch');
+
             e.appendChild(elementContainer);
+            elementContainer.classList.add('ui-element');
 
             if(p.onCreate) {
                 setTimeout(() => {
@@ -912,6 +982,24 @@ const ui = {
     label: (text, props = {}, children = []) =>
         ui.create('label', Object.assign(props, { text }), children),
     /**
+     * Creates an icon
+     * @param {string} src icon source
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    icon: (src, props = {}, children = []) =>
+        ui.create('icon', Object.assign(props, { src }), children),
+     /**
+     * Creates an image
+     * @param {string} src image source
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    image: (src, props = {}, children = []) =>
+        ui.create('image', Object.assign(props, { src }), children),
+    /**
      * Creates a slider
      * @param {string} label slider label
      * @param {{}} props element properties
@@ -959,4 +1047,3 @@ const ui = {
 }
 
 export default ui;
-

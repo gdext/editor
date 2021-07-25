@@ -221,22 +221,6 @@ function updateRelativeTransform(obj, shiftcenter) {
     if(relativeTransform.rotation < 0) relativeTransform.rotation += 360;
     else if(relativeTransform.rotation >= 360) relativeTransform.rotation -= 360;
 
-    let objid;
-    let objidn;
-    let objcontent;
-    if(shiftcenter) {
-        objid = level.getObject(Object.keys(relativeTransform.objdata)[0]);
-        if(objid) objid = objid.id.toString();
-        else objid = null;
-        objidn = objid ? parseInt(objid) : null;
-        relativeTransform.center.x -= objAlignData[objid] ? objAlignData[objid].alignX : 0;
-        relativeTransform.center.x -= objAlignData[objid] ? objAlignData[objid].alignY : 0;
-        
-        objcontent = relativeTransform.objdata[Object.keys(relativeTransform.objdata)[0]];
-        objcontent.xFromCenter += objAlignData[objid] ? objAlignData[objid].alignX : 0;
-        objcontent.yFromCenter += objAlignData[objid] ? objAlignData[objid].alignY : 0;
-    }
-    
     //pre-calculate rotation
     function toRadians (angle) {
         return angle * (Math.PI / 180);
@@ -257,25 +241,37 @@ function updateRelativeTransform(obj, shiftcenter) {
             od.flipy = relativeTransform.vflip ? 1 : null;
             od.order = relativeTransform.zorder;
 
+            //shift center
+            let shiftX, shiftY;
+            if(shiftcenter) {
+                shiftX = objAlignData[od.id] ? objAlignData[od.id].alignX : 0;
+                shiftY = objAlignData[od.id] ? objAlignData[od.id].alignY : 0;
+
+                if(shiftX != 0 || shiftY != 0) {
+                    let odRotRad = toRadians(od.r || 0);
+                    let odRotCos = Math.cos(odRotRad);
+                    let odRotSin = Math.sin(odRotRad);
+
+                    od.x -= shiftX * odRotCos + shiftY * odRotSin
+                    od.y -= shiftX * odRotSin + shiftY * odRotCos
+                }
+            }
+
+            // update rotation
             let targetRot = relativeTransform.rotation;
             if(od && objectsData.solids.includes(od.id)) targetRot = Math.round(targetRot/90)*90;
             if(targetRot < 0) targetRot += 360;
             else if(targetRot >= 360) targetRot -= 360;
-            //relativeTransform.rotation = targetRot;
             od.r = targetRot;
 
-            if(shiftcenter) {
-                let targetX, targetY;
-                targetX = v.xFromCenter;
-                targetY = v.yFromCenter;
-                let newTargetX = (targetX * cosRot) + (targetY * sinRot);
-                let newTargetY = (targetY * cosRot) - (targetX * sinRot);
-                targetX = newTargetX;
-                targetY = newTargetY;
+            // unshift center
+            if(shiftcenter && (shiftX != 0 || shiftY != 0)) {
+                let odRotRad = toRadians(od.r || 0);
+                let odRotCos = Math.cos(odRotRad);
+                let odRotSin = Math.sin(odRotRad);
 
-                console.log(targetX, targetY);
-                od.x = relativeTransform.center.x + targetX;
-                od.y = relativeTransform.center.y + targetY;
+                od.x += shiftX * odRotCos + shiftY * odRotSin
+                od.y += shiftX * odRotSin + shiftY * odRotCos
             }
         } else {
             //relative transform init
@@ -346,11 +342,11 @@ function updateRelativeTransform(obj, shiftcenter) {
     });
 
     if(shiftcenter) {
-        relativeTransform.center.x += objAlignData[objid] ? objAlignData[objid].alignX : 0;
-        relativeTransform.center.x += objAlignData[objid] ? objAlignData[objid].alignY : 0;
-        objcontent.xFromCenter -= objAlignData[objid] ? objAlignData[objid].alignX : 0;
-        objcontent.yFromCenter -= objAlignData[objid] ? objAlignData[objid].alignY : 0;
-        relativeTransform.shiftcenter = false;
+        let prevS = selectedObjs;
+        selectedObjs = [];
+        selectObjects();
+        selectedObjs = prevS;
+        selectObjects();
     }
 
     level.confirmEdit();

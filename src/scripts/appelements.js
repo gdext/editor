@@ -257,7 +257,10 @@ export default {
             l = actionsExec.getLevelData(localStorage.getItem('lvlnumber'));
             localStorage.setItem('lvlcode', l.data);
             localStorage.setItem('lvlname', l.name);
-            localStorage.setItem('lvlsong', l.song);
+            let song = l.customsong;
+            if(!song) song = l.song;
+            else song = 'c' + song;
+            localStorage.setItem('lvlsong', song);
         }
         util.updateTitle();
 
@@ -408,7 +411,7 @@ export default {
             // position
             let xposinput = document.querySelector('#editXPos');
             let yposinput = document.querySelector('#editYPos');
-            let editrow1 = xposinput.parentElement.parentElement.parentElement;
+            let editrow1 = xposinput.parentElement.parentElement;
             xposinput.setAttribute('unit', '');
             yposinput.setAttribute('unit', '');
             if(relativeTransform.x != undefined && relativeTransform.y != undefined) {
@@ -429,8 +432,8 @@ export default {
             let rotinput = document.querySelector('#editRot');
             let scaleinput = document.querySelector('#editScale');
             let zorderinput = document.querySelector('#editZOrder');
-            let editrow2 = rotinput.parentElement.parentElement.parentElement;
-            let editrow3 = rotinput.parentElement.parentElement.parentElement.parentElement.parentElement.children[2].children[0]
+            let editrow2 = rotinput.parentElement.parentElement;
+            let editrow3 = rotinput.parentElement.parentElement.parentElement.children[2];
             rotinput.setAttribute('unit', '°');
             scaleinput.setAttribute('unit', '');
             zorderinput.setAttribute('unit', '');
@@ -595,7 +598,7 @@ export default {
                     finishObjectTransform();
                     break;
                 case 'update': 
-                    if(!detail.softUpdate) updateEditInputs();
+                    if(!detail.softUpdate || detail.updateInputs) updateEditInputs();
                     if(!detail.softUpdate) finishObjectTransform();
                     renderer.update(canvas);
                     break;
@@ -867,7 +870,9 @@ export default {
               if (mutation.type == "attributes") {
                 loadObjs(lastCategory, page);
                 let event = new CustomEvent('editor', { detail: {
-                    action: 'update'
+                    action: 'update',
+                    softUpdate: true,
+                    updateInputs: true
                 }});
                 dispatchEvent(event);
               }

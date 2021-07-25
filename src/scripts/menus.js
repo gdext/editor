@@ -10,12 +10,13 @@ import settingsData from '../assets/settings.json';
 import ui from './ui';
 import actions from './actions';
 
-function loadLevel(levelTxt, lvlName) {
+function loadLevel(level) {
     let event = new CustomEvent('electronApi', { 
         detail: {
             detail: 'loadLevel',
-            name: lvlName,
-            data: levelTxt
+            name: level.name,
+            data: level.data,
+            song: level.song
         }
     });
     dispatchEvent(event);
@@ -27,423 +28,443 @@ const bottomMenus = {
         properties: {
             type: 'container',
             direction: 'row',
-            scroll: 'both', 
+            scroll: 'horizontal', 
             paddingX: 15,
             paddingY: 0
         },
         children: [
             // transform section
-            {
-                properties: {
-                    type: 'container',
-                    direction: 'row',
-                },
-                children: [
-                    {
-                        properties: {
-                            type: 'container',
-                            direction: 'column',
+            ui.container('row', { align: 'end' }, [
+                // transform columns
+                ui.container('column', {}, [
+                    // x position
+                    ui.label('X Position'),
+                    ui.numberInput('Number', {
+                        id: 'editXPos',
+                        defaultValue: () => { return '0' },
+                        onValueChange: (v) => {
+                            canvas.setRelativeTransform({
+                                x: parseFloat(v)*3,
+                            });
                         },
-                        children: [
-                            // x position
-                            {
-                                properties: {
-                                    type: 'label',
-                                    text: 'X Position',
-                                }
-                            },
-                            {
-                                properties: {
-                                    type: 'numberInput',
-                                    id: 'editXPos',
-                                    placeholder: 'Number',
-                                    defaultValue: () => { return '0' },
-                                    onValueChange: (v) => {
-                                        canvas.setRelativeTransform({
-                                            x: parseFloat(v)*3,
-                                        });
-                                    },
-                                    onIconDragEnd: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'update'
-                                        }});
-                                        dispatchEvent(event);
-                                    },
-                                    icon: 'slide',
-                                    defaultToInteger: true,
-                                    scale: 0.33
-                                }
-                            },
-                            //y position
-                            {
-                                properties: {
-                                    type: 'label',
-                                    text: 'Y Position',
-                                    marginTop: 5
-                                }
-                            },
-                            {
-                                properties: {
-                                    type: 'numberInput',
-                                    id: 'editYPos',
-                                    placeholder: 'Number',
-                                    defaultValue: () => { return '0' },
-                                    onValueChange: (v) => {
-                                        canvas.setRelativeTransform({
-                                            y: parseFloat(v)*3,
-                                        });
-                                    },
-                                    onIconDragEnd: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'update'
-                                        }});
-                                        dispatchEvent(event);
-                                    },
-                                    icon: 'slide',
-                                    defaultToInteger: true,
-                                    scale: 0.33
-                                }
-                            },
-                            //z layer
-                            {
-                                properties: {
-                                    type: 'label',
-                                    text: 'Z Layer',
-                                    marginTop: 5
-                                }
-                            },
-                            {
-                                properties: {
-                                    type: 'list',
-                                    id: 'editZLayer',
-                                    items: ['B4', 'B3', 'B2', 'B1', 'T1', 'T2', 'T3'],
-                                    selected:  () => { return 4 },
+                        onIconDragEnd: () => {
+                            let event = new CustomEvent('editor', { detail: {
+                                action: 'update'
+                            }});
+                            dispatchEvent(event);
+                        },
+                        icon: 'slide',
+                        defaultToInteger: true,
+                        scale: 0.33
+                    }),
+                    
+                    //y position
+                    ui.label('Y Position', { marginTop: 5 }),
+                    ui.numberInput('Number', {
+                        id: 'editYPos',
+                        defaultValue: () => { return '0' },
+                        onValueChange: (v) => {
+                            canvas.setRelativeTransform({
+                                y: parseFloat(v)*3,
+                            });
+                        },
+                        onIconDragEnd: () => {
+                            let event = new CustomEvent('editor', { detail: {
+                                action: 'update'
+                            }});
+                            dispatchEvent(event);
+                        },
+                        icon: 'slide',
+                        defaultToInteger: true,
+                        scale: 0.33
+                    }),
+
+                    //z layer
+                    ui.label('Z Layer', { marginTop: 5 }),
+                    ui.list(['B4', 'B3', 'B2', 'B1', 'T1', 'T2', 'T3'], { 
+                        id: 'editZLayer',
+                        selected:  () => { return 4 },
+                    })
+                ]),
+
+                ui.container('column', { id: 'test' }, [
+                    // rotation
+                    ui.label('Rotation'),
+                    ui.numberInput('Degree', {
+                        id: 'editRot',
+                        max: 359,
+                        min: 0,
+                        wrapAround: true,
+                        unit: '°',
+                        defaultValue: () => { return '0' },
+                        onValueChange: (v) => {
+                            canvas.setRelativeTransform({
+                                rotation: parseFloat(v),
+                            });
+                        },
+                        onIconDragEnd: () => {
+                            let event = new CustomEvent('editor', { detail: {
+                                action: 'update'
+                            }});
+                            dispatchEvent(event);
+                        },
+                        icon: 'slide',
+                        defaultToInteger: true,
+                        scale: 1.33
+                    }),
+                    
+                    //scale
+                    ui.label('Scale', { marginTop: 5 }),
+                    ui.numberInput('Number', {
+                        id: 'editScale',
+                        defaultValue: () => { return '1' },
+                        onValueChange: (v) => {
+                            canvas.setRelativeTransform({
+                                scale: parseFloat(v),
+                            });
+                        },
+                        onIconDragEnd: () => {
+                            let event = new CustomEvent('editor', { detail: {
+                                action: 'update'
+                            }});
+                            dispatchEvent(event);
+                        },
+                        icon: 'slide',
+                        min: 0.1,
+                        max: 8,
+                        scale: 0.01
+                    }),
+
+                    //z order
+                    ui.label('Z Order', { marginTop: 5 }),
+                    ui.numberInput('Number', {
+                        id: 'editZOrder',
+                        defaultValue: () => { return '10' },
+                        onValueChange: (v) => {
+                            canvas.setRelativeTransform({
+                                zorder: parseInt(v),
+                            });
+                        },
+                        onIconDragEnd: () => {
+                            let event = new CustomEvent('editor', { detail: {
+                                action: 'update'
+                            }});
+                            dispatchEvent(event);
+                        },
+                        icon: 'slide',
+                        scale: 0.5,
+                        integerOnly: true
+                    }),
+                ]),
+
+                // quick transform buttons
+                {
+                    properties: {
+                        type: 'container',
+                        isGrid: true,
+                        id: 'editTransformTools',
+                        columns: 3,
+                    },
+                    children: [
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'editRotate90CCW',
+                                icon: 'ic-rotateccw.svg',
+                                hint: 'Rotate 90 CCW',
+                                iconHeight: 20,
+                                width: 40,
+                                height: 40,
+                                primary: false,
+                                onClick: () => {
+                                    let event = new CustomEvent('editor', { detail: {
+                                        action: 'transform',
+                                        mode: 'add',
+                                        data: {
+                                            rotation: -90,
+                                            shiftcenter: true
+                                        } 
+                                    }});
+                                    dispatchEvent(event);
                                 }
                             }
-                        ]
-                    },
-                    {
-                        properties: {
-                            type: 'container',
-                            id: 'test',
-                            direction: 'column',
                         },
-                        children: [
-                            // rotation
-                            {
-                                properties: {
-                                    type: 'label',
-                                    text: 'Rotation',
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'editMoveUp',
+                                icon: 'ic-moveup.svg',
+                                hint: 'Move Up',
+                                iconHeight: 20,
+                                width: 40,
+                                height: 40,
+                                primary: false,
+                                onClick: () => {
+                                    let event = new CustomEvent('editor', { detail: {
+                                        action: 'transform',
+                                        mode: 'add',
+                                        data: {
+                                            y: parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
+                                        }
+                                    }});
+                                    dispatchEvent(event);
                                 }
-                            },
-                            {
-                                properties: {
-                                    type: 'numberInput',
-                                    id: 'editRot',
-                                    placeholder: 'Degree',
-                                    max: 359,
-                                    min: 0,
-                                    wrapAround: true,
-                                    unit: '°',
-                                    defaultValue: () => { return '0' },
-                                    onValueChange: (v) => {
-                                        canvas.setRelativeTransform({
-                                            rotation: parseFloat(v),
-                                        });
-                                    },
-                                    onIconDragEnd: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'update'
-                                        }});
-                                        dispatchEvent(event);
-                                    },
-                                    icon: 'slide',
-                                    defaultToInteger: true,
-                                    scale: 1.33
-                                }
-                            },
-                            //scale
-                            {
-                                properties: {
-                                    type: 'label',
-                                    text: 'Scale',
-                                    marginTop: 5
-                                }
-                            },
-                            {
-                                properties: {
-                                    type: 'numberInput',
-                                    id: 'editScale',
-                                    placeholder: 'Number',
-                                    defaultValue: () => { return '1' },
-                                    onValueChange: (v) => {
-                                        canvas.setRelativeTransform({
-                                            scale: parseFloat(v),
-                                        });
-                                    },
-                                    onIconDragEnd: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'update'
-                                        }});
-                                        dispatchEvent(event);
-                                    },
-                                    icon: 'slide',
-                                    min: 0.1,
-                                    max: 8,
-                                    scale: 0.01
-                                }
-                            },
-                            //z order
-                            {
-                                properties: {
-                                    type: 'label',
-                                    text: 'Z Order',
-                                    marginTop: 5
-                                }
-                            },
-                            {
-                                properties: {
-                                    type: 'numberInput',
-                                    id: 'editZOrder',
-                                    placeholder: 'Number',
-                                    defaultValue: () => { return '10' },
-                                    onValueChange: (v) => {
-                                        canvas.setRelativeTransform({
-                                            zorder: parseInt(v),
-                                        });
-                                    },
-                                    onIconDragEnd: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'update'
-                                        }});
-                                        dispatchEvent(event);
-                                    },
-                                    icon: 'slide',
-                                    scale: 0.5,
-                                    integerOnly: true
-                                }
-                            },
-                        ]
-                    },
-                    {
-                        properties: {
-                            type: 'container',
-                            isGrid: true,
-                            id: 'editTransformTools',
-                            columns: 3,
+                            }
                         },
-                        children: [
-                            {
-                                properties: {
-                                    type: 'button',
-                                    id: 'editRotate90CCW',
-                                    icon: 'ic-rotateccw.svg',
-                                    hint: 'Rotate 90 CCW',
-                                    iconHeight: 20,
-                                    width: 40,
-                                    height: 40,
-                                    primary: false,
-                                    onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'transform',
-                                            mode: 'add',
-                                            data: {
-                                                rotation: -90,
-                                                shiftcenter: true
-                                            } 
-                                        }});
-                                        dispatchEvent(event);
-                                    }
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'editRotate90CW',
+                                icon: 'ic-rotatecw.svg',
+                                hint: 'Rotate 90 CW',
+                                iconHeight: 20,
+                                width: 40,
+                                height: 40,
+                                primary: false,
+                                onClick: () => {
+                                    let event = new CustomEvent('editor', { detail: {
+                                        action: 'transform',
+                                        mode: 'add',
+                                        data: {
+                                            rotation: 90,
+                                            shiftcenter: true
+                                        } 
+                                    }});
+                                    dispatchEvent(event);
                                 }
-                            },
-                            {
-                                properties: {
-                                    type: 'button',
-                                    id: 'editMoveUp',
-                                    icon: 'ic-moveup.svg',
-                                    hint: 'Move Up',
-                                    iconHeight: 20,
-                                    width: 40,
-                                    height: 40,
-                                    primary: false,
-                                    onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'transform',
-                                            mode: 'add',
-                                            data: {
-                                                y: parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
-                                            }
-                                        }});
-                                        dispatchEvent(event);
-                                    }
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'editMoveLeft',
+                                icon: 'ic-moveleft.svg',
+                                hint: 'Move Left',
+                                iconHeight: 20,
+                                width: 40,
+                                height: 40,
+                                primary: false,
+                                onClick: () => {
+                                    let event = new CustomEvent('editor', { detail: {
+                                        action: 'transform',
+                                        mode: 'add',
+                                        data: {
+                                            x: - parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
+                                        }
+                                    }});
+                                    dispatchEvent(event);
                                 }
-                            },
-                            {
-                                properties: {
-                                    type: 'button',
-                                    id: 'editRotate90CW',
-                                    icon: 'ic-rotatecw.svg',
-                                    hint: 'Rotate 90 CW',
-                                    iconHeight: 20,
-                                    width: 40,
-                                    height: 40,
-                                    primary: false,
-                                    onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'transform',
-                                            mode: 'add',
-                                            data: {
-                                                rotation: 90,
-                                                shiftcenter: true
-                                            } 
-                                        }});
-                                        dispatchEvent(event);
-                                    }
-                                }
-                            },
-                            {
-                                properties: {
-                                    type: 'button',
-                                    id: 'editMoveLeft',
-                                    icon: 'ic-moveleft.svg',
-                                    hint: 'Move Left',
-                                    iconHeight: 20,
-                                    width: 40,
-                                    height: 40,
-                                    primary: false,
-                                    onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'transform',
-                                            mode: 'add',
-                                            data: {
-                                                x: - parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
-                                            }
-                                        }});
-                                        dispatchEvent(event);
-                                    }
-                                }
-                            },
-                            {
-                                properties: {
-                                    type: 'button',
-                                    id: 'editChangeScale',
-                                    text: 'x1',
-                                    textStyle: 'bold',
-                                    hint: 'Change Move Scale',
-                                    width: 40,
-                                    height: 40,
-                                    primary: false,
-                                    onClick: () => {
-                                        let scaleMultipliers = [
-                                            30, //1 scale
-                                            3, // 1/10 scale
-                                            0.6, // 1/50 scale
-                                            150, //5 scale
-                                        ];
-                                        let scaleMultiplierText = ['x1', '1/10', '1/50', 'x5']
-                                        let currentIndex = document.querySelector('#editChangeScale').getAttribute('multAmount');
-                                        if(currentIndex != undefined) currentIndex = scaleMultipliers.indexOf(parseFloat(currentIndex));
-                                        else currentIndex = 0;
-                                        currentIndex++;
-                                        if(currentIndex >= scaleMultipliers.length) currentIndex = 0;
-                                        document.querySelector('#editChangeScale').setAttribute('multAmount', scaleMultipliers[currentIndex]);
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'editChangeScale',
+                                text: 'x1',
+                                textStyle: 'bold',
+                                hint: 'Change Move Scale',
+                                width: 40,
+                                height: 40,
+                                primary: false,
+                                onClick: () => {
+                                    let scaleMultipliers = [
+                                        30, //1 scale
+                                        3, // 1/10 scale
+                                        0.6, // 1/50 scale
+                                        150, //5 scale
+                                    ];
+                                    let scaleMultiplierText = ['x1', '1/10', '1/50', 'x5']
+                                    let currentIndex = document.querySelector('#editChangeScale').getAttribute('multAmount');
+                                    if(currentIndex != undefined) currentIndex = scaleMultipliers.indexOf(parseFloat(currentIndex));
+                                    else currentIndex = 0;
+                                    currentIndex++;
+                                    if(currentIndex >= scaleMultipliers.length) currentIndex = 0;
+                                    document.querySelector('#editChangeScale').setAttribute('multAmount', scaleMultipliers[currentIndex]);
 
-                                        document.querySelector('#editChangeScale').querySelector('span').innerText = scaleMultiplierText[currentIndex];
-                                    }
+                                    document.querySelector('#editChangeScale').querySelector('span').innerText = scaleMultiplierText[currentIndex];
                                 }
-                            },
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'editMoveRight',
+                                icon: 'ic-moveright.svg',
+                                hint: 'Move Right',
+                                iconHeight: 20,
+                                width: 40,
+                                height: 40,
+                                primary: false,
+                                onClick: () => {
+                                    let event = new CustomEvent('editor', { detail: {
+                                        action: 'transform',
+                                        mode: 'add',
+                                        data: {
+                                            x: parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
+                                        }
+                                    }});
+                                    dispatchEvent(event);
+                                }
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'editFlipV',
+                                icon: 'ic-flipv.svg',
+                                hint: 'Flip Vertically',
+                                iconHeight: 20,
+                                width: 40,
+                                height: 40,
+                                primary: false,
+                                onClick: () => {
+                                    let event = new CustomEvent('editor', { detail: {
+                                        action: 'transform',
+                                        mode: 'add',
+                                        data: {
+                                            vflip: '$invert'
+                                        } 
+                                    }});
+                                    dispatchEvent(event);
+                                }
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'editMoveDown',
+                                icon: 'ic-movedown.svg',
+                                hint: 'Move Down',
+                                iconHeight: 20,
+                                width: 40,
+                                height: 40,
+                                primary: false,
+                                onClick: () => {
+                                    let event = new CustomEvent('editor', { detail: {
+                                        action: 'transform',
+                                        mode: 'add',
+                                        data: {
+                                            y: - parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
+                                        } 
+                                    }});
+                                    dispatchEvent(event);
+                                }
+                            }
+                        },
+                        {
+                            properties: {
+                                type: 'button',
+                                id: 'editFlipH',
+                                icon: 'ic-fliph.svg',
+                                hint: 'Flip Horizontally',
+                                iconHeight: 20,
+                                width: 40,
+                                height: 40,
+                                primary: false,
+                                onClick: () => {
+                                    let event = new CustomEvent('editor', { detail: {
+                                        action: 'transform',
+                                        mode: 'add',
+                                        data: {
+                                            hflip: '$invert'
+                                        } 
+                                    }});
+                                    dispatchEvent(event);
+                                }
+                            }
+                        },
+                    ]
+                },
+
+                // group settings
+                {
+                    properties: {
+                        type: 'container',
+                        direction: 'column',
+                        seperationLeft: 50,
+                        uistretch: true
+                    },
+                    children: [
+                        // groups
+                        ui.label('Groups'),
+                        ui.textInput('Coming Soon!', {
+                            id: 'editGroup',
+                            //defaultValue: () => { return '0' },
+                            icon: 'pick'
+                        }),
+
+                        // misc checkboxes
+                        ui.container('row', { marginTop: 8.5, marginBottom: 8.5 }, [
+                            ui.container('column', {}, [
+                                ui.checkbox('No Fade', { checked: () => { return false } }),
+                                ui.checkbox('Group Parent', { checked: () => { return false }, marginTop: 7 })
+                            ]),
+                            ui.container('column', {}, [
+                                ui.checkbox('No Enter', { checked: () => { return false } }),
+                                ui.checkbox('High Detail', { checked: () => { return false }, marginTop: 7 })
+                            ])
+                        ]),
+
+                        // editor layers
+                        ui.label('Editor Layers'),
+                        ui.textInput('Coming Soon!', {
+                            id: 'editELayers',
+                            //defaultValue: () => { return '0' },
+                            icon: 'pick'
+                        }),
+                    ]
+                },
+
+                // tools
+                {
+                    properties: {
+                        type: 'container',
+                        direction: 'column',
+                        seperationLeft: 50
+                    },
+                    children: [
+                        // tools
+                        ui.container('column', {}, [
+                            ui.label('Tools'),
                             {
                                 properties: {
-                                    type: 'button',
-                                    id: 'editMoveRight',
-                                    icon: 'ic-moveright.svg',
-                                    hint: 'Move Right',
-                                    iconHeight: 20,
-                                    width: 40,
-                                    height: 40,
-                                    primary: false,
-                                    onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'transform',
-                                            mode: 'add',
-                                            data: {
-                                                x: parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
-                                            }
-                                        }});
-                                        dispatchEvent(event);
-                                    }
-                                }
+                                    type: 'container',
+                                    isGrid: true,
+                                    id: 'editTransformTools',
+                                    columns: 2,
+                                },
+                                children: [
+                                    ui.button(null, { id: 'editToolMove', icon: 'ic-move.svg',
+                                        hint: 'Toggle Move Tool', iconHeight: 20, width: 40, 
+                                        height: 40, primary: false
+                                    }),
+                                    ui.button(null, { id: 'editToolRotate', icon: 'ic-rotate.svg',
+                                        hint: 'Toggle Rotate Tool', iconHeight: 20, width: 40, 
+                                        height: 40, primary: false
+                                    }),
+                                    ui.button(null, { id: 'editToolScale', icon: 'ic-scale.svg',
+                                        hint: 'Toggle Scale Tool', iconHeight: 20, width: 40, 
+                                        height: 40, primary: false
+                                    }),
+                                    ui.button(null, { id: 'editToolSnap', icon: 'ic-magnet.svg',
+                                        hint: 'Toggle Grid Snapping', iconHeight: 20, width: 40, 
+                                        height: 40,primary: false
+                                    }),
+                                    ui.button('Free Move', { id: 'editToolFreeMove', textStyle: 'small',
+                                        hint: 'Toggle Free Move', iconHeight: 20, width: 40, height: 40,
+                                        primary: false
+                                    }),
+                                    ui.button(null, { id: 'editToolFilter', icon: 'ic-filter.svg',
+                                        hint: 'Selection Filter', iconHeight: 20, width: 40, 
+                                        height: 40, primary: false
+                                    }),
+                                ]
                             },
-                            {
-                                properties: {
-                                    type: 'button',
-                                    id: 'editFlipV',
-                                    icon: 'ic-flipv.svg',
-                                    hint: 'Move Vertically',
-                                    iconHeight: 20,
-                                    width: 40,
-                                    height: 40,
-                                    primary: false,
-                                    onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'transform',
-                                            mode: 'add',
-                                            data: {
-                                                vflip: '$invert'
-                                            } 
-                                        }});
-                                        dispatchEvent(event);
-                                    }
-                                }
-                            },
-                            {
-                                properties: {
-                                    type: 'button',
-                                    id: 'editMoveDown',
-                                    icon: 'ic-movedown.svg',
-                                    hint: 'Move Down',
-                                    iconHeight: 20,
-                                    width: 40,
-                                    height: 40,
-                                    primary: false,
-                                    onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'transform',
-                                            mode: 'add',
-                                            data: {
-                                                y: - parseFloat(document.querySelector('#editChangeScale').getAttribute('multAmount')||30)
-                                            } 
-                                        }});
-                                        dispatchEvent(event);
-                                    }
-                                }
-                            },
-                            {
-                                properties: {
-                                    type: 'button',
-                                    id: 'editFlipH',
-                                    icon: 'ic-fliph.svg',
-                                    hint: 'Flip Horizontally',
-                                    iconHeight: 20,
-                                    width: 40,
-                                    height: 40,
-                                    primary: false,
-                                    onClick: () => {
-                                        let event = new CustomEvent('editor', { detail: {
-                                            action: 'transform',
-                                            mode: 'add',
-                                            data: {
-                                                hflip: '$invert'
-                                            } 
-                                        }});
-                                        dispatchEvent(event);
-                                    }
-                                }
-                            },
-                        ]
-                    }
-                ]
-            }
+                        ]),
+
+                    ]
+                }
+            ])
         ]
     },
     deleteMenu: {
@@ -483,7 +504,11 @@ const canvasMenus = {
                 if(!window.process) {
                     util.alert('gdPathFailDialog', 'Playtesting is not supported\nin GDExt Web', 'Please use the desktop version', 'OK');
                 } else if(gdPath == 'steam') {
-                    loadLevel(levelTxt, localStorage.getItem('lvlname'));
+                    loadLevel({
+                        data: levelTxt, 
+                        name: localStorage.getItem('lvlname'),
+                        song: localStorage.getItem('lvlsong')
+                    });
                 } else {
                     util.confirm(
                         'gdPathDialog', 'GD Playtesting',
@@ -494,7 +519,11 @@ const canvasMenus = {
                             onConfirm: (t) => {
                                 if(t) {
                                     localStorage.setItem('settings.gdpath', 'steam');
-                                    loadLevel(levelTxt, localStorage.getItem('lvlname'));
+                                    loadLevel({
+                                        data: levelTxt, 
+                                        name: localStorage.getItem('lvlname'),
+                                        song: localStorage.getItem('lvlsong')
+                                    });
                                 } else {
                                     util.alert('gdPathFailDialog', 'Pirated GD is not yet supported', 'So yeah... get $2 and buy official GD, nerd', 'OK');
                                 }
@@ -829,7 +858,8 @@ const settingsMenus = {
     general: {
         properties: {
             type: 'container',
-            direction: 'row'
+            direction: 'row',
+            align: 'start'
         },
         children: [
             {
@@ -903,7 +933,8 @@ const settingsMenus = {
     editor: {
         properties: {
             type: 'container',
-            direction: 'row'
+            direction: 'row',
+            align: 'start'
         },
         children: [
             {
@@ -1071,6 +1102,49 @@ const settingsMenus = {
                     }
                 ]
             }
+        ]
+    },
+    flags: {
+        properties: {
+            type: 'container',
+            direction: 'column',
+            align: 'start',
+            scroll: 'vertical'
+        },
+        children: [
+            ui.label('Appearance', { style: 'heading', marginBottom: 10 }),
+            ui.container('row', { align: 'start', marginBottom: 20 }, [
+                ui.container('column', { seperationRight: 15 }, [
+                    ui.checkbox('Show Grid', { checked: () => { return true }, big: true, marginBottom: 10 }),
+                    ui.checkbox('Show Colors', { checked: () => { return true }, big: true, marginBottom: 10 }),
+                    ui.checkbox('Show Alpha', { checked: () => { return true }, big: true }),
+                    ui.label('If disabled, all objects have 100% opacity, regardless of alpha triggers',
+                    {  marginBottom: 10, style: 'small' } ),
+                    ui.checkbox('Show Lines', { checked: () => { return true }, big: true }),
+                ]),
+                ui.container('column', { }, [
+                    ui.checkbox('Show Collision Boxes', { checked: () => { return true }, big: true, marginBottom: 10 }),
+                    ui.checkbox('Show Duration Lines', { checked: () => { return false }, big: true, marginBottom: 10 }),
+                    ui.checkbox('Show Ground Texture', { checked: () => { return false }, big: true }),
+                    ui.label('If disabled, the ground is shown as a line, instead of an actual ground texture',
+                    {  marginBottom: 10, style: 'small' } ),
+                    ui.checkbox('Show Object Info', { checked: () => { return false }, big: true }),
+                ])
+            ]),
+
+            ui.label('Functionality', { style: 'heading', marginBottom: 10 }),
+            ui.container('row', { align: 'start', marginBottom: 20 }, [
+                ui.container('column', { seperationRight: 15 }, [
+                    ui.checkbox('Scroll Wheel to Zoom', { checked: () => { return true }, big: true }),
+                    ui.label('If disabled, scroll wheel is used to move the camera vertically, instead of zoomin in/out',
+                    {  marginBottom: 10, style: 'small' } ),
+                ]),
+                ui.container('column', { }, [
+                    ui.checkbox('Selection Cycle', { checked: () => { return false }, big: true }),
+                    ui.label('Cycle between all the objects, that collide with the mouse pointer, when selecting',
+                    {  marginBottom: 10, style: 'small' } ),
+                ])
+            ])
         ]
     }
 }
