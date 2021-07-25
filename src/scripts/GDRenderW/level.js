@@ -446,8 +446,8 @@ export function EditorLevel(renderer, level) {
     }
 
     this.moveObjectZList = function(key, obj, chunk, layer, order) {
-        if (getChunk(obj.x) != chunk || obj.z != layer || obj.order != order) {
-            this.removeObjectZList(key, getChunk(obj.x), obj.z);
+        if (getChunk(obj.x) != chunk || obj.ren_z != layer || obj.order != order) {
+            this.removeObjectZList(key, getChunk(obj.x), obj.ren_z);
 
             let chk = this.level.lchunks[chunk];
 
@@ -481,12 +481,12 @@ export function EditorLevel(renderer, level) {
     this.editObject = function(key, props) {
         let obj = this.getObject(key);
 
-        let zprp = obj.z;
+        let zprp = obj.ren_z;
         let oprp = obj.order;
         let xprp = obj.x;
 
         if (props.z)
-            zprp = props.z;
+            zprp = util.zorder[props.z];
         if (props.order)
             oprp = props.order;
         if (props.x)
@@ -700,8 +700,8 @@ export function EditorLevel(renderer, level) {
             let o1 = this.level.data[a];
             let o2 = this.level.data[b];
 
-            let l1 = o1.z;
-            let l2 = o2.z;
+            let l1 = o1.ren_z;
+            let l2 = o2.ren_z;
 
             if (!l1) l1 = renderer.objectDefs[o1.id].zlayer;
             if (!l2) l2 = renderer.objectDefs[o2.id].zlayer;
@@ -757,6 +757,8 @@ export function EditorLevel(renderer, level) {
     this.addObject = function(obj) {
         let key = this.level.data.findIndex(Object.is.bind(null, undefined));
 
+        if (obj.z) obj.ren_z = util.zorder[obj.z];
+
         if (key != -1)
             this.level.data[key] = obj;
         else
@@ -772,13 +774,13 @@ export function EditorLevel(renderer, level) {
         if (util.getSpeedPortal(obj) != null)
             this.reloadSpeeds = true;
 
-        let layer = chunk[obj.z];
+        let layer = chunk[obj.ren_z];
 
         if (layer) {
             layer.push(key);
-            this.addZSort(getChunk(obj.x), obj.z);
+            this.addZSort(getChunk(obj.x), obj.ren_z);
         } else
-            this.level.lchunks[Math.floor(obj.x / 992)][obj.z] = [key];
+            this.level.lchunks[Math.floor(obj.x / 992)][obj.ren_z] = [key];
 
         return key;
     }
@@ -803,12 +805,15 @@ export function EditorLevel(renderer, level) {
                     y = y + alg.alignY;
             }
         }
-        let ret = {id: id, x: x, y: y, z: def.zlayer, order: def.zorder};
+        let ret = {id: id, x: x, y: y, z: util.exportZLayer(def.zlayer), order: def.zorder};
 
         return ret;
     }
 
     this.getLevel = function() {
+        for (let o of this.level.data)
+            o.z = util.exportZLayer(o.ren_z);
+
         return this.level;
     }
 
@@ -821,7 +826,7 @@ export function EditorLevel(renderer, level) {
         let chunk = this.level.lchunks[getChunk(obj.x)];
 
         if (chunk) {
-            let layer = chunk[obj.z];
+            let layer = chunk[obj.ren_z];
             if (layer) {
                 let o = layer.indexOf(i);
                 if (o != -1)
@@ -846,10 +851,10 @@ export function EditorLevel(renderer, level) {
         const def = renderer.objectDefs[obj.id];
 
         if (!obj.z)
-            obj.z = ( def ? def.zlayer : null ) || -1;
+            obj.ren_z = ( def ? def.zlayer : null ) || -1;
         else
-            obj.z = util.zorder[obj.z] ||
-                    ( def ? def.zlayer : null ) || -1;
+            obj.ren_z = util.zorder[obj.z] ||
+                            ( def ? def.zlayer : null ) || -1;
 
         obj.order = obj.order || ( def ? def.zorder : null ) || 5;
     }
@@ -861,10 +866,10 @@ export function EditorLevel(renderer, level) {
         if (!chunk)
             chunk = {};
 
-        if (!chunk[obj.z])
-            chunk[obj.z] = [];
+        if (!chunk[obj.ren_z])
+            chunk[obj.ren_z] = [];
 
-        chunk[obj.z].push(i);
+        chunk[obj.ren_z].push(i);
         lchunks[Math.floor(obj.x / 992)] = chunk;
     });
 
