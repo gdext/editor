@@ -411,6 +411,12 @@ export const util = {
 
         return {r: 0, b: 0, g: 0, a: 0};
     },
+    exportZLayer: (z) => {
+        for (let {gd, ex} in Object.entries(z))
+            if (z == ex) return gd;
+
+        return 0;
+    },
     zorder: {
         '-3': -4,
         '-1': -3,
@@ -863,7 +869,32 @@ export function GDRenderer(gl, loaded_callback = null) {
     };
 
     this.renderDynamicLine = (x1, y1, x2, y2, tint = {r: 1, g: 1, b: 1, opacity: 1}, width = 1, toCamera = false) => {
+        let gl = this.gl;
+
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 1);
+
+        let cx = (x1 + x2) / 2;
+        let cy = (y1 + y2) / 2;
+
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+
+        let dis = Math.sqrt(dx * dx + dy * dy);
+
+        let angle = Math.atan2(dy, dx) * (180 / Math.PI);
         
+        if (!toCamera)
+            util.setCamera(this, 0, 0);
+        else
+            util.setCamera(this);
+
+        util.setModelMatrix(this, cx, cy, dis, toCamera ? width / this.camera.zoom : width, -angle);
+
+        util.setTint(this, tint);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        gl.uniform1i(gl.getUniformLocation(this.gProg, "type"), 0);
     }
 
     this.renderText = (text, x, y, font, scale = 0.5, tint = {r: 1, g: 1, b: 1, opacity: 1}, toCamera = true, centered = true) => {
@@ -1110,11 +1141,11 @@ export function GDRenderer(gl, loaded_callback = null) {
         for (var obj of this.level.data) {
             if (obj.z == undefined) {
                 if (this.objectDefs[obj.id] != undefined)
-                    obj.z = this.objectDefs[obj.id].zlayer;
+                    obj.ren_z = this.objectDefs[obj.id].zlayer;
                 else
-                    obj.z = -1;
+                    obj.ren_z = -1;
             } else
-                obj.z = util.zorder[obj.z];
+                obj.ren_z = util.zorder[obj.z];
             if (obj.order == undefined) {
                 if (this.objectDefs[obj.id] != undefined)
                     obj.order = this.objectDefs[obj.id].zorder;
@@ -1154,10 +1185,10 @@ export function GDRenderer(gl, loaded_callback = null) {
             if (!chunk)
                 chunk = {};
 
-            if (!chunk[obj.z])
-                chunk[obj.z] = [];
+            if (!chunk[obj.ren_z])
+                chunk[obj.ren_z] = [];
 
-            chunk[obj.z].push(obj);
+            chunk[obj.ren_z].push(obj);
             lchunks[Math.floor(obj.x / 992)] = chunk;
         }
 
@@ -1327,6 +1358,8 @@ export function GDRenderer(gl, loaded_callback = null) {
         this.renderObject({id: 8, x: -1005, y: 15, _MICHIGUN: true});
         this.renderObject({id: 8, x: -1035, y: 15, _MICHIGUN: true});
         this.renderObject({id: 8, x: -1065, y: 15, _MICHIGUN: true});
+
+        //this.renderDynamicLine(0, 0, 30 * 10, 30 * 16, {r: 1, g: 1, b: 1, opacity: 1}, 1, true);
 
         var frameTime = window.performance.now() - startTime;
 
