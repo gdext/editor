@@ -1341,11 +1341,13 @@ export function GDRenderer(gl, loaded_callback = null) {
         let camB = Math.floor( this.cache.camX1 / 992 );
         let camE = Math.floor( this.cache.camX2 / 992 );
 
+        let zlayers = [-3, -1, 1, 3, 5, 7, 9];
+
         // This renders each object in each z layer in each level chunk
         for (let c = camB; c <= camE; c++)
             if (this.level.lchunks && this.level.lchunks[c]) {
                 let chunk = this.level.lchunks[c];
-                for (let i = -4; i <= 3; i++)
+                for (let i of zlayers)
                     if (i != 0 && chunk[i]) {
                         for (let obj of chunk[i])
                             this.renderObject(this.level.data[obj], obj);
