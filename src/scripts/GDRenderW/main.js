@@ -1141,11 +1141,11 @@ export function GDRenderer(gl, loaded_callback = null) {
         for (var obj of this.level.data) {
             if (obj.z == undefined) {
                 if (this.objectDefs[obj.id] != undefined)
-                    obj.ren_z = this.objectDefs[obj.id].zlayer;
+                    obj.z = util.zorder[this.objectDefs[obj.id].zlayer];
                 else
-                    obj.ren_z = -1;
-            } else
-                obj.ren_z = util.zorder[obj.z];
+                    obj.z = -1;
+            }
+
             if (obj.order == undefined) {
                 if (this.objectDefs[obj.id] != undefined)
                     obj.order = this.objectDefs[obj.id].zorder;
@@ -1185,10 +1185,10 @@ export function GDRenderer(gl, loaded_callback = null) {
             if (!chunk)
                 chunk = {};
 
-            if (!chunk[obj.ren_z])
-                chunk[obj.ren_z] = [];
+            if (!chunk[obj.z])
+                chunk[obj.z] = [];
 
-            chunk[obj.ren_z].push(obj);
+            chunk[obj.z].push(obj);
             lchunks[Math.floor(obj.x / 992)] = chunk;
         }
 
