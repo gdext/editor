@@ -411,6 +411,7 @@ export default {
             // position
             let xposinput = document.querySelector('#editXPos');
             let yposinput = document.querySelector('#editYPos');
+            let zlayerinput = document.querySelector('#editZLayer');
             let editrow1 = xposinput.parentElement.parentElement;
             xposinput.setAttribute('unit', '');
             yposinput.setAttribute('unit', '');
@@ -421,6 +422,19 @@ export default {
                 }
                 xposinput.value = relativeTransform.x/3 + xposinput.getAttribute('unit');
                 yposinput.value = relativeTransform.y/3 + yposinput.getAttribute('unit');
+                
+                let zlayerval = { text: 'Mixed', value: 4 };
+                if(relativeTransform.zlayer != null) {
+                    let vals = {
+                        '-3': 'B4', '-1': 'B3', '1': 'B2', '3': 'B1', 
+                        '5': 'T1', '7': 'T2', '9': 'T3'
+                    }
+                    zlayerval.text = vals[relativeTransform.zlayer.toString()]
+                    zlayerval.value = Math.round((relativeTransform.zlayer + 3) / 2)
+                }
+                zlayerinput.setAttribute('value', zlayerval.value);
+                zlayerinput.querySelector('.ui-list-display').innerText = zlayerval.text;
+
                 editrow1.classList.remove('disabled');
             } else {
                 xposinput.value = '';

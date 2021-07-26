@@ -84,6 +84,15 @@ const bottomMenus = {
                     ui.list(['B4', 'B3', 'B2', 'B1', 'T1', 'T2', 'T3'], { 
                         id: 'editZLayer',
                         selected:  () => { return 4 },
+                        onSelectChange: (s, i) => {
+                            let vals = {
+                                'B4': -3, 'B3': -1, 'B2': 1, 'B1': 3, 
+                                'T1': 5, 'T2': 7, 'T3': 9
+                            }
+                            canvas.setRelativeTransform({
+                                zlayer: vals[i[s]]
+                            });
+                        }
                     })
                 ]),
 

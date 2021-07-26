@@ -17,6 +17,7 @@ let relativeTransform = {
     hflip: false,
     vflip: false,
     zorder: 0,
+    zlayer: null
     center: {},
     objdata: {}*/
 }
@@ -131,6 +132,7 @@ function selectObjects() {
         hflip: false,
         vflip: false,
         zorder: 0,
+        zlayer: null,
         absolute: false
     }
 
@@ -148,6 +150,7 @@ function selectObjects() {
         relativeTransform.hflip = obj.flipx == true;
         relativeTransform.vflip = obj.flipx == true;
         relativeTransform.zorder = obj.order || gdrenderwData[obj.id.toString()].zorder;
+        relativeTransform.zlayer = obj.z || gdrenderwData[obj.id.toString()].zlayer
         relativeTransform.absolute = true;
 
         relativeTransform.objdata = {};
@@ -186,6 +189,7 @@ function selectObjects() {
         }
 
         // object local variables
+        let differentZLayers = [];
         relativeTransform.objdata = {};
         selectedObjs.forEach(o => {
             let od = level.getObject(o);
@@ -198,7 +202,12 @@ function selectObjects() {
                 flipy: od.flipy || false,
                 zorder: od.order || gdrenderwData[od.id.toString()].zorder
             }
+            let z = od.z || gdrenderwData[od.id.toString()].zlayer;
+            if(!differentZLayers.includes(z)) differentZLayers.push(z);
         });
+
+        // z layer
+        if(differentZLayers.length < 2) relativeTransform.zlayer = differentZLayers[0]
     }
 }
 
@@ -210,13 +219,15 @@ function updateRelativeTransform(obj, shiftcenter) {
         rot: false,
         scale: false,
         flip: false,
-        zorder: false
+        zorder: false,
+        zlayer: false
     }
     if(relativeTransform.x || relativeTransform.y) changedProps.pos = true;
     if(relativeTransform.rotation) changedProps.rot = true;
     if(relativeTransform.scale) changedProps.scale = true;
     if(relativeTransform.hflip || relativeTransform.vflip) changedProps.flip = true; 
     if(relativeTransform.zorder) changedProps.zorder = true; 
+    if(relativeTransform.zlayer != null) changedProps.zlayer = true; 
 
     if(relativeTransform.rotation < 0) relativeTransform.rotation += 360;
     else if(relativeTransform.rotation >= 360) relativeTransform.rotation -= 360;
@@ -240,6 +251,7 @@ function updateRelativeTransform(obj, shiftcenter) {
             od.flipx = relativeTransform.hflip ? 1 : null;
             od.flipy = relativeTransform.vflip ? 1 : null;
             od.order = relativeTransform.zorder;
+            od.z = relativeTransform.zlayer;
 
             //shift center
             let shiftX, shiftY;
@@ -302,6 +314,11 @@ function updateRelativeTransform(obj, shiftcenter) {
             //relative transform z order
             if(changedProps.zorder) {
                 od.order = v.zorder + relativeTransform.zorder;
+            }
+
+            //relative transform z layer
+            if(changedProps.zlayer) {
+                od.z = relativeTransform.zlayer;
             }
 
             //relative transform x,y
