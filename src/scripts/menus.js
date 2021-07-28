@@ -7,6 +7,7 @@ import quicktoolsData from '../assets/quicktools.json';
 import gdrenderwData from './GDRenderW/assets/data.json';
 import settingidsData from '../assets/levelparse/settingids.json';
 import settingsData from '../assets/settings.json';
+import songsData from '../assets/levelparse/songs.json';
 import ui from './ui';
 import actions from './actions';
 
@@ -501,7 +502,7 @@ function quickButton(id, icon, hint, primary = false, props = {}, children = [])
 const canvasMenus = {
     canvasOptions: ui.container('row', {}, [
         quickButton('levelSettingsBtn', 'ic-settings.svg', 'Level Settings', true, {
-            onClick: () => util.alert('levelSettingsDialog', 'Level Settings', 'are empty rn, sorry :/', 'Æ')
+            onClick: () => openLevelSettings()
         }),
         quickButton('levelZoomIn', 'ic-zoomin.svg', 'Zoom In'),
         quickButton('levelZoomOut', 'ic-zoomout.svg', 'Zoom Out'),
@@ -1155,7 +1156,153 @@ const settingsMenus = {
                 ])
             ])
         ]
-    }
+    },
+    level: {
+        properties: {
+            type: 'container',
+            scroll: 'vertical'
+        },
+        children: [
+            ui.container('row', { align: 'start', paddingX: 15, paddingY: 10 }, [
+                ui.container('column', { seperationRight: 15 }, [
+                    ui.label('Colors', { style: 'heading', marginBottom: 10 }),
+                    ui.button('Customize Level Colors', { 
+                        marginBottom: 20,
+                        onClick: () => { util.applySettings('comingsoon') }
+                    }),
+
+                    ui.label('Texture', { style: 'heading', marginBottom: 10 }),
+                    ui.container('column', { disabled: true }, [
+                        ui.label('Background'),
+                        ui.list(
+                            ['Background 1'],
+                            { selected: () => { return 0 } }
+                        ),
+                        ui.label('Ground', { marginTop: 5 }),
+                        ui.list(
+                            ['Ground 1'],
+                            { selected: () => { return 0 } }
+                        ),
+                        ui.label('Ground Line Style', { marginTop: 5 }),
+                        ui.tabs(
+                            ['Gradient', 'Constant'],
+                            { selected: () => { return 0 } }
+                        ),
+                        ui.label('Font', { marginTop: 5 }),
+                        ui.list(
+                            ['Font 1 (Pusab)'],
+                            { selected: () => { return 0 }, marginBottom: 20 }
+                        ),
+                    ]),
+
+                    ui.label('Song Guidelines', { style: 'heading', marginBottom: 10 }),
+                    ui.button('Open Guidelines Editor', { 
+                        marginBottom: 20,
+                        onClick: () => { util.applySettings('comingsoon') } 
+                    })
+                ]),
+                ui.container('column', {}, [
+                    ui.label('Game Mode', { style: 'heading', marginBottom: 10 }),
+                    ui.label('Starting Game Mode'),
+                    ui.list(
+                        ['Cube', 'Ship', 'Ball', 'UFO', 'Wave', 'Robot', 'Spider'],
+                        { 
+                            selected: () => { return parseInt(canvas.getSetting('gamemode') || 0) }, 
+                            onSelectChange: (s) => { canvas.setSetting('gamemode', s) },
+                            mode: 'dropdown' 
+                        }
+                    ),
+
+                    ui.container('row', { marginTop: 7 }, [
+                        ui.checkbox('Mini mode', { 
+                            checked: () => { return canvas.getSetting('mini') == '1' },
+                            onCheckChange: (c) => {  canvas.setSetting('mini', c * 1) }
+                        }),
+                        ui.checkbox('Dual mode', { 
+                            checked: () => { return canvas.getSetting('dual') == '1' },
+                            onCheckChange: (c) => {  canvas.setSetting('dual', c * 1) }
+                        })
+                    ]),
+                    ui.checkbox('2-Player mode', { 
+                        marginTop: 7, 
+                        checked: () => { return canvas.getSetting('2p') == '1' },
+                        onCheckChange: (c) => {  canvas.setSetting('2p', c * 1) }
+                    }),
+                    ui.label('In dual mode players are controlled separately. This is often used in ' +
+                    'levels for 2 players and minigames', { style: 'small' } ),
+
+                    ui.label('Speed', { marginTop: 10 }),
+                    ui.tabs(
+                        ['0.5x', '1x', '2x', '3x', '4x'],
+                        { 
+                            selected: () => { 
+                                let speed = parseInt(canvas.getSetting('speed') || 0); 
+                                if(speed == 1) speed = 0;
+                                else if(speed == 0) speed = 1;
+                                return speed;
+                            }, 
+                            onSelectChange: (s) => {
+                                if(s == 1) s = 0;
+                                else if(s == 0) s = 1;
+                                canvas.setSetting('speed', s);
+                            },
+                            marginBottom: 20 
+                        }
+                    ),
+
+                    ui.label('Song', { style: 'heading', marginBottom: 10 }),
+                    ui.tabs(
+                        ['Official', 'Custom'],
+                        { 
+                            selected: () => { return 0 }, 
+                            onSelectChange: (s) => { if(s) util.applySettings('comingsoon') } 
+                        }
+                    ),
+                    ui.label('Official Song Name', { marginTop: 5 }),
+                    ui.list(
+                        songsData.slice(1),
+                        { 
+                            selected: () => { return parseInt(localStorage.getItem('lvlsong') || 1) - 1 },
+                            onSelectChange: (s) => { localStorage.setItem('lvlsong', s+1) }
+                        }
+                    ),
+                    ui.label('Start Offset (in seconds)', { marginTop: 5 }),
+                    ui.container('row', {}, [
+                        ui.numberInput(
+                            'Number',
+                            { 
+                                defaultValue: () => { return parseFloat(canvas.getSetting('songoffset') || 0) }, 
+                                icon: 'slide', 
+                                min: 0,
+                                onValueChange: (v) => {
+                                    canvas.setSetting('songoffset', v);
+                                },
+                                scale: 0.1
+                            }
+                        ),
+                        ui.button(null, { 
+                            icon: 'ic-play.svg', iconHeight: 14, width: 32, height: 30,
+                            onClick: () => { util.applySettings('comingsoon') }
+                        })
+                    ]),
+                    ui.container('row', { marginTop: 7 }, [
+                        ui.checkbox('Fade in', { 
+                            checked: () => { return canvas.getSetting('songfadein') == '1' },
+                            onCheckChange: (c) => {  canvas.setSetting('songfadein', c * 1) }
+                        }),
+                        ui.checkbox('Fade out', { 
+                            checked: () => { return canvas.getSetting('songfadeout') == '1' },
+                            onCheckChange: (c) => {  canvas.setSetting('songfadeout', c * 1) }
+                        })
+                    ]),
+                ])
+            ])
+        ]
+    },
+}
+
+function openLevelSettings() {
+    util.createDialog('settingsDialog', 'Level Settings', true, [settingsMenus.level], true);
 }
 
 export default {
@@ -1420,6 +1567,12 @@ export default {
     },
 
     openSettings: (n) => {
+        //level settings
+        if(n == 4) {
+            openLevelSettings();
+            return;
+        }
+
         let settingsTabs = {
             properties: {
                 type: 'tabs',

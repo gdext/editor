@@ -15,7 +15,7 @@ export default {
             let data = {};
             let objSplitted = obj.split(',');
             for(let i = 0; i < objSplitted.length; i+=2){
-                if(!objSplitted[i] || !objSplitted[i+1]) break;
+                if(!objSplitted[i] || !objSplitted[i+1]) continue;
                 let val = objSplitted[i+1];
                 if(parseFloat(val) == val) val = parseFloat(val);
                 // groups and hsv data split
@@ -51,7 +51,7 @@ export default {
         let levelSettingsObj = {};
         let levelSettingsSplitted = code.split(';')[0].split(',');
         for(let i = 0; i < levelSettingsSplitted.length; i+=2){
-            if(!levelSettingsSplitted[i] || !levelSettingsSplitted[i+1]) break;
+            if(!levelSettingsSplitted[i] || !levelSettingsSplitted[i+1]) continue;
             let val = levelSettingsSplitted[i+1];
             let key = settingids[levelSettingsSplitted[i]];
             //color data split
@@ -97,7 +97,7 @@ export default {
             let guidelinesSplit = levelSettingsObj.guidelines.split('~');
             let guidelinesArray = [];
             for(let i = 0; i < guidelinesSplit.length; i+=2) {
-                if(!guidelinesSplit[i] || !guidelinesSplit[i+1]) break;
+                if(!guidelinesSplit[i] || !guidelinesSplit[i+1]) continue;
                 guidelinesArray.push({ timestamp: parseFloat(guidelinesSplit[i]), color: parseFloat(guidelinesSplit[i+1]) });
             }
             levelSettingsObj.guidelines = guidelinesArray;

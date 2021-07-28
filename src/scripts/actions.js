@@ -307,6 +307,9 @@ function executeAction(action) {
         case 'settings4':
             menus.openSettings(3);
             break;
+        case 'lvlsettings':
+            menus.openSettings(4);
+            break;
         case 'githubissue':
             util.openUrl('https://github.com/gdext/editor/issues/new/choose');
             break;

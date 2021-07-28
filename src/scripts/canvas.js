@@ -646,6 +646,15 @@ export default {
         if(!opt.dontSubmitUndo) submitUndoGroup();
         return keys;
     },
+    getSetting: (key) => {
+        let l = level.getLevel();
+        if(l) return key ? l.info[key] : l.info;
+    },
+    setSetting: (key, val) => {
+        let l = level.getLevel();
+        if(l) l.info[key] = val;
+        util.setUnsavedChanges(true);
+    },
     addUndoGroupAction: (obj, dontSubmitUndo) => {
         addUndoGroupAction(obj);
         if(!dontSubmitUndo) submitUndoGroup();

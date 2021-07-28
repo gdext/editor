@@ -260,7 +260,8 @@ export default {
             let song = l.customsong;
             if(!song) song = l.song;
             else song = 'c' + song;
-            localStorage.setItem('lvlsong', song);
+            if(song) localStorage.setItem('lvlsong', song);
+            else localStorage.setItem('lvlsong', 1);
         }
         util.updateTitle();
 
