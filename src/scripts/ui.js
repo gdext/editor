@@ -325,6 +325,9 @@ function UiObject() {
         listContainer.setAttribute('items', items.join('|'));
         listContainer.setAttribute('value', selected);
 
+        if(options.marginTop != undefined) listContainer.style.marginTop = options.marginTop + 'px';
+        if(options.marginBottom != undefined) listContainer.style.marginBottom = options.marginBottom + 'px';
+
         let mode = 1;
         if(options && options.mode == 'dropdown') mode = 2;
         let listDisplay = document.createElement('p');
