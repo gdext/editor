@@ -433,7 +433,6 @@ export function EditorLevel(renderer, level) {
 
             if (layer) {
                 let o = Math.max(layer.indexOf(key + ""), layer.indexOf(+key));
-                console.log(o, key + "", +key);
                 if (o != -1)
                     layer.splice(o, 1);
             }
