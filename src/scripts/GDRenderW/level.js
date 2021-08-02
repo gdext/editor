@@ -430,8 +430,10 @@ export function EditorLevel(renderer, level) {
 
         if (chunk) {
             let layer = chunk[layern];
+
             if (layer) {
-                let o = layer.indexOf(key);
+                let o = Math.max(layer.indexOf(key + ""), layer.indexOf(+key));
+                console.log(o, key + "", +key);
                 if (o != -1)
                     layer.splice(o, 1);
             }
@@ -842,11 +844,16 @@ export function EditorLevel(renderer, level) {
     for (var i = 1; i < 1010; i++)
         this.loadCTriggers(i);
 
+    let zlayers = [-3, -1, 1, 3, 5, 7, 9];
+
     for (var obj of this.level.data) {
         const def = renderer.objectDefs[obj.id];
 
         if (!obj.z)
-            obj.z = ( def ? util.zorder[def.zlayer] : null ) || -1;
+            obj.z = ( def ? util.exportZLayer(def.zlayer) : null ) || -1;
+        
+        if (!zlayers.includes(obj.z))
+            obj.z = util.exportZLayer(def.zlayer);
 
         obj.order = obj.order || ( def ? def.zorder : null ) || 5;
     }
