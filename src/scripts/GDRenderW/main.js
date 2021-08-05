@@ -1357,9 +1357,9 @@ export function GDRenderer(gl, loaded_callback = null) {
         //console.log(this.level);
         
         /*   RIP /\/\/\   */
-        this.renderObject({id: 8, x: -1005, y: 15, _MICHIGUN: true});
-        this.renderObject({id: 8, x: -1035, y: 15, _MICHIGUN: true});
-        this.renderObject({id: 8, x: -1065, y: 15, _MICHIGUN: true});
+        //this.renderObject({id: 8, x: -1005, y: 15, _MICHIGUN: true});
+        //this.renderObject({id: 8, x: -1035, y: 15, _MICHIGUN: true});
+        //this.renderObject({id: 8, x: -1065, y: 15, _MICHIGUN: true});
 
         //this.renderDynamicLine(0, 0, 30 * 10, 30 * 16, {r: 1, g: 1, b: 1, opacity: 1}, 1, true);
 
