@@ -18,7 +18,7 @@ After you've cloned the repository, type `npm install` (Node.js is required, obv
 * `/src/index.js` is the entry script
 
 ## Running Locally (via web browser)
-Make sure Webpack is installed, if not you may do:
+Make sure Webpack is installed (it should be, if you followed all of the steps above), if not you may do:
 ```
 npm install -g webpack-dev-server
 ```
