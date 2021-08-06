@@ -8,6 +8,7 @@ import './styles/general.css';
 import './styles/app.css';
 import './styles/ui.css';
 
+
 window.onload = () => {
     app.createApp();
     devmode.init();

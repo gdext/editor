@@ -503,7 +503,11 @@ export default {
             if(e.button == 0) {
                 if(keyboard.getKeys().includes(32)) {
                     beginScreenPanning();
-                } else {
+                } 
+                else if (keyboard.getKeys().includes(17)) { // while ctrl is pressed begin object selection
+                    beginObjectSelection(e);
+                }
+                else {
                     if(selectedTab == 0) beginObjectBuilding(e);
                     else beginObjectSelection(e);
                 }

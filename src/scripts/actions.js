@@ -6,6 +6,7 @@ import songsData from '../assets/levelparse/songs.json';
 import menus from './menus';
 
 let fs = null;
+
 if(window.process) fs = window.require('fs');
 
 // gbloab vars:
@@ -78,6 +79,7 @@ function confirmUnsavedChanges(onConfirm) {
 function executeAction(action) {
     let levelObj;
     let levelTxt;
+    
     switch(action) {
         case 'load':
             confirmUnsavedChanges((t) => {
