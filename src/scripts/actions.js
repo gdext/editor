@@ -78,6 +78,7 @@ function confirmUnsavedChanges(onConfirm) {
 function executeAction(action) {
     let levelObj;
     let levelTxt;
+    
     switch(action) {
         case 'load':
             confirmUnsavedChanges((t) => {
