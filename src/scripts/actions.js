@@ -6,7 +6,6 @@ import songsData from '../assets/levelparse/songs.json';
 import menus from './menus';
 
 let fs = null;
-
 if(window.process) fs = window.require('fs');
 
 // gbloab vars:
