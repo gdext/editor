@@ -46,6 +46,10 @@ function submitUndoGroup() {
     currentUndoGroup = null;
 }
 
+function discardUndoGroup() {
+    currentUndoGroup = null;
+}
+
 function moveInHistory(backward) {
     if(backward) {
         if(!undoHistory[currentHistoryPosition]) {
