@@ -207,7 +207,7 @@ function selectObjects() {
                 zorder: od.order || gdrenderwData[od.id.toString()].zorder,
                 groups: od.groups
             }
-            od.groups.forEach(g => {
+            if(od.groups) od.groups.forEach(g => {
                 if(!allGroups.includes(g)) allGroups.push(g);
             });
             let z = od.z || gdrenderwData[od.id.toString()].zlayer;
@@ -347,7 +347,7 @@ function updateRelativeTransform(obj, shiftcenter) {
                 relativeTransform.groups.remove.forEach(rg => {
                     if(v.groups.includes(rg)) newgroups.splice(newgroups.indexOf(rg), 1);
                 });
-                
+
                 od.groups = newgroups;
             }
 
