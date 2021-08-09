@@ -479,6 +479,35 @@ export default {
     pickFiles: (opt) => {
         if(window.gdext) return window.gdext.pickFilesElectron(opt);
         else return null;
+    },
+
+    waitForElement: (query, func) => {
+        // if node already exists, execute immediately
+        if(document.querySelector(query)) {
+            func();
+            return;
+        }
+
+        // else, wait for node using mutation observer
+        let observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (!mutation.addedNodes) return;   
+                for (let i = 0; i < mutation.addedNodes.length; i++) {
+                    let node = mutation.addedNodes[i];
+                    if(document.querySelector(query) == node) {
+                        // node exists
+                        func();
+                    }
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true, 
+            subtree: true, 
+            attributes: false, 
+            characterData: false
+        });   
     }
 
 }

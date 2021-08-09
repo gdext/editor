@@ -7,6 +7,7 @@ import icExit from '../assets/ic-exit.svg';
 import icArrowLeft from '../assets/ic-arrowleft.svg';
 import icArrowRight from '../assets/ic-arrowright.svg';
 import icArrowDown from '../assets/ic-arrowdown.svg';
+import icAdd from '../assets/ic-add.svg';
 import keyboard from './keyboard';
 import util from './util';
 
@@ -222,7 +223,6 @@ function UiObject() {
                     }
 
                     let pv = isInteger() ? Math.round(v) : Math.round(v*100)/100;
-                    console.log('pv', pv);
                     if(pv.toString() == 'NaN') pv = options.defaultValue ? options.defaultValue() : 0;
                     //handle numbers after the decimal point
                     if(!isInteger()) {
@@ -316,6 +316,124 @@ function UiObject() {
         });
 
         return tabContainer;
+    }
+
+    this.createArray = (values, id, options) => {
+        let arrayContainer = document.createElement('div');
+        arrayContainer.classList.add('ui-input');
+        if(id) arrayContainer.id = id;
+        if(values) arrayContainer.setAttribute('value', values().join('|'));
+        else arrayContainer.setAttribute('value', '');
+
+        if(options.marginTop != undefined) arrayContainer.style.marginTop = options.marginTop + 'px';
+        if(options.marginBottom != undefined) arrayContainer.style.marginBottom = options.marginBottom + 'px';
+        if(options.width) arrayContainer.style.width = options.width + 'px';
+
+        let arrayContent = document.createElement('div');
+        arrayContent.classList.add('ui-array-content');
+
+        let arrayButton = document.createElement('img');
+        arrayButton.draggable = false;
+        arrayButton.style.cursor = 'pointer';
+        arrayButton.src = icAdd;
+
+        let arrayChanges = {add: [], remove: []};
+
+        if(options.addMenu) {
+            arrayButton.onclick = (e) => {
+                ui.renderUiObject({
+                    properties: {
+                        type: 'contextMenu',
+                        id: id ? id + 'AddMenu' : 'arrayAddMenu',
+                        title: options.addMenu.title,
+                        maxwidth: options.addMenu.maxwidth,
+                        x: e.pageX,
+                        y: e.pageY
+                    },
+                    children: [
+                        options.addMenu.content
+                    ]
+                }, document.body);
+            }
+
+            if(options.addMenu.btnId) {
+                let val = '#' + options.addMenu.valId;
+                let btn = '#' + options.addMenu.btnId;
+                util.waitForElement(btn, () => {
+                    document.querySelector(btn).addEventListener('click', () => {
+                        let prevvals = arrayContainer.getAttribute('value');
+                        let newval = document.querySelector(val).value;
+
+                        arrayChanges = {add: [newval], remove: []};
+                        arrayContainer.setAttribute(
+                            'value', prevvals + '|' + newval
+                        );
+                    });
+                })
+            }
+        }
+
+        arrayContainer.appendChild(arrayContent);
+        arrayContainer.appendChild(arrayButton);
+
+        let currentlyUpdating = false;
+
+        function renderContent() {
+            currentlyUpdating = true;
+            let values = arrayContainer.getAttribute('value').split('|');
+
+            // sort values nuemrically, clip max items and remove duplicates
+            values = values.filter((item, pos) => {
+                return values.indexOf(item) == pos;
+            });
+            if(options.maxItems) {
+                if(values.length > options.maxItems) values = values.slice(0, options.maxItems);
+            }
+            values.sort((a, b) => a - b);
+
+            if(options.onValuesChange) {
+                options.onValuesChange(values, JSON.parse(JSON.stringify(arrayChanges)));
+                arrayChanges = { add: [], remove: [] };
+            }
+
+            arrayContent.innerHTML = '';
+            let vi = -1;
+            values.forEach(v => {
+                vi++;
+                let lvi = parseInt(vi);
+                if(!v) return;
+                v = parseInt(v);
+                let arrayItem = document.createElement('div');
+                arrayItem.classList.add('ui-array-item');
+                arrayItem.innerText = v;
+                arrayItem.onclick = () => {
+                    arrayChanges = {add: [], remove: [values[lvi]]};
+                    values.splice(lvi, 1);
+                    arrayContainer.setAttribute('value', values.join('|'));
+                }
+                arrayContent.appendChild(arrayItem);
+            });
+
+            arrayContainer.setAttribute('value', values.join('|'));
+            setTimeout(() => {
+                currentlyUpdating = false;
+            }, 10);
+        }
+
+        // listen for value attribute change
+        let arrayObserver = new MutationObserver((mutations) => {
+            mutations.forEach(function(mutation) {
+                if (mutation.type == "attributes" && !currentlyUpdating) {
+                    renderContent();
+                }
+            });
+        });
+        
+        arrayObserver.observe(arrayContainer, {
+            attributes: true 
+        });
+
+        return arrayContainer;
     }
 
     this.createList = (items, id, selected, options) => {
@@ -717,10 +835,11 @@ function UiObject() {
         menu.classList.add('ui-context-menu');
         menu.classList.add('uistretch');
         menu.tabIndex = 2;
-        setTimeout(() => {
-            menu.focus();
-        }, 25);
         if(id) menu.id = id;
+        util.waitForElement(id ? '#' + id : '.ui-context-menu', () => {
+            menu.focus();
+            fixMenuHeight();
+        });
         if(options && options.maxwidth) menu.style.width = options.maxwidth + 'px';
         if(options && options.maxheight) menu.style.maxHeight = options.maxheight + 'px';
         if(options && options.x) menu.style.left = options.x + 'px';
@@ -735,9 +854,6 @@ function UiObject() {
             let maxh = document.querySelector('#app').getBoundingClientRect().height - parseInt(menu.style.top) - 10;
             if(!options.maxheight) menu.style.maxHeight = maxh + 'px';
         }
-        setTimeout(() => {
-            fixMenuHeight();
-        }, 8);
 
         if(title) {
             let menuTitle = document.createElement('p');
@@ -819,6 +935,11 @@ const ui = {
                     let tabsElement = uiObject.createTabs(p.items, p.id, p.selected(), p);
                     if(p.disabled) tabsElement.classList.add('disabled');
                     elementContainer = tabsElement;
+                    break;
+                case 'array':
+                    let arrayElement = uiObject.createArray(p.values, p.id, p);
+                    if(p.disabled) arrayElement.classList.add('disabled');
+                    elementContainer = arrayElement;
                     break;
                 case 'list':
                     let listElement = uiObject.createList(p.items, p.id, p.selected(), p);
@@ -966,6 +1087,15 @@ const ui = {
      */
     tabs: (items, props = {}, children = []) =>
         ui.create('tabs', Object.assign(props, { items }), children),
+    /**
+     * Creates an array element
+     * @param {[]} values array's default values
+     * @param {{}} props element properties
+     * @param {[]} children element children
+     * @returns UIElement
+     */
+    array: (values, props = {}, children = []) =>
+        ui.create('array', Object.assign(props, { values }), children),
     /**
      * Creates a list
      * @param {[]} items list items

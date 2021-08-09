@@ -17,7 +17,8 @@ let relativeTransform = {
     hflip: false,
     vflip: false,
     zorder: 0,
-    zlayer: null
+    zlayer: null,
+    groups: {add: [], remove: []},
     center: {},
     objdata: {}*/
 }
@@ -133,6 +134,7 @@ function selectObjects() {
         vflip: false,
         zorder: 0,
         zlayer: null,
+        groups: { add: [], remove: [] },
         absolute: false
     }
 
@@ -150,7 +152,8 @@ function selectObjects() {
         relativeTransform.hflip = obj.flipx == true;
         relativeTransform.vflip = obj.flipx == true;
         relativeTransform.zorder = obj.order || gdrenderwData[obj.id.toString()].zorder;
-        relativeTransform.zlayer = obj.z || gdrenderwData[obj.id.toString()].zlayer
+        relativeTransform.zlayer = obj.z || gdrenderwData[obj.id.toString()].zlayer;
+        relativeTransform.groups.add = obj.groups || [];
         relativeTransform.absolute = true;
 
         relativeTransform.objdata = {};
@@ -190,6 +193,7 @@ function selectObjects() {
 
         // object local variables
         let differentZLayers = [];
+        let allGroups = [];
         relativeTransform.objdata = {};
         selectedObjs.forEach(o => {
             let od = level.getObject(o);
@@ -200,14 +204,19 @@ function selectObjects() {
                 rotation: od.r || 0,
                 flipx: od.flipx || false,
                 flipy: od.flipy || false,
-                zorder: od.order || gdrenderwData[od.id.toString()].zorder
+                zorder: od.order || gdrenderwData[od.id.toString()].zorder,
+                groups: od.groups
             }
+            od.groups.forEach(g => {
+                if(!allGroups.includes(g)) allGroups.push(g);
+            });
             let z = od.z || gdrenderwData[od.id.toString()].zlayer;
             if(!differentZLayers.includes(z)) differentZLayers.push(z);
         });
 
         // z layer
         if(differentZLayers.length < 2) relativeTransform.zlayer = differentZLayers[0]
+        relativeTransform.groups.all = allGroups;
     }
 }
 
@@ -220,7 +229,8 @@ function updateRelativeTransform(obj, shiftcenter) {
         scale: false,
         flip: false,
         zorder: false,
-        zlayer: false
+        zlayer: false,
+        groups: false
     }
     if(relativeTransform.x || relativeTransform.y) changedProps.pos = true;
     if(relativeTransform.rotation) changedProps.rot = true;
@@ -228,6 +238,11 @@ function updateRelativeTransform(obj, shiftcenter) {
     if(relativeTransform.hflip || relativeTransform.vflip) changedProps.flip = true; 
     if(relativeTransform.zorder) changedProps.zorder = true; 
     if(relativeTransform.zlayer != null) changedProps.zlayer = true; 
+    if(
+        relativeTransform.groups 
+        && (relativeTransform.groups.add.length > 0 || 
+            relativeTransform.groups.remove.length > 0)
+    ) changedProps.groups = true; 
 
     if(relativeTransform.rotation < 0) relativeTransform.rotation += 360;
     else if(relativeTransform.rotation >= 360) relativeTransform.rotation -= 360;
@@ -252,6 +267,7 @@ function updateRelativeTransform(obj, shiftcenter) {
             od.flipy = relativeTransform.vflip ? 1 : null;
             od.order = relativeTransform.zorder;
             od.z = relativeTransform.zlayer;
+            od.groups = relativeTransform.groups.add;
 
             //shift center
             let shiftX, shiftY;
@@ -319,6 +335,20 @@ function updateRelativeTransform(obj, shiftcenter) {
             //relative transform z layer
             if(changedProps.zlayer) {
                 od.z = relativeTransform.zlayer;
+            }
+
+            //relative transform groups
+            if(changedProps.groups) {
+                let newgroups = v.groups;
+
+                relativeTransform.groups.add.forEach(ag => {
+                    if(!v.groups.includes(ag)) newgroups.push(ag);
+                });
+                relativeTransform.groups.remove.forEach(rg => {
+                    if(v.groups.includes(rg)) newgroups.splice(newgroups.indexOf(rg), 1);
+                });
+                
+                od.groups = newgroups;
             }
 
             //relative transform x,y

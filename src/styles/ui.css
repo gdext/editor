@@ -293,6 +293,45 @@ input::-webkit-color-swatch {
     width: 100%;
 }
 
+/* array */
+.ui-array-content {
+    display: flex;
+    overflow: auto;
+    height: 30px;
+    align-items: center;
+    margin-left: 2px;
+    min-width: calc(100% - 34px);
+}
+
+.ui-array-item {
+    flex-shrink: 0;
+    padding: 3px 7px;
+    background: #4C4C4C;
+    font-weight: 500;
+    border-radius: 4px;
+    margin-left: 5px;
+    user-select: none;
+    cursor: pointer;
+}
+.ui-array-item:hover {
+    background: #444;
+}
+.ui-array-item::after {
+    content: '';
+    opacity: 0.8;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+    margin-left: 5px;
+    background-image: url('../assets/ic-exit.svg');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.ui-array-item:hover::after {
+    opacity: 1;
+}
+
 /* tab */
 .ui-tabs {
     color: #fff;

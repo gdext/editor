@@ -470,6 +470,17 @@ export default {
                 editrow2.classList.add('disabled');
                 editrow3.classList.add('disabled');
             }
+
+            // groups & editor layers
+            let groupsinput = document.querySelector('#editGroup');
+            let editrow4 = groupsinput.parentElement;
+            if(relativeTransform.groups != undefined) {
+                groupsinput.setAttribute('value', (relativeTransform.groups.all || relativeTransform.groups.add).join('|'));
+                editrow4.classList.remove('disabled');
+            } else {
+                groupsinput.setAttribute('value', '');
+                editrow4.classList.add('disabled');
+            }
         }
 
         function finishObjectTransform() {
@@ -524,9 +535,7 @@ export default {
             }
         }, 100);
 
-        // TODO: Replace the text context menu with data from menus.js
         top_canvas.oncontextmenu = (e) => {
-            //test context menu
             ui.renderUiObject(menus.getContextMenu('editObjectNormal', {x: e.pageX, y: e.pageY}), document.body);
             return false;
         }
