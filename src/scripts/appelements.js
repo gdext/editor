@@ -473,13 +473,43 @@ export default {
 
             // groups & editor layers
             let groupsinput = document.querySelector('#editGroup');
+            let nofadecheck = document.querySelector('#editNoFade');
+            let noentercheck = document.querySelector('#editNoEnter');
+            let highdetailcheck = document.querySelector('#editHighDetail');
+            let groupparentcheck = document.querySelector('#editGroupParent');
             let editrow4 = groupsinput.parentElement;
             if(relativeTransform.groups != undefined) {
                 groupsinput.setAttribute('value', (relativeTransform.groups.all || relativeTransform.groups.add).join('|'));
                 editrow4.classList.remove('disabled');
+
+                let selFlags = { nofade: [], noenter: [], highdetail: [], groupparent: [] };
+                renderer.getSelectedObjects().forEach(k => {
+                    let o = renderer.getObjectByKey(k);
+                    selFlags.nofade.push(o.dontFade || 0);
+                    selFlags.noenter.push(o.dontEnter || 0);
+                    selFlags.highdetail.push(o.highDetail || 0);
+                    selFlags.groupparent.push(o.parent || 0);
+                });
+
+                if(!selFlags.nofade.includes(0)) nofadecheck.checked = true;
+                else nofadecheck.checked = false;
+
+                if(!selFlags.noenter.includes(0)) noentercheck.checked = true;
+                else noentercheck.checked = false;
+
+                if(!selFlags.highdetail.includes(0)) highdetailcheck.checked = true;
+                else highdetailcheck.checked = false;
+                
+                if(!selFlags.groupparent.includes(0)) groupparentcheck.checked = true;
+                else groupparentcheck.checked = false;
             } else {
                 groupsinput.setAttribute('value', '');
                 editrow4.classList.add('disabled');
+
+                nofadecheck.checked = false;
+                noentercheck.checked = false;
+                highdetailcheck.checked = false;
+                groupparentcheck.checked = false;
             }
         }
 

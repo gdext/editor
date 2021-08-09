@@ -465,12 +465,54 @@ const bottomMenus = {
                         // misc checkboxes
                         ui.container('row', { marginTop: 8.5, marginBottom: 8.5 }, [
                             ui.container('column', {}, [
-                                ui.checkbox('No Fade', { checked: () => { return false } }),
-                                ui.checkbox('Group Parent', { checked: () => { return false }, marginTop: 7 })
+                                ui.checkbox('No Fade', { 
+                                    id: 'editNoFade',
+                                    checked: () => { return false },
+                                    onCheckChange: (c) => {
+                                        let sel = canvas.getSelectedObjects();
+                                        sel.forEach(k => {
+                                            let o = canvas.getObjectByKey(k);
+                                            o.dontFade = c * 1;
+                                        })
+                                    } 
+                                }),
+                                ui.checkbox('Group Parent', { 
+                                    id: 'editGroupParent',
+                                    checked: () => { return false }, 
+                                    onCheckChange: (c) => {
+                                        let sel = canvas.getSelectedObjects();
+                                        sel.forEach(k => {
+                                            let o = canvas.getObjectByKey(k);
+                                            o.parent = c * 1;
+                                        })
+                                    },
+                                    marginTop: 7 
+                                })
                             ]),
                             ui.container('column', {}, [
-                                ui.checkbox('No Enter', { checked: () => { return false } }),
-                                ui.checkbox('High Detail', { checked: () => { return false }, marginTop: 7 })
+                                ui.checkbox('No Enter', { 
+                                    id: 'editNoEnter',
+                                    checked: () => { return false },
+                                    onCheckChange: (c) => {
+                                        let sel = canvas.getSelectedObjects();
+                                        sel.forEach(k => {
+                                            let o = canvas.getObjectByKey(k);
+                                            o.dontEnter = c * 1;
+                                        })
+                                    } 
+                                }),
+                                ui.checkbox('High Detail', {
+                                    id: 'editHighDetail', 
+                                    checked: () => { return false }, 
+                                    onCheckChange: (c) => {
+                                        let sel = canvas.getSelectedObjects();
+                                        sel.forEach(k => {
+                                            let o = canvas.getObjectByKey(k);
+                                            o.highDetail = c * 1;
+                                        })
+                                    },
+                                    marginTop: 7 
+                                })
                             ])
                         ]),
 
