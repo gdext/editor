@@ -17,6 +17,7 @@ import levelparse from './levelparse';
 import actionsExec from './actions';
 import keyboard from './keyboard';
 import menus from './menus';
+import gizmos from './gizmos';
 
 let buildSelection = 1;
 let selectedTab = 0; // 0 - build, 1 - edit, 2 - delete
@@ -273,6 +274,17 @@ export default {
             renderer.update(canvas);
         }, 5000);
 
+        // gizmos
+        gizmos.init();
+        top_canvas.addEventListener('pointermove', (e) => {
+            let gizmo = gizmos.getGizmo();
+            if(!gizmo) return;
+            let tctx = top_canvas.getContext('2d');
+            tctx.clearRect(0, 0, top_canvas.width, top_canvas.height);
+            gizmo.changeMousePos(e.offsetX, e.offsetY);
+            gizmo.render();
+        });
+
         //mouse events
         function beginScreenPanning(e) {
             let coords = renderer.getCoords();
@@ -339,13 +351,16 @@ export default {
                     window.requestAnimationFrame(update);
             }
             update();
-            top_canvas.onpointermove = (e1) => {
+
+            let movelistener = top_canvas.addEventListener('pointermove', (e1) => {
                 eX = e1.offsetX;
                 eY = e1.offsetY;
-            }
+            });
             
             function stop() {
-                top_canvas.onpointermove = null;
+                let gizmo = gizmos.getGizmo();
+                if(gizmo) gizmo.mouseRelease();
+                top_canvas.removeEventListener('pointermove', movelistener);
                 window.onpointerup = null;
                 moving = false;
                 window.onpointerout = null;
@@ -367,13 +382,15 @@ export default {
                     window.requestAnimationFrame(update);
             }
             update();
-            top_canvas.onpointermove = (e1) => {
+            let movelistener = top_canvas.addEventListener('pointermove', (e1) => {
                 eX = e1.offsetX;
                 eY = e1.offsetY;
-            }
+            });
             
             function stop() {
-                top_canvas.onpointermove = null;
+                let gizmo = gizmos.getGizmo();
+                if(gizmo) gizmo.mouseRelease();
+                top_canvas.removeEventListener('pointermove', movelistener);
                 window.onpointerup = null;
                 moving = false;
                 window.onpointerout = null;
@@ -549,6 +566,8 @@ export default {
                     beginObjectSelection(e);
                 }
                 else {
+                    let gizmo = gizmos.getGizmo();
+                    if(gizmo) gizmo.mousePress();
                     if(selectedTab == 0) beginObjectBuilding(e);
                     else beginObjectSelection(e);
                 }

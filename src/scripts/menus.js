@@ -10,6 +10,7 @@ import settingsData from '../assets/settings.json';
 import songsData from '../assets/levelparse/songs.json';
 import ui from './ui';
 import actions from './actions';
+import gizmos from './gizmos';
 
 function loadLevel(level) {
     let event = new CustomEvent('electronApi', { 
@@ -551,7 +552,16 @@ const bottomMenus = {
                                     }),
                                     ui.button(null, { id: 'editToolRotate', icon: 'ic-rotate.svg',
                                         hint: 'Toggle Rotate Tool', iconHeight: 20, width: 40, 
-                                        height: 40, primary: false
+                                        height: 40, primary: false, onClick: () => {
+                                            let self = document.querySelector('#editToolRotate');
+                                            if(self.classList.contains('primary')) {
+                                                gizmos.destroyGizmo();
+                                                self.classList.remove('primary');
+                                            } else {
+                                                gizmos.createGizmo('rotate');
+                                                self.classList.add('primary');
+                                            }
+                                        }
                                     }),
                                     ui.button(null, { id: 'editToolScale', icon: 'ic-scale.svg',
                                         hint: 'Toggle Scale Tool', iconHeight: 20, width: 40, 
