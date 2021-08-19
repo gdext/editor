@@ -383,7 +383,6 @@ export default {
         switch (type) {
             case 'rotate':
                 currentGizmo = new TransformRotateGizmo(canvas.getContext('2d'), canvas, (r, f) => {
-                    console.log(r);
                     let rt = renderer.getRelativeTransform();
                     
                     let prevrot = rt.rotation;
@@ -393,7 +392,6 @@ export default {
                     let newrot = Math.round((prevrot + util.radiansToDegrees(r))*1000)/1000;
                     let dis = distance(objp, currentGizmo.position);
                     let ang = getAngle(objp, currentGizmo.position, 0);
-                    if(f) console.log(rt.center, currentGizmo.position, dis);
 
                     let newx = Math.cos(ang) * dis;
                     let newy = Math.sin(ang) * dis;
