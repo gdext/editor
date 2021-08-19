@@ -293,6 +293,12 @@ export default {
             util.setCursor('grab');
             function update() {
                 renderer.update(canvas);
+                let gizmo = gizmos.getGizmo();
+                if(gizmo) {
+                    let tctx = top_canvas.getContext('2d');
+                    tctx.clearRect(0, 0, top_canvas.width, top_canvas.height);
+                    gizmo.render();
+                }
                 if (moving)
                     window.requestAnimationFrame(update);
             }
@@ -421,6 +427,12 @@ export default {
             }
             renderer.moveTo(coords.x, coords.y, coords.z);
             renderer.update(canvas);
+            let gizmo = gizmos.getGizmo();
+            if(gizmo) {
+                let tctx = top_canvas.getContext('2d');
+                tctx.clearRect(0, 0, top_canvas.width, top_canvas.height);
+                gizmo.render();
+            }
         }
 
         function updateEditInputs() {
@@ -567,7 +579,17 @@ export default {
                 }
                 else {
                     let gizmo = gizmos.getGizmo();
-                    if(gizmo) gizmo.mousePress();
+                    if(gizmo) {
+                        let press = gizmo.mousePress();
+                        if(press) {
+                            let pressEnd = () => {
+                                gizmo.mouseRelease();
+                                window.removeEventListener('pointerup', pressEnd);
+                            };
+                            window.addEventListener('pointerup', pressEnd);
+                            return;
+                        }
+                    } 
                     if(selectedTab == 0) beginObjectBuilding(e);
                     else beginObjectSelection(e);
                 }

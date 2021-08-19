@@ -5,6 +5,7 @@ import objectsData from '../assets/levelparse/objects.json';
 import objAlignData from '../assets/obj-align.json';
 import gdrenderwData from './GDRenderW/assets/data.json';
 import util from './util';
+import gizmos from './gizmos';
 
 let gl, renderer, cvs, options, level, top, sel;
 
@@ -221,6 +222,15 @@ function selectObjects() {
         // z layer
         if(differentZLayers.length < 2) relativeTransform.zlayer = differentZLayers[0]
         relativeTransform.groups.all = allGroups;
+    }
+
+    // gizmo center
+    let gizmo = gizmos.getGizmo();
+    if(gizmo) {
+        if(relativeTransform.center) gizmo.setCenter(relativeTransform.center.x, relativeTransform.center.y);
+        else gizmo.setCenter(relativeTransform.x, relativeTransform.y);
+        
+        gizmo.setPos(gizmo.center.x, gizmo.center.y);
     }
 }
 
@@ -485,7 +495,12 @@ export default {
         return level.getObjectsIn(rect);
     },
     screen2LevelCoords: (x, y) => {
+        if(typeof x == 'object') return renderer.screenToLevelPos(x.x, x.y);
         return renderer.screenToLevelPos(x, y);
+    },
+    level2ScreenCoords: (x, y) => {
+        if(typeof x == 'object') return renderer.levelToScreenPos(x.x, x.y);
+        return renderer.levelToScreenPos(x, y);
     },
     beginSelectionBox: (x, y) => {
         let pos = renderer.screenToLevelPos(x, y);
@@ -603,6 +618,13 @@ export default {
     },
     getSelectedObjects: () => {
         return selectedObjs;
+    },
+    applySelection: () => {
+        let prevS = selectedObjs;
+        selectedObjs = [];
+        selectObjects();
+        selectedObjs = prevS;
+        selectObjects();
     },
     getRelativeTransform: () => {
         return relativeTransform;

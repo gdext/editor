@@ -508,6 +508,14 @@ export default {
             attributes: false, 
             characterData: false
         });   
+    },
+
+    radiansToDegrees: (radians) => {
+        return radians * (180/Math.PI);
+    },
+
+    degreesToRadians: (degrees) => {
+        return degrees / (180/Math.PI);
     }
 
 }
