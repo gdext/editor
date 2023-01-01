@@ -13,8 +13,7 @@
                 ],
                 [
                     { "name": "Export as File", "id": "export", "icon": "ic-export.svg" },
-                    { "name": "Import", "id": "import" },
-                    { "name": "Exit", "id": "exit", "icon": "ic-exit.svg" }
+                    { "name": "Import", "id": "import" }
                 ]
             ]
         },
@@ -77,9 +76,19 @@
                     { "name": "Discord Server", "id": "discord" }
                 ]
             ]
+        },
+        {
+            "title": "Window",
+            "options": [
+                [
+                    { "name": "Minimize", "id": "minimize", "icon": "ic-windowmin.svg" },
+                    { "name": "Maximize", "id": "maximize", "icon": "ic-windowmax.svg" },
+                    { "name": "Exit", "id": "exit", "icon": "ic-exit.svg" }
+                ]
+            ]
         }
     ],
     "right": [ 
-        "save", "saveas", "export", "exit"
+        "save", "saveas", "export", "minimize", "maximize", "exit"
     ]
 }
