@@ -5,6 +5,8 @@ import util from './util';
 import songsData from '../assets/levelparse/songs.json';
 import menus from './menus';
 
+let ipc = null;
+if(window.process) ipc = window.require('electron').ipcRenderer;
 let fs = null;
 if(window.process) fs = window.require('fs');
 
@@ -247,6 +249,16 @@ function executeAction(action) {
                     window.location.reload();
                 }
             });
+            break;
+        case 'minimize':
+            if (ipc) {
+                ipc.send('minimize')
+            }
+            break;
+        case 'maximize':
+            if (ipc) {
+                ipc.send('maximize')
+            }
             break;
         case 'exit':
             confirmUnsavedChanges((t) => {
