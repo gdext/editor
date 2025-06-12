@@ -3,6 +3,9 @@
 [![](https://img.shields.io/github/issues/gdext/editor)](https://github.com/gdext/editor/issues)
 [![](https://img.shields.io/github/license/gdext/editor)](https://github.com/gdext/editor/blob/master/LICENSE)
 
+> [!CAUTION]
+> ⚠️ **THIS PROJECT IS ABANDONED!** Almost none of the features work and probably never will be, as GDExt has stopped development in 2021 and never left pre-alpha
+
 **Welcome to GDExt's repo! :)**
 This is an external Geometry Dash editor built using electron and webpack. This repo contains the code for the editor's page itself. However, it doesn't include the `/dist` directory and any of the code related to electron.
 > **Note:** This repo is obsolete. GDExt is currently being [rewritten from the ground up](https://github.com/gdext/app). 
